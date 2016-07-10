@@ -55,7 +55,7 @@
     if (captureSession)
     {
         // Create the session video preview layer
-        AVCaptureVideoPreviewLayer * videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
+        LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
         [videoPreviewLayer setBackgroundColor:[[UIColor greenColor] CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
 
@@ -68,7 +68,7 @@
     }
 }
 
-- (void)setVideoPreviewLayer:(AVCaptureVideoPreviewLayer *)videoPreviewLayer
+- (void)setVideoPreviewLayer:(LMTCaptureVideoPreviewLayer *)videoPreviewLayer
 {
     if (videoPreviewLayer)
     {

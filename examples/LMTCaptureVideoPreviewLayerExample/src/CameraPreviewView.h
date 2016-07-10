@@ -32,7 +32,7 @@
 @interface CameraPreviewView : UIView
 {
     // Preview (live)
-    AVCaptureVideoPreviewLayer * _videoPreviewLayer;
+    LMTCaptureVideoPreviewLayer * _videoPreviewLayer;
 }
 
 - (void)setCaptureSession:(AVCaptureSession *)captureSession;

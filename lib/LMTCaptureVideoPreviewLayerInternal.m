@@ -90,6 +90,9 @@
         // Set the video data output delegate
         [captureOutput setSampleBufferDelegate:self queue:[self captureOutputSampleBufferDelegateQueue]];
         
+        // Enable the video data output
+        [[captureOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+        
         _captureOutput = captureOutput;
     }
     
