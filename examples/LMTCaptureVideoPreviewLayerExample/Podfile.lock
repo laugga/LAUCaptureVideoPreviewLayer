@@ -10,7 +10,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   LMTCaptureVideoPreviewLayer:
-    :commit: 96e2fd24835293776a9ffcbbd569f218888bcc18
+    :commit: bbc7b48f546607bc55216b770d9f917ce354c704
     :git: git@bitbucket.org:coletiv/lmtcapturevideopreviewlayer.git
 
 SPEC CHECKSUMS:

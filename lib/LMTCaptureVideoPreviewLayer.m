@@ -727,7 +727,7 @@
 
 - (void)drawPixelBuffer:(CADisplayLink*)aDisplayLink
 {
-    CMSampleBufferRef sampleBuffer = (CMSampleBufferRef)CFRetain(self.internal.sampleBuffer);
+    CMSampleBufferRef sampleBuffer = self.internal.sampleBuffer;
     
     if (!sampleBuffer)
     {
@@ -736,8 +736,6 @@
     }
     
     CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
-    
-    CFRelease(sampleBuffer);
     
     if (!pixelBuffer)
     {
