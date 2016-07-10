@@ -56,6 +56,8 @@ NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
     LMTCaptureVideoPreviewLayerInternal * _internal;
 }
 
+@property (nonatomic, readwrite) CGFloat blur; // [0,1]
+
 /*!
  @method layerWithSession:
  @abstract

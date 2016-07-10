@@ -192,6 +192,15 @@
     // TODO
 }
 
+#pragma mark -
+#pragma mark Blur property
+
+- (void)setBlur:(CGFloat)blur
+{
+    _blur = blur;
+    [self setFilterIntensity:_blur animated:YES];
+}
+
 #pragma mark - 
 #pragma mark AVCaptureSession
 

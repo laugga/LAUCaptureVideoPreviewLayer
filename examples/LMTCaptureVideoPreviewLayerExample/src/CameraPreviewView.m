@@ -34,6 +34,8 @@
     self = [super initWithFrame:frame];
     if (self)
     {
+        UITapGestureRecognizer * tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userDidTap:)];
+        [self addGestureRecognizer:tapGestureRecognizer];
     }
     
     return self;
@@ -81,6 +83,14 @@
     {
         [_videoPreviewLayer removeFromSuperlayer];
         _videoPreviewLayer = nil;
+    }
+}
+
+- (void)userDidTap:(UITapGestureRecognizer *)sender
+{
+    if (sender.state == UIGestureRecognizerStateEnded)
+    {
+        
     }
 }
 
