@@ -6,9 +6,6 @@ set -e
 # Project ${PRODUCT_NAME}-Info.plist
 PROJECT_INFOPLIST_PATH="${PROJECT_DIR}/${INFOPLIST_FILE}"
 
-# App settings Root.plist file
-APP_SETTINGS_ROOTPLIST_PATH="${SRCROOT}/resources/Settings.bundle/Root.plist"
-
 CURRENT_GIT_LONG_VERSION=""
 CURRENT_GIT_TAG_VERSION=""
 CURRENT_GIT_COMMIT_COUNT=""

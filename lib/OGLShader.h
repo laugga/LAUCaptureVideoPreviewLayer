@@ -1,9 +1,9 @@
 /*
  
- LMTCaptureVideoPreviewLayerTest.m
- LMTCaptureVideoPreviewLayer
+ OGLShader.h
+ Lightmate
  
- Copyright (c) 2016 Coletiv Studio.
+ Copyright (cc) 2016 Luis Laugga.
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,35 +23,44 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- */
+*/
 
-#import <XCTest/XCTest.h>
+#ifndef __Lightmate_OGLShader__
+#define __Lightmate_OGLShader__
 
-@interface LMTCaptureVideoPreviewLayerTest : XCTestCase
+#if TARGET_OS_IPHONE
+    #import <OpenGLES/ES2/gl.h>
+#else
+    #import <OpenGL/gl.h>
+#endif
 
-@end
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-@implementation LMTCaptureVideoPreviewLayerTest
+typedef struct
+{
+	GLchar* string;
+	GLsizei byteSize;
+	GLenum shaderType; // Vertex or Fragment
+	
+} Shader;
 
-- (void)setUp {
-    [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+// Shader memory management
+    Shader * allocShader(GLenum shaderType, const char * shaderSource);
+void freeShader(Shader * shader);
+    
+// Shader compilation
+GLuint buildShader(const char * source, GLenum shaderType);
+GLuint buildProgram(const char * vShader, const char * fShader);  
+int validateProgram(GLuint programHandle);
+    
+// Shader loading
+GLuint loadProgram(const char * vertexShaderSource, const char * fragmentShaderSource);
+void unloadProgram(GLuint * programHandle);
+    
+#ifdef __cplusplus
 }
+#endif
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-}
-
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
-}
-@end
+#endif // __Lightmate_OGLShader__

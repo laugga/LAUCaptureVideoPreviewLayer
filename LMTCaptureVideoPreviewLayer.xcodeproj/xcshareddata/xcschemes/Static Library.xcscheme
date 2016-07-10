@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "38E212771D31441A00AAE5F6"
+               BuildableName = "Test.xctest"
+               BlueprintName = "Test"
+               ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A01C02111620D8B4003DA76F"
+            BuildableName = "libLMTCaptureVideoPreviewLayer.a"
+            BlueprintName = "Static Library"
+            ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -60,6 +79,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A01C02111620D8B4003DA76F"
+            BuildableName = "libLMTCaptureVideoPreviewLayer.a"
+            BlueprintName = "Static Library"
+            ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

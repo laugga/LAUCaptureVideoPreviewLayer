@@ -33,7 +33,7 @@
 #import <AVFoundation/AVAnimation.h>
 
 @class AVMetadataObject;
-@class AVCaptureVideoPreviewLayerInternal;
+@class LMTCaptureVideoPreviewLayerInternal;
 
 /*!
  @class LMTCaptureVideoPreviewLayer
@@ -50,10 +50,10 @@
  @"orientation" and @"mirrored".
  */
 NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
-@interface LMTCaptureVideoPreviewLayer : CALayer
+@interface LMTCaptureVideoPreviewLayer : CAEAGLLayer
 {
 @private
-    //AVCaptureVideoPreviewLayerInternal *_internal;
+    LMTCaptureVideoPreviewLayerInternal * _internal;
 }
 
 /*!

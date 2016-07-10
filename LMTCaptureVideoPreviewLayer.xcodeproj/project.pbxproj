@@ -7,23 +7,36 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		38E212721D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */; };
-		A01C02C91620E7E7003DA76F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */; };
-		A01C02CA1620E7E7003DA76F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02411620D9BA003DA76F /* CoreFoundation.framework */; };
-		A039A76B161F8C08009E4C10 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB291608B2C300E20441 /* UIKit.framework */; };
-		A039A76C161F8C08009E4C10 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2B1608B2C300E20441 /* Foundation.framework */; };
-		A0445E0E18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */; };
-		A0445E0F18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */; };
-		A0BCA0511874722600FC20CE /* LMTCaptureVideoPreviewLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A0BCA0501874722600FC20CE /* LMTCaptureVideoPreviewLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		38E212821D31448F00AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */; };
+		38E212861D324EBC00AAE5F6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E212851D324EBC00AAE5F6 /* AVFoundation.framework */; };
+		38E2129B1D3258B300AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */; };
+		38E2129C1D3258B300AAE5F6 /* OGLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212901D3258A600AAE5F6 /* OGLShader.h */; };
+		38E2129D1D3258B300AAE5F6 /* OGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212911D3258A600AAE5F6 /* OGLShader.m */; };
+		38E2129E1D3258B300AAE5F6 /* OGLUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212921D3258A600AAE5F6 /* OGLUtilities.h */; };
+		38E2129F1D3258B300AAE5F6 /* OGLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212931D3258A600AAE5F6 /* OGLUtilities.m */; };
+		38E212A11D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A0BCA0501874722600FC20CE /* LMTCaptureVideoPreviewLayer.h */; };
+		38E212A21D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */; };
+		38E212A31D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212871D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h */; };
+		38E212A41D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LMTCaptureVideoPreviewLayerTest.m; path = test/LMTCaptureVideoPreviewLayerTest.m; sourceTree = SOURCE_ROOT; };
+		38E212781D31441A00AAE5F6 /* Test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38E212801D31447200AAE5F6 /* LMTCaptureVideoPreviewLayerTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LMTCaptureVideoPreviewLayerTest-Info.plist"; path = "test/LMTCaptureVideoPreviewLayerTest-Info.plist"; sourceTree = SOURCE_ROOT; };
+		38E212851D324EBC00AAE5F6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		38E212871D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerInternal.h; sourceTree = "<group>"; };
+		38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerInternal.m; sourceTree = "<group>"; };
+		38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerStructures.h; sourceTree = "<group>"; };
+		38E212901D3258A600AAE5F6 /* OGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGLShader.h; sourceTree = "<group>"; };
+		38E212911D3258A600AAE5F6 /* OGLShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OGLShader.m; sourceTree = "<group>"; };
+		38E212921D3258A600AAE5F6 /* OGLUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGLUtilities.h; sourceTree = "<group>"; };
+		38E212931D3258A600AAE5F6 /* OGLUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OGLUtilities.m; sourceTree = "<group>"; };
+		38E212A51D325F4200AAE5F6 /* LMTCaptureVideoPreviewLayerShaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerShaders.h; sourceTree = "<group>"; };
 		A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLMTCaptureVideoPreviewLayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A01C02411620D9BA003DA76F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		A01C02941620E015003DA76F /* LMTCaptureVideoPreviewLayer-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "LMTCaptureVideoPreviewLayer-Prefix.pch"; path = "Support/LMTCaptureVideoPreviewLayer-Prefix.pch"; sourceTree = "<group>"; };
 		A01C02BF1620E286003DA76F /* LMTCaptureVideoPreviewLayer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LMTCaptureVideoPreviewLayer-Info.plist"; path = "Support/LMTCaptureVideoPreviewLayer-Info.plist"; sourceTree = "<group>"; };
-		A039A768161F8C08009E4C10 /* Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Test.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayer.m; sourceTree = "<group>"; };
 		A06ACB291608B2C300E20441 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A06ACB2B1608B2C300E20441 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -32,14 +45,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A039A764161F8C08009E4C10 /* Frameworks */ = {
+		38E212751D31441A00AAE5F6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A039A76B161F8C08009E4C10 /* UIKit.framework in Frameworks */,
-				A039A76C161F8C08009E4C10 /* Foundation.framework in Frameworks */,
-				A01C02C91620E7E7003DA76F /* CoreGraphics.framework in Frameworks */,
-				A01C02CA1620E7E7003DA76F /* CoreFoundation.framework in Frameworks */,
+				38E212861D324EBC00AAE5F6 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +75,7 @@
 		A039A76D161F8C08009E4C10 /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				38E212801D31447200AAE5F6 /* LMTCaptureVideoPreviewLayerTest-Info.plist */,
 				38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */,
 			);
 			path = Test;
@@ -85,8 +96,8 @@
 		A06ACB261608B2C300E20441 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A039A768161F8C08009E4C10 /* Test.octest */,
 				A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */,
+				38E212781D31441A00AAE5F6 /* Test.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -94,6 +105,7 @@
 		A06ACB281608B2C300E20441 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				38E212851D324EBC00AAE5F6 /* AVFoundation.framework */,
 				A06ACB291608B2C300E20441 /* UIKit.framework */,
 				A06ACB2B1608B2C300E20441 /* Foundation.framework */,
 				A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */,
@@ -107,6 +119,14 @@
 			children = (
 				A0BCA0501874722600FC20CE /* LMTCaptureVideoPreviewLayer.h */,
 				A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */,
+				38E212871D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h */,
+				38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */,
+				38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */,
+				38E212A51D325F4200AAE5F6 /* LMTCaptureVideoPreviewLayerShaders.h */,
+				38E212901D3258A600AAE5F6 /* OGLShader.h */,
+				38E212911D3258A600AAE5F6 /* OGLShader.m */,
+				38E212921D3258A600AAE5F6 /* OGLUtilities.h */,
+				38E212931D3258A600AAE5F6 /* OGLUtilities.m */,
 			);
 			name = Library;
 			path = lib;
@@ -119,13 +139,34 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0BCA0511874722600FC20CE /* LMTCaptureVideoPreviewLayer.h in Headers */,
+				38E2129B1D3258B300AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h in Headers */,
+				38E2129E1D3258B300AAE5F6 /* OGLUtilities.h in Headers */,
+				38E212A11D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.h in Headers */,
+				38E212A31D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h in Headers */,
+				38E2129C1D3258B300AAE5F6 /* OGLShader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		38E212771D31441A00AAE5F6 /* Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38E2127D1D31441A00AAE5F6 /* Build configuration list for PBXNativeTarget "Test" */;
+			buildPhases = (
+				38E212741D31441A00AAE5F6 /* Sources */,
+				38E212751D31441A00AAE5F6 /* Frameworks */,
+				38E212761D31441A00AAE5F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test;
+			productName = Test;
+			productReference = 38E212781D31441A00AAE5F6 /* Test.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A01C02111620D8B4003DA76F /* Static Library */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A01C021C1620D8B4003DA76F /* Build configuration list for PBXNativeTarget "Static Library" */;
@@ -143,24 +184,6 @@
 			productReference = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		A039A767161F8C08009E4C10 /* Test */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A039A777161F8C08009E4C10 /* Build configuration list for PBXNativeTarget "Test" */;
-			buildPhases = (
-				A039A763161F8C08009E4C10 /* Sources */,
-				A039A764161F8C08009E4C10 /* Frameworks */,
-				A039A765161F8C08009E4C10 /* Resources */,
-				A039A766161F8C08009E4C10 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Test;
-			productName = Test;
-			productReference = A039A768161F8C08009E4C10 /* Test.octest */;
-			productType = "com.apple.product-type.bundle.ocunit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -170,6 +193,11 @@
 				LastTestingUpgradeCheck = 0730;
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Luis Laugga";
+				TargetAttributes = {
+					38E212771D31441A00AAE5F6 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
 			};
 			buildConfigurationList = A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LMTCaptureVideoPreviewLayer" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -183,14 +211,14 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A039A767161F8C08009E4C10 /* Test */,
 				A01C02111620D8B4003DA76F /* Static Library */,
+				38E212771D31441A00AAE5F6 /* Test */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A039A765161F8C08009E4C10 /* Resources */ = {
+		38E212761D31441A00AAE5F6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -214,42 +242,77 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/scripts/update_version.sh\"";
 		};
-		A039A766161F8C08009E4C10 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		38E212741D31441A00AAE5F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38E212821D31448F00AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A01C020E1620D8B4003DA76F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0445E0F18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A039A763161F8C08009E4C10 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				38E212721D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m in Sources */,
-				A0445E0E18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m in Sources */,
+				38E212A41D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m in Sources */,
+				38E2129D1D3258B300AAE5F6 /* OGLShader.m in Sources */,
+				38E212A21D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.m in Sources */,
+				38E2129F1D3258B300AAE5F6 /* OGLUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		38E2127E1D31441A00AAE5F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "test/LMTCaptureVideoPreviewLayerTest-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayer.Test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		38E2127F1D31441A00AAE5F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "test/LMTCaptureVideoPreviewLayerTest-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayer.Test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		A01C021A1620D8B4003DA76F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -264,7 +327,6 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(PROJECT_NAME)_PrivateHeaders";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.laugga.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = LMTCaptureVideoPreviewLayer;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(PROJECT_NAME)_Headers";
 				SKIP_INSTALL = YES;
@@ -286,43 +348,10 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(PROJECT_NAME)_PrivateHeaders";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.laugga.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = LMTCaptureVideoPreviewLayer;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(PROJECT_NAME)_Headers";
 				SKIP_INSTALL = YES;
 				STRIP_STYLE = "non-global";
-			};
-			name = Release;
-		};
-		A039A778161F8C08009E4C10 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "support/LMTCaptureVideoPreviewLayer-Prefix.pch";
-				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.laugga.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Debug;
-		};
-		A039A779161F8C08009E4C10 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "support/LMTCaptureVideoPreviewLayer-Prefix.pch";
-				INFOPLIST_EXPAND_BUILD_SETTINGS = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.laugga.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};
@@ -364,6 +393,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PLIST_FILE_OUTPUT_FORMAT = "same-as-input";
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayer;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -400,6 +430,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PLIST_FILE_OUTPUT_FORMAT = "same-as-input";
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayer;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -409,20 +440,19 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		38E2127D1D31441A00AAE5F6 /* Build configuration list for PBXNativeTarget "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38E2127E1D31441A00AAE5F6 /* Debug */,
+				38E2127F1D31441A00AAE5F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		A01C021C1620D8B4003DA76F /* Build configuration list for PBXNativeTarget "Static Library" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A01C021A1620D8B4003DA76F /* Debug */,
 				A01C021B1620D8B4003DA76F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A039A777161F8C08009E4C10 /* Build configuration list for PBXNativeTarget "Test" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A039A778161F8C08009E4C10 /* Debug */,
-				A039A779161F8C08009E4C10 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
