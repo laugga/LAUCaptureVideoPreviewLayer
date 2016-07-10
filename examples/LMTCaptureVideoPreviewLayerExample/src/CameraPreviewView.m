@@ -90,7 +90,8 @@
 {
     if (sender.state == UIGestureRecognizerStateEnded)
     {
-        
+        // Switch between blur = 1.0 and blur = 0.0 when user taps
+        _videoPreviewLayer.blur = (_videoPreviewLayer.blur == 0.0 ? 1.0 : 0.0);
     }
 }
 

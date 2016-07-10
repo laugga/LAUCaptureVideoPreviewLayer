@@ -142,8 +142,10 @@
     return self;
 }
 
-- (void)resizeWithOldSuperlayerSize:(CGSize)size
+- (void)layoutSublayers
 {
+    [super layoutSublayers];
+    
     // Create the onscreen framebuffer
     [self createOnscreenFramebufferForLayer:self];
     
