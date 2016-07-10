@@ -52,7 +52,12 @@
     
     if ([_session canAddOutput:[self captureOutput]])
     {
+        Log(@"LMTCaptureVideoPreviewLayerInternal: Added AVCaptureVideoDataOutput to AVCaptureSession");
         [_session addOutput:[self captureOutput]];
+    }
+    else
+    {
+        Log(@"LMTCaptureVideoPreviewLayerInternal: Can NOT add AVCaptureVideoDataOutput to AVCaptureSession");
     }
 }
 
