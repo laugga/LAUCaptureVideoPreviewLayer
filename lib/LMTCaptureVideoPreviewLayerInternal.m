@@ -33,6 +33,10 @@
     AVCaptureVideoDataOutput * _videoDataOutput;
     dispatch_queue_t _videoDataOutputSampleBufferDelegateQueue;
     CMSampleBufferRef _videoDataOutputSampleBuffer;
+    
+    // Hijacked AVCaptureVideoDataOutput (check
+    dispatch_queue_t _hijackedVideoDataOutputSampleBufferDelegateQueue;
+    id <AVCaptureVideoDataOutputSampleBufferDelegate> _hijackedVideoDataOutputSampleBufferDelegate;
 }
 @end
 
@@ -50,6 +54,7 @@
     
     _session = session;
     
+    // Set the session's AVCaptureVideoDataOutput
     if ([_session canAddOutput:[self videoDataOutput]])
     {
         Log(@"LMTCaptureVideoPreviewLayerInternal: Added AVCaptureVideoDataOutput to AVCaptureSession");
@@ -58,6 +63,45 @@
     else
     {
         Log(@"LMTCaptureVideoPreviewLayerInternal: Can NOT add AVCaptureVideoDataOutput to AVCaptureSession");
+        [self hijackSessionVideoDataOutput];
+    }
+}
+
+- (void)hijackSessionVideoDataOutput
+{
+    Log(@"LMTCaptureVideoPreviewLayerInternal: Hijacking current AVCaptureVideoDataOutput of AVCaptureSession");
+    
+    if (_session)
+    {
+        AVCaptureVideoDataOutput * currentVideoDataOutput = nil;
+        
+        // Look for an instance of AVCaptureVideoDataOutput in session's outputs
+        for (AVCaptureOutput * currentOutput in _session.outputs)
+        {
+            if ([currentOutput isKindOfClass:[AVCaptureVideoDataOutput class]])
+            {
+                currentVideoDataOutput = (AVCaptureVideoDataOutput *)currentOutput;
+                break;
+            }
+        }
+        
+        if (currentVideoDataOutput)
+        {
+            // Copy a reference of current delegate and queue
+            _hijackedVideoDataOutputSampleBufferDelegate = currentVideoDataOutput.sampleBufferDelegate;
+            _hijackedVideoDataOutputSampleBufferDelegateQueue = currentVideoDataOutput.sampleBufferCallbackQueue;
+            
+            // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
+            NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+            [currentVideoDataOutput setVideoSettings:videoSettings];
+            [currentVideoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
+            
+            // Set the video data output delegate
+            [currentVideoDataOutput setSampleBufferDelegate:self queue:[self videoDataOutputSampleBufferDelegateQueue]];
+            
+            // Enable the video data output
+            [[currentVideoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+        }
         
     }
 }
@@ -87,17 +131,7 @@
     if (!_videoDataOutput)
     {
         AVCaptureVideoDataOutput * videoDataOutput = [AVCaptureVideoDataOutput new];
-        
-        // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
-        NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
-        [videoDataOutput setVideoSettings:videoSettings];
-        [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
-        
-        // Set the video data output delegate
-        [videoDataOutput setSampleBufferDelegate:self queue:[self videoDataOutputSampleBufferDelegateQueue]];
-        
-        // Enable the video data output
-        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+        [self configureVideoDataOutput:videoDataOutput];
         
         _videoDataOutput = videoDataOutput;
     }
@@ -105,27 +139,18 @@
     return _videoDataOutput;
 }
 
-- (void)hijackSessionVideoDataOutput
+- (void)configureVideoDataOutput:(AVCaptureVideoDataOutput *)videoDataOutput
 {
-//    if (!_captureOutput)
-//    {
-//        AVCaptureVideoDataOutput * captureOutput = [AVCaptureVideoDataOutput new];
-//        
-//        // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
-//        NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
-//        [captureOutput setVideoSettings:videoSettings];
-//        [captureOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
-//        
-//        // Set the video data output delegate
-//        [captureOutput setSampleBufferDelegate:self queue:[self captureOutputSampleBufferDelegateQueue]];
-//        
-//        // Enable the video data output
-//        [[captureOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
-//        
-//        _captureOutput = captureOutput;
-//    }
-//    
-//    return _captureOutput;
+    // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
+    NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+    [videoDataOutput setVideoSettings:videoSettings];
+    [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
+    
+    // Set the video data output delegate
+    [videoDataOutput setSampleBufferDelegate:self queue:[self videoDataOutputSampleBufferDelegateQueue]];
+    
+    // Enable the video data output
+    [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
 }
 
 #pragma mark -
@@ -145,6 +170,19 @@
         // Retain
         _videoDataOutputSampleBuffer = sampleBuffer;
         CFRetain(_videoDataOutputSampleBuffer);
+    }
+    
+    // Was the AVCaptureVideoDataOutput's hijacked?
+    if (_hijackedVideoDataOutputSampleBufferDelegate && _hijackedVideoDataOutputSampleBufferDelegateQueue)
+    {
+        dispatch_async(_hijackedVideoDataOutputSampleBufferDelegateQueue, ^{
+            
+            // Forward the delegate method to the AVCaptureVideoDataOutput's hijacked sampleBufferDelegate
+            if ([_hijackedVideoDataOutputSampleBufferDelegate respondsToSelector:@selector(captureOutput:didOutputSampleBuffer:fromConnection:)])
+            {
+                [_hijackedVideoDataOutputSampleBufferDelegate captureOutput:captureOutput didOutputSampleBuffer:sampleBuffer fromConnection:connection];
+            }
+        });
     }
 }
 
