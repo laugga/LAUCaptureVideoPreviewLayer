@@ -30,9 +30,9 @@
 @interface LMTCaptureVideoPreviewLayerInternal () <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
     AVCaptureSession * _session;
-    AVCaptureVideoDataOutput * _captureOutput;
-    dispatch_queue_t _captureOutputSampleBufferDelegateQueue;
-    CMSampleBufferRef _captureOutputSampleBuffer;
+    AVCaptureVideoDataOutput * _videoDataOutput;
+    dispatch_queue_t _videoDataOutputSampleBufferDelegateQueue;
+    CMSampleBufferRef _videoDataOutputSampleBuffer;
 }
 @end
 
@@ -50,58 +50,82 @@
     
     _session = session;
     
-    if ([_session canAddOutput:[self captureOutput]])
+    if ([_session canAddOutput:[self videoDataOutput]])
     {
         Log(@"LMTCaptureVideoPreviewLayerInternal: Added AVCaptureVideoDataOutput to AVCaptureSession");
-        [_session addOutput:[self captureOutput]];
+        [_session addOutput:[self videoDataOutput]];
     }
     else
     {
         Log(@"LMTCaptureVideoPreviewLayerInternal: Can NOT add AVCaptureVideoDataOutput to AVCaptureSession");
+        
     }
 }
 
 #pragma mark -
 #pragma mark AVCaptureVideoDataOutput
 
-- (dispatch_queue_t)captureOutputSampleBufferDelegateQueue
+- (dispatch_queue_t)videoDataOutputSampleBufferDelegateQueue
 {
-    if (!_captureOutputSampleBufferDelegateQueue)
+    if (!_videoDataOutputSampleBufferDelegateQueue)
     {
         // Create a serial dispatch queue used for the sample buffer delegate.
         // In a multi-threaded producer consumer system it's generally a good idea to make sure that producers
         // do not get starved of CPU time by their consumers. In this app we start with VideoDataOutput frames
         // on a high priority queue, and downstream consumers use default priority queues.
-        dispatch_queue_t captureOutputSampleBufferDelegateQueue = dispatch_queue_create( "co.coletiv.lightmate.LMTCaptureVideoPreviewLayerInternal.captureOutputSampleBufferQueue", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_t captureOutputSampleBufferDelegateQueue = dispatch_queue_create( "co.coletiv.lightmate.LMTCaptureVideoPreviewLayerInternal.videoDataOutputSampleBufferDelegateQueue", DISPATCH_QUEUE_SERIAL);
         dispatch_set_target_queue(captureOutputSampleBufferDelegateQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
         
-        _captureOutputSampleBufferDelegateQueue = captureOutputSampleBufferDelegateQueue;
+        _videoDataOutputSampleBufferDelegateQueue = captureOutputSampleBufferDelegateQueue;
     }
     
-    return _captureOutputSampleBufferDelegateQueue;
+    return _videoDataOutputSampleBufferDelegateQueue;
 }
 
-- (AVCaptureVideoDataOutput *)captureOutput
+- (AVCaptureVideoDataOutput *)videoDataOutput
 {
-    if (!_captureOutput)
+    if (!_videoDataOutput)
     {
-        AVCaptureVideoDataOutput * captureOutput = [AVCaptureVideoDataOutput new];
+        AVCaptureVideoDataOutput * videoDataOutput = [AVCaptureVideoDataOutput new];
         
         // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
         NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
-        [captureOutput setVideoSettings:videoSettings];
-        [captureOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
+        [videoDataOutput setVideoSettings:videoSettings];
+        [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
         
         // Set the video data output delegate
-        [captureOutput setSampleBufferDelegate:self queue:[self captureOutputSampleBufferDelegateQueue]];
+        [videoDataOutput setSampleBufferDelegate:self queue:[self videoDataOutputSampleBufferDelegateQueue]];
         
         // Enable the video data output
-        [[captureOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
         
-        _captureOutput = captureOutput;
+        _videoDataOutput = videoDataOutput;
     }
     
-    return _captureOutput;
+    return _videoDataOutput;
+}
+
+- (void)hijackSessionVideoDataOutput
+{
+//    if (!_captureOutput)
+//    {
+//        AVCaptureVideoDataOutput * captureOutput = [AVCaptureVideoDataOutput new];
+//        
+//        // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
+//        NSDictionary * videoSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+//        [captureOutput setVideoSettings:videoSettings];
+//        [captureOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked
+//        
+//        // Set the video data output delegate
+//        [captureOutput setSampleBufferDelegate:self queue:[self captureOutputSampleBufferDelegateQueue]];
+//        
+//        // Enable the video data output
+//        [[captureOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
+//        
+//        _captureOutput = captureOutput;
+//    }
+//    
+//    return _captureOutput;
 }
 
 #pragma mark -
@@ -112,15 +136,15 @@
     @synchronized (self)
     {
         // Release the buffer if it exists
-        if(_captureOutputSampleBuffer)
+        if(_videoDataOutputSampleBuffer)
         {
-            CFRelease(_captureOutputSampleBuffer);
-            _captureOutputSampleBuffer = NULL;
+            CFRelease(_videoDataOutputSampleBuffer);
+            _videoDataOutputSampleBuffer = NULL;
         }
         
         // Retain
-        _captureOutputSampleBuffer = sampleBuffer;
-        CFRetain(_captureOutputSampleBuffer);
+        _videoDataOutputSampleBuffer = sampleBuffer;
+        CFRetain(_videoDataOutputSampleBuffer);
     }
 }
 
@@ -128,7 +152,7 @@
 {
     @synchronized (self)
     {
-        return _captureOutputSampleBuffer;
+        return _videoDataOutputSampleBuffer;
     }
 }
 
