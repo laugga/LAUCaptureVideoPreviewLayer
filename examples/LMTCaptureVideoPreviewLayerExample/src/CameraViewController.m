@@ -227,8 +227,8 @@
     {
         if ([captureDevice position] == desiredPosition)
         {
-            NSError * error = nil;
-            
+//            NSError * error = nil;
+//            
 //            // Calculate frame duration
 //            CMTime frameDuration = kCMTimeInvalid;
 //            frameDuration = CMTimeMake(1, _frameRate);
