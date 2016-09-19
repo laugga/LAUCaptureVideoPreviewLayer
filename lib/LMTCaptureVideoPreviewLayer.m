@@ -525,26 +525,12 @@
     // Change T, means we need to check view height vs. texture height
     // T is going to map [0,1]
     if (changeT) {
-        // texture height >= view height means we don't need to scale (only crop)
-        if (_onscreenTextureInstance.textureWidth > ((GLfloat)_onscreenColorRenderbufferHeight)) {
-            textureScale = 1.0;
-        }
-        // texture height < view height means we have to scale (and crop)
-        else {
-            textureScale = ((GLfloat)_onscreenColorRenderbufferWidth) / _onscreenTextureInstance.textureHeight;
-        }
+        textureScale = ((GLfloat)_onscreenColorRenderbufferWidth) / _onscreenTextureInstance.textureHeight;
     }
     // Change S, means we need to check view width vs. texture width
     // S is going to map [0,1]
     else {
-        // texture width >= view width means we don't need to scale (only crop)
-        if (_onscreenTextureInstance.textureHeight > ((GLfloat)_onscreenColorRenderbufferWidth)) {
-            textureScale = 1.0;
-        }
-        // texture width < view width means we have to scale (and crop)
-        else {
-            textureScale = ((GLfloat)_onscreenColorRenderbufferHeight) / _onscreenTextureInstance.textureWidth;
-        }
+        textureScale = ((GLfloat)_onscreenColorRenderbufferHeight) / _onscreenTextureInstance.textureWidth;
     }
     
     // Calculate texture scaled dimensions
