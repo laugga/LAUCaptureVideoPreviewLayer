@@ -29,9 +29,7 @@
 #import "LMTCaptureVideoPreviewLayerInternal.h"
 #import "LMTCaptureVideoPreviewLayerStructures.h"
 #import "LMTCaptureVideoPreviewLayerShaders.h"
-
-#import "OGLShader.h"
-#import "OGLUtilities.h"
+#import "LMTCaptureVideoPreviewLayerUtilities.h"
 
 #import <AVFoundation/AVCaptureOutput.h>
 #import <QuartzCore/CAEAGLLayer.h>

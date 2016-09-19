@@ -39,6 +39,11 @@
  */
 @property (nonatomic, retain) AVCaptureSession * session;
 
+/*!
+ @property sampleBuffer
+ @abstract
+ The CMSampleBufferRef sample buffer being currently displayed
+ */
 @property (nonatomic, readonly) CMSampleBufferRef sampleBuffer;
 
 @end

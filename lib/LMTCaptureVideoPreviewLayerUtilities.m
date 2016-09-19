@@ -1,9 +1,9 @@
 /*
  
- OGLShader.m
- Lightmate
+ LMTCaptureVideoPreviewLayerUtilities.m
+ LMTCaptureVideoPreviewLayer
  
- Copyright (cc) 2016 Luis Laugga.
+ Copyright (c) 2016 Coletiv Studio.
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,20 +23,20 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-*/
+ */
 
-#include "OGLShader.h"
+#include "LMTCaptureVideoPreviewLayerUtilities.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #pragma mark - 
-#pragma mark Memory Management
+#pragma mark Shader Memory Management
 
-Shader * allocShader(GLenum shaderType, const char * shaderSource)
+Shader_t * allocShader(GLenum shaderType, const char * shaderSource)
 {
-    Shader * shader = (Shader *)calloc(sizeof(Shader), 1);
+    Shader_t * shader = (Shader_t *)calloc(sizeof(Shader_t), 1);
     shader->shaderType = shaderType;
 	
     // Get the size of the source
@@ -57,7 +57,7 @@ Shader * allocShader(GLenum shaderType, const char * shaderSource)
 	return shader;
 }
 
-void freeShader(Shader * shader)
+void freeShader(Shader_t * shader)
 {
     // Release dynamic memory allocated for string and the shader itself
 	free(shader->string);
@@ -65,7 +65,7 @@ void freeShader(Shader * shader)
 }
 
 #pragma mark -
-#pragma mark Compilation
+#pragma mark Shader Compilation
 
 GLuint buildShader(const char * source, GLenum shaderType)
 {
@@ -172,8 +172,8 @@ GLuint loadProgram(const char * vertexShaderSource, const char * fragmentShaderS
     GLuint programHandle;
     
     // Load shaders
-    Shader * vertexShader = allocShader(GL_VERTEX_SHADER, vertexShaderSource);
-    Shader * fragmentShader = allocShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+    Shader_t * vertexShader = allocShader(GL_VERTEX_SHADER, vertexShaderSource);
+    Shader_t * fragmentShader = allocShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     
     // Create the GLSL program.
     programHandle = buildProgram(vertexShader->string, fragmentShader->string);
@@ -193,3 +193,47 @@ void unloadProgram(GLuint * programHandle)
         *programHandle = 0;
     }
 }
+
+#pragma mark -
+#pragma mark Framebuffer
+
+// Checks current bound framebuffer status
+bool checkFramebufferStatusComplete(void)
+{
+    GLenum framebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    
+    switch (framebufferStatus) {
+        case GL_FRAMEBUFFER_COMPLETE:
+            return true; // We can return true
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            Logc("Framebuffer Status Error: Incomplete Attachment Point");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            Logc("Framebuffer Status Error: Missing Attachment");
+            break;
+#if TARGET_OS_MAC && !TARGET_OS_IPHONE // NOT OPEN GL ES
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            Logc("Framebuffer Status Error: Dimensions do not match");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            Logc("Framebuffer Status Error: Formats");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            Logc("Framebuffer Status Error: Draw Buffer");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            Logc("Framebuffer Status Error: Read Buffer");
+            break;
+#endif
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            Logc("Framebuffer Status Error: Unsupported Framebuffer Configuration");
+            break;
+        default:
+            Logc("Framebuffer Status Error: Unkown Framebuffer Object Failure");
+            break;
+    }
+    
+    return false;
+}
+

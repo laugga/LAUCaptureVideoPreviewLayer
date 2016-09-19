@@ -1,9 +1,9 @@
 /*
  
- OGLUtilities.h
- Lightmate
+ LMTCaptureVideoPreviewLayerUtilities.h
+ LMTCaptureVideoPreviewLayer
  
- Copyright (cc) 2016 Luis Laugga.
+ Copyright (c) 2016 Coletiv Studio.
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,10 +23,10 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-*/
+ */
 
-#ifndef __Lightmate_OGLUtilities__
-#define __Lightmate_OGLUtilities__
+#ifndef LMTCaptureVideoPreviewLayerUtilities_h
+#define LMTCaptureVideoPreviewLayerUtilities_h
 
 #if TARGET_OS_IPHONE
     #import <OpenGLES/ES2/gl.h>
@@ -38,10 +38,32 @@
 extern "C" {
 #endif
 
+struct Shader {
+    GLchar * string;
+	GLsizei byteSize;
+	GLenum shaderType; // Vertex or Fragment
+};
+    
+typedef struct Shader Shader_t;
+
+// Shader memory management
+Shader_t * allocShader(GLenum shaderType, const char * shaderSource);
+void freeShader(Shader_t * shader);
+    
+// Shader compilation
+GLuint buildShader(const char * source, GLenum shaderType);
+GLuint buildProgram(const char * vertexShaderSource, const char * fragmentShaderSource);
+int validateProgram(GLuint programHandle);
+    
+// Shader loading
+GLuint loadProgram(const char * vertexShaderSource, const char * fragmentShaderSource);
+void unloadProgram(GLuint * programHandle);
+
+// Framebuffer status
 bool checkFramebufferStatusComplete(void);
     
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __Lightmate_OGLUtilies__
+#endif /* LMTCaptureVideoPreviewLayerUtilities_h */
