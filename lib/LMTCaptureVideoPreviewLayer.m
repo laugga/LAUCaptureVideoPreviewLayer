@@ -859,7 +859,7 @@
     float const filterIntensityTransitionStep = 1.0f / _filterKernelCount;
     
     _filterIntensityTransitionTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-    dispatch_source_set_timer(_filterIntensityTransitionTimer, DISPATCH_TIME_NOW, (1.0f/30.0f) * NSEC_PER_SEC, 0.0 * NSEC_PER_SEC);
+    dispatch_source_set_timer(_filterIntensityTransitionTimer, DISPATCH_TIME_NOW, (1.0f/60.0f) * NSEC_PER_SEC, 0.0 * NSEC_PER_SEC);
     dispatch_source_set_event_handler(_filterIntensityTransitionTimer, ^{
         
         if (_filterIntensity != _filterIntensityTransitionTarget)
