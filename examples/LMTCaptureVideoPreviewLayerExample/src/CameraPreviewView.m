@@ -34,8 +34,9 @@
     self = [super initWithFrame:frame];
     if (self)
     {
-        UITapGestureRecognizer * tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userDidTap:)];
-        [self addGestureRecognizer:tapGestureRecognizer];
+        UILongPressGestureRecognizer * longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(userDidLongPress:)];
+        longPressGestureRecognizer.minimumPressDuration = 0.01;
+        [self addGestureRecognizer:longPressGestureRecognizer];
     }
     
     return self;
@@ -86,12 +87,17 @@
     }
 }
 
-- (void)userDidTap:(UITapGestureRecognizer *)sender
+- (void)userDidLongPress:(UITapGestureRecognizer *)sender
 {
-    if (sender.state == UIGestureRecognizerStateEnded)
+    if (sender.state == UIGestureRecognizerStateBegan)
     {
-        // Switch between blur = 1.0 and blur = 0.0 when user taps
-        _videoPreviewLayer.blur = (_videoPreviewLayer.blur == 0.0 ? 1.0 : 0.0);
+        // Switch to blur = 1.0 when user presses
+        _videoPreviewLayer.blur = 1.0;
+    }
+    else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateFailed)
+    {
+        // Turn blur off when user stops pressing
+        _videoPreviewLayer.blur = 0.0f;
     }
 }
 
