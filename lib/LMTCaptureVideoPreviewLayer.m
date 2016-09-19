@@ -138,6 +138,9 @@
         
         // Disable depth testing
         glDisable(GL_DEPTH_TEST);
+        
+        // Preemptively load filter kernel
+        [self loadFilterKernel];
     }
     return self;
 }
@@ -819,10 +822,8 @@
 
 - (void)setFilterIntensity:(float)intensity
 {
-    if (!_filterKernelCount)
-    {
-        [self loadFilterKernel];
-    }
+    // Load filter kernel (will do nothing if it's already loaded)
+    [self loadFilterKernel];
     
     // Clamp intensity between [0,1] range
     float clampedIntensity =  MAX(0, MIN(1, intensity));
@@ -980,6 +981,12 @@ void releaseTextureFilterKernel(TextureFilterKernel_t * textureFilterKernel)
 
 - (void)loadFilterKernel
 {
+    // Skip if it's already loaded
+    if (_filterKernelCount)
+    {
+        return;
+    }
+    
     unsigned int const kernelRadius = 16.0;
     
     // Define how many kernels should be generated
