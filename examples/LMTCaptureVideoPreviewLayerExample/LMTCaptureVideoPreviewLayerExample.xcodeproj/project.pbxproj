@@ -191,6 +191,11 @@
 			attributes = {
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Luis Laugga";
+				TargetAttributes = {
+					A06ACB241608B2C300E20441 = {
+						DevelopmentTeam = JJC3QT2D2L;
+					};
+				};
 			};
 			buildConfigurationList = A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LMTCaptureVideoPreviewLayerExample" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -387,6 +392,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = JJC3QT2D2L;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -407,6 +413,7 @@
 			baseConfigurationReference = 4F8F2323D7872B979A6332AF /* Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEVELOPMENT_TEAM = JJC3QT2D2L;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
