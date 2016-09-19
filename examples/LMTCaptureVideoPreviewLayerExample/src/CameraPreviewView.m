@@ -58,7 +58,7 @@
     {
         // Create the session video preview layer
         LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
-        [videoPreviewLayer setBackgroundColor:[[UIColor greenColor] CGColor]];
+        [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
 
         [self setVideoPreviewLayer:videoPreviewLayer];

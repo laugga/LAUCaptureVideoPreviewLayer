@@ -2,20 +2,15 @@ PODS:
   - LMTCaptureVideoPreviewLayer (0.1.0)
 
 DEPENDENCIES:
-  - LMTCaptureVideoPreviewLayer (from `git@bitbucket.org:coletiv/lmtcapturevideopreviewlayer.git`)
+  - LMTCaptureVideoPreviewLayer (from `../../`)
 
 EXTERNAL SOURCES:
   LMTCaptureVideoPreviewLayer:
-    :git: git@bitbucket.org:coletiv/lmtcapturevideopreviewlayer.git
-
-CHECKOUT OPTIONS:
-  LMTCaptureVideoPreviewLayer:
-    :commit: bbc7b48f546607bc55216b770d9f917ce354c704
-    :git: git@bitbucket.org:coletiv/lmtcapturevideopreviewlayer.git
+    :path: "../../"
 
 SPEC CHECKSUMS:
   LMTCaptureVideoPreviewLayer: a5648fd14d06a52fa29482c66e1e7955ed11b5c9
 
-PODFILE CHECKSUM: 124343d5f65c41a8e3c794dac2c0cc39d0a2c820
+PODFILE CHECKSUM: 27b9e0bb53da8b39b784f1ef16250be227507bb9
 
 COCOAPODS: 1.0.1
