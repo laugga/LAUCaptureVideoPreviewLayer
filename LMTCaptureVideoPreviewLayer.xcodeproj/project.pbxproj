@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		38C069E51D913C9C009B1140 /* LMTCaptureVideoPreviewLayerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F2F1D91359B0055EFD3 /* LMTCaptureVideoPreviewLayerUITests.m */; };
+		38C069E81D913F4B009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */; };
+		38C069EB1D91407F009B1140 /* PreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069EA1D91407F009B1140 /* PreviewView.m */; };
 		38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */; };
 		38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */; };
 		38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F341D9136470055EFD3 /* AppDelegate.m */; };
-		38E03F461D9136D90055EFD3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F361D9136470055EFD3 /* ViewController.m */; };
+		38E03F461D9136D90055EFD3 /* PreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F361D9136470055EFD3 /* PreviewViewController.m */; };
 		38E03F481D9136E00055EFD3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38E03F3B1D9136610055EFD3 /* LaunchScreen.storyboard */; };
 		38E03F491D9136E00055EFD3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38E03F3D1D9136610055EFD3 /* Main.storyboard */; };
 		38E03F4A1D9136E30055EFD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38E03F411D9136670055EFD3 /* Assets.xcassets */; };
@@ -31,10 +33,19 @@
 			remoteGlobalIDString = 38E03EFB1D9134C10055EFD3;
 			remoteInfo = "UI Tests Application";
 		};
+		38C069E61D913F3C009B1140 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A06ACB1C1608B2C200E20441 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A01C02111620D8B4003DA76F;
+			remoteInfo = "Static Library";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		38C069DB1D913C84009B1140 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38C069E91D91407F009B1140 /* PreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviewView.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.h; sourceTree = SOURCE_ROOT; };
+		38C069EA1D91407F009B1140 /* PreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviewView.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.m; sourceTree = SOURCE_ROOT; };
 		38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerUtilities.h; sourceTree = "<group>"; };
 		38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerUtilities.m; sourceTree = "<group>"; };
 		38E03EFC1D9134C10055EFD3 /* UI Tests Application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UI Tests Application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -42,8 +53,8 @@
 		38E03F311D9135A20055EFD3 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = test/LMTCaptureVideoPreviewLayerUITests/Info.plist; sourceTree = SOURCE_ROOT; };
 		38E03F331D9136470055EFD3 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		38E03F341D9136470055EFD3 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/AppDelegate.m; sourceTree = SOURCE_ROOT; };
-		38E03F351D9136470055EFD3 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/ViewController.h; sourceTree = SOURCE_ROOT; };
-		38E03F361D9136470055EFD3 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/ViewController.m; sourceTree = SOURCE_ROOT; };
+		38E03F351D9136470055EFD3 /* PreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviewViewController.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewViewController.h; sourceTree = SOURCE_ROOT; };
+		38E03F361D9136470055EFD3 /* PreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviewViewController.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewViewController.m; sourceTree = SOURCE_ROOT; };
 		38E03F391D91364F0055EFD3 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/Info.plist; sourceTree = SOURCE_ROOT; };
 		38E03F3C1D9136610055EFD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/Base.lproj/LaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
 		38E03F3E1D9136610055EFD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/Base.lproj/Main.storyboard; sourceTree = SOURCE_ROOT; };
@@ -77,6 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38C069E81D913F4B009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,8 +100,10 @@
 			children = (
 				38E03F331D9136470055EFD3 /* AppDelegate.h */,
 				38E03F341D9136470055EFD3 /* AppDelegate.m */,
-				38E03F351D9136470055EFD3 /* ViewController.h */,
-				38E03F361D9136470055EFD3 /* ViewController.m */,
+				38E03F351D9136470055EFD3 /* PreviewViewController.h */,
+				38E03F361D9136470055EFD3 /* PreviewViewController.m */,
+				38C069E91D91407F009B1140 /* PreviewView.h */,
+				38C069EA1D91407F009B1140 /* PreviewView.m */,
 				38E03F3B1D9136610055EFD3 /* LaunchScreen.storyboard */,
 				38E03F411D9136670055EFD3 /* Assets.xcassets */,
 				38E03F3D1D9136610055EFD3 /* Main.storyboard */,
@@ -239,6 +253,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				38C069E71D913F3C009B1140 /* PBXTargetDependency */,
 			);
 			name = "UI Tests Application";
 			productName = LMTCaptureVideoPreviewLayerTestApp;
@@ -355,7 +370,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38E03F461D9136D90055EFD3 /* ViewController.m in Sources */,
+				38E03F461D9136D90055EFD3 /* PreviewViewController.m in Sources */,
+				38C069EB1D91407F009B1140 /* PreviewView.m in Sources */,
 				38E03F4B1D9136E60055EFD3 /* main.m in Sources */,
 				38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */,
 			);
@@ -378,6 +394,11 @@
 			isa = PBXTargetDependency;
 			target = 38E03EFB1D9134C10055EFD3 /* UI Tests Application */;
 			targetProxy = 38C069E01D913C84009B1140 /* PBXContainerItemProxy */;
+		};
+		38C069E71D913F3C009B1140 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A01C02111620D8B4003DA76F /* Static Library */;
+			targetProxy = 38C069E61D913F3C009B1140 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -476,7 +497,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = test/LMTCaptureVideoPreviewLayerUITestsApplication/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayerUITestsApplication;
@@ -505,7 +526,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = test/LMTCaptureVideoPreviewLayerUITestsApplication/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayerUITestsApplication;

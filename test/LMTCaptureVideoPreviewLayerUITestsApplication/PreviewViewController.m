@@ -1,9 +1,9 @@
 /*
  
- ViewController.m
- LMTCaptureVideoPreviewLayerExample
+ PreviewViewController.m
+ LMTCaptureVideoPreviewLayer UI Tests Application
  
- Copyright (c) 2016 Coletiv Studio.
+ Copyright (c) 2016 Luis Laugga
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,22 +23,22 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-*/
+ */
 
-#import "CameraViewController.h"
+#import "PreviewViewController.h"
 
-@interface CameraViewController ()
+@interface PreviewViewController ()
 
 @end
 
-@implementation CameraViewController
+@implementation PreviewViewController
 
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithCoder:(NSCoder *)aDecoder
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    self = [super initWithCoder:aDecoder];
     if(self)
     {
         // AVCaptureSession queue
@@ -46,11 +46,6 @@
         
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [super dealloc];
 }
 
 #pragma mark -
@@ -121,12 +116,12 @@
 #pragma mark -
 #pragma mark Preview View
 
-- (CameraPreviewView *)previewView
+- (PreviewView *)previewView
 {
     // Check if the preview view is already initialized
     if (_previewView == nil)
     {
-        _previewView = [[CameraPreviewView alloc] initWithFrame:CGRectZero];
+        _previewView = [[PreviewView alloc] initWithFrame:CGRectZero];
     }
     
     return _previewView;
@@ -225,22 +220,22 @@
     {
         if ([captureDevice position] == desiredPosition)
         {
-//            NSError * error = nil;
-//            
-//            // Calculate frame duration
-//            CMTime frameDuration = kCMTimeInvalid;
-//            frameDuration = CMTimeMake(1, _frameRate);
-//            
-//            if ([captureDevice lockForConfiguration:&error])
-//            {
-//                captureDevice.activeVideoMaxFrameDuration = frameDuration;
-//                captureDevice.activeVideoMinFrameDuration = frameDuration;
-//                [captureDevice unlockForConfiguration];
-//            }
-//            else
-//            {
-//                Log(@"Camera: videoDevice lockForConfiguration returned error %@", error);
-//            }
+            //            NSError * error = nil;
+            //
+            //            // Calculate frame duration
+            //            CMTime frameDuration = kCMTimeInvalid;
+            //            frameDuration = CMTimeMake(1, _frameRate);
+            //
+            //            if ([captureDevice lockForConfiguration:&error])
+            //            {
+            //                captureDevice.activeVideoMaxFrameDuration = frameDuration;
+            //                captureDevice.activeVideoMinFrameDuration = frameDuration;
+            //                [captureDevice unlockForConfiguration];
+            //            }
+            //            else
+            //            {
+            //                Log(@"Camera: videoDevice lockForConfiguration returned error %@", error);
+            //            }
             
             return captureDevice;
         }
@@ -251,19 +246,19 @@
 
 - (void)setCaptureDevice:(AVCaptureDevice *)captureDevice
 {
-//    if (_device) {
-//        
-//        // Remove observer from capture device
-//        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus];
-//        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure];
-//    }
-//    
-//    if (captureDevice) {
-//        
-//        // Add Observer to capture device for focus and exposure events
-//        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-//        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-//    }
+    //    if (_device) {
+    //
+    //        // Remove observer from capture device
+    //        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus];
+    //        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure];
+    //    }
+    //
+    //    if (captureDevice) {
+    //
+    //        // Add Observer to capture device for focus and exposure events
+    //        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
+    //        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
+    //    }
     
     _device = captureDevice;
 }

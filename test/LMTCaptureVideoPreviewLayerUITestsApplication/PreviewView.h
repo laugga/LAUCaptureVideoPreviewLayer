@@ -1,9 +1,9 @@
 /*
  
- CameraPreviewView.h
- LMTCaptureVideoPreviewLayerExample
+ PreviewView.h
+ LMTCaptureVideoPreviewLayer UI Tests Application
  
- Copyright (c) 2016 Coletiv Studio.
+ Copyright (c) 2016 Luis Laugga
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -25,10 +25,10 @@
  
  */
 
-#import <LMTCaptureVideoPreviewLayer/LMTCaptureVideoPreviewLayer.h>
-#import <AVFoundation/AVFoundation.h>
+@import AVFoundation;
+#import "LMTCaptureVideoPreviewLayer.h"
 
-@interface CameraPreviewView : UIView
+@interface PreviewView : UIView
 {
     // Preview (live)
     LMTCaptureVideoPreviewLayer * _videoPreviewLayer;
