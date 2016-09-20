@@ -176,14 +176,6 @@
     // OpenGL pre-warm
     [self drawColor:self.backgroundColor];
     
-#if TARGET_OS_SIMULATOR
-    // TODO
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        CVPixelBufferRef pixelBuffer = [self pixelBufferFromImageNamed:@"TestFrame-1.jpg"];
-//        [self drawPixelBuffer:nil];
-//    });
-#endif // TARGET_OS_SIMULATOR
-    
     // Create and setup displayLink
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
     [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];

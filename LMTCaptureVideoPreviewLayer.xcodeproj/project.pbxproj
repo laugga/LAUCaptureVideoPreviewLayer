@@ -11,6 +11,7 @@
 		38C069E81D913F4B009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */; };
 		38C069EB1D91407F009B1140 /* PreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069EA1D91407F009B1140 /* PreviewView.m */; };
 		38C069F21D915CA8009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */; };
+		38C069F51D9162CB009B1140 /* screenshot-iphone-6.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C069F31D9162C8009B1140 /* screenshot-iphone-6.png */; };
 		38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */; };
 		38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */; };
 		38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F341D9136470055EFD3 /* AppDelegate.m */; };
@@ -49,6 +50,7 @@
 		38C069EA1D91407F009B1140 /* PreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviewView.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.m; sourceTree = SOURCE_ROOT; };
 		38C069EF1D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MockLMTCaptureVideoPreviewLayerInternal.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/MockLMTCaptureVideoPreviewLayerInternal.h; sourceTree = SOURCE_ROOT; };
 		38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MockLMTCaptureVideoPreviewLayerInternal.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/MockLMTCaptureVideoPreviewLayerInternal.m; sourceTree = SOURCE_ROOT; };
+		38C069F31D9162C8009B1140 /* screenshot-iphone-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "screenshot-iphone-6.png"; path = "test/LMTCaptureVideoPreviewLayerUITests/screenshot-iphone-6.png"; sourceTree = SOURCE_ROOT; };
 		38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerUtilities.h; sourceTree = "<group>"; };
 		38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerUtilities.m; sourceTree = "<group>"; };
 		38E03EFC1D9134C10055EFD3 /* UI Tests Application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UI Tests Application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -130,6 +132,7 @@
 		38E03F171D9134C20055EFD3 /* LMTCaptureVideoPreviewLayerUITests */ = {
 			isa = PBXGroup;
 			children = (
+				38C069F31D9162C8009B1140 /* screenshot-iphone-6.png */,
 				38E03F2F1D91359B0055EFD3 /* LMTCaptureVideoPreviewLayerUITests.m */,
 				38E03F311D9135A20055EFD3 /* Info.plist */,
 			);
@@ -340,6 +343,7 @@
 				38E03F481D9136E00055EFD3 /* LaunchScreen.storyboard in Resources */,
 				38E03F4A1D9136E30055EFD3 /* Assets.xcassets in Resources */,
 				38E03F491D9136E00055EFD3 /* Main.storyboard in Resources */,
+				38C069F51D9162CB009B1140 /* screenshot-iphone-6.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

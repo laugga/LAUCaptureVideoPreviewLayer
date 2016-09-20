@@ -36,7 +36,61 @@
 
 - (CMSampleBufferRef)sampleBuffer
 {
-    return nil;
+    CMSampleBufferRef sampleBuffer = [[self class] sampleBufferFromImageNamed:@"screenshot-iphone-6.png"];
+
+    return sampleBuffer;
+}
+
++ (CVPixelBufferRef)pixelBufferFromImageNamed:(NSString *)imageName
+{
+    CGImageRef image = [UIImage imageNamed:imageName].CGImage;
+    
+    if (!image) {
+        Log(@"Failed to load image %@", imageName);
+        return NULL;
+    }
+    
+    size_t width = CGImageGetWidth(image);
+    size_t height = CGImageGetHeight(image);
+    
+    CVPixelBufferRef pixelBuffer = NULL;
+    NSDictionary * pixelBufferAttributes = @{ (NSString *)kCVPixelBufferCGImageCompatibilityKey: @YES,
+                                              (NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey: @YES };
+    
+    CVReturn result = CVPixelBufferCreate(NULL, width, height, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)pixelBufferAttributes, &pixelBuffer);
+    
+    if (result != kCVReturnSuccess) {
+        Log(@"Failed to create pixelBuffer from image %@", imageName);
+        return NULL;
+    }
+    
+    CIContext * coreImageContext = [CIContext contextWithCGContext:UIGraphicsGetCurrentContext() options:nil];
+    [coreImageContext render:[CIImage imageWithCGImage:image] toCVPixelBuffer:pixelBuffer];
+    
+    return pixelBuffer;
+}
+
++ (CMSampleBufferRef)sampleBufferFromImageNamed:(NSString *)imageName
+{
+    CVPixelBufferRef pixelBuffer = [self pixelBufferFromImageNamed:imageName];
+    
+    CMSampleBufferRef sampleBuffer = NULL;
+    
+    CMSampleTimingInfo timimgInfo = kCMTimingInfoInvalid;
+    
+    CMVideoFormatDescriptionRef videoInfo = NULL;
+    CMVideoFormatDescriptionCreateForImageBuffer(NULL, pixelBuffer, &videoInfo);
+    
+    CMSampleBufferCreateForImageBuffer(kCFAllocatorDefault,
+                                       pixelBuffer,
+                                       true,
+                                       NULL,
+                                       NULL,
+                                       videoInfo,
+                                       &timimgInfo,
+                                       &sampleBuffer);
+    
+    return sampleBuffer;
 }
 
 @end

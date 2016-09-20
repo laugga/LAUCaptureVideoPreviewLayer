@@ -54,6 +54,7 @@
         LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
         [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
+        [videoPreviewLayer setBlur:1.0];
     
 #if TARGET_OS_SIMULATOR
         // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
