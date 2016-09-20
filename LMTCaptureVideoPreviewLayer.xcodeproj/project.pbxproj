@@ -7,13 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */; };
+		38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */; };
 		38E212821D31448F00AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */; };
 		38E212861D324EBC00AAE5F6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E212851D324EBC00AAE5F6 /* AVFoundation.framework */; };
 		38E2129B1D3258B300AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */; };
-		38E2129C1D3258B300AAE5F6 /* OGLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212901D3258A600AAE5F6 /* OGLShader.h */; };
-		38E2129D1D3258B300AAE5F6 /* OGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212911D3258A600AAE5F6 /* OGLShader.m */; };
-		38E2129E1D3258B300AAE5F6 /* OGLUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212921D3258A600AAE5F6 /* OGLUtilities.h */; };
-		38E2129F1D3258B300AAE5F6 /* OGLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212931D3258A600AAE5F6 /* OGLUtilities.m */; };
 		38E212A11D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A0BCA0501874722600FC20CE /* LMTCaptureVideoPreviewLayer.h */; };
 		38E212A21D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A0445E0D18747BCC007BC506 /* LMTCaptureVideoPreviewLayer.m */; };
 		38E212A31D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E212871D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h */; };
@@ -21,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerUtilities.h; sourceTree = "<group>"; };
+		38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerUtilities.m; sourceTree = "<group>"; };
 		38E212711D3130E400AAE5F6 /* LMTCaptureVideoPreviewLayerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LMTCaptureVideoPreviewLayerTest.m; path = test/LMTCaptureVideoPreviewLayerTest.m; sourceTree = SOURCE_ROOT; };
 		38E212781D31441A00AAE5F6 /* Test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		38E212801D31447200AAE5F6 /* LMTCaptureVideoPreviewLayerTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LMTCaptureVideoPreviewLayerTest-Info.plist"; path = "test/LMTCaptureVideoPreviewLayerTest-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -28,10 +28,6 @@
 		38E212871D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerInternal.h; sourceTree = "<group>"; };
 		38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerInternal.m; sourceTree = "<group>"; };
 		38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerStructures.h; sourceTree = "<group>"; };
-		38E212901D3258A600AAE5F6 /* OGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGLShader.h; sourceTree = "<group>"; };
-		38E212911D3258A600AAE5F6 /* OGLShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OGLShader.m; sourceTree = "<group>"; };
-		38E212921D3258A600AAE5F6 /* OGLUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGLUtilities.h; sourceTree = "<group>"; };
-		38E212931D3258A600AAE5F6 /* OGLUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OGLUtilities.m; sourceTree = "<group>"; };
 		38E212A51D325F4200AAE5F6 /* LMTCaptureVideoPreviewLayerShaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerShaders.h; sourceTree = "<group>"; };
 		A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLMTCaptureVideoPreviewLayer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A01C02411620D9BA003DA76F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -123,10 +119,8 @@
 				38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */,
 				38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */,
 				38E212A51D325F4200AAE5F6 /* LMTCaptureVideoPreviewLayerShaders.h */,
-				38E212901D3258A600AAE5F6 /* OGLShader.h */,
-				38E212911D3258A600AAE5F6 /* OGLShader.m */,
-				38E212921D3258A600AAE5F6 /* OGLUtilities.h */,
-				38E212931D3258A600AAE5F6 /* OGLUtilities.m */,
+				38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */,
+				38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */,
 			);
 			name = Library;
 			path = lib;
@@ -140,10 +134,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				38E2129B1D3258B300AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h in Headers */,
-				38E2129E1D3258B300AAE5F6 /* OGLUtilities.h in Headers */,
 				38E212A11D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.h in Headers */,
 				38E212A31D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h in Headers */,
-				38E2129C1D3258B300AAE5F6 /* OGLShader.h in Headers */,
+				38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +189,7 @@
 				TargetAttributes = {
 					38E212771D31441A00AAE5F6 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = JJC3QT2D2L;
 					};
 				};
 			};
@@ -258,9 +252,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				38E212A41D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m in Sources */,
-				38E2129D1D3258B300AAE5F6 /* OGLShader.m in Sources */,
 				38E212A21D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.m in Sources */,
-				38E2129F1D3258B300AAE5F6 /* OGLUtilities.m in Sources */,
+				38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +271,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = JJC3QT2D2L;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "test/LMTCaptureVideoPreviewLayerTest-Info.plist";
@@ -301,6 +295,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = JJC3QT2D2L;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -447,6 +442,7 @@
 				38E2127F1D31441A00AAE5F6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A01C021C1620D8B4003DA76F /* Build configuration list for PBXNativeTarget "Static Library" */ = {
 			isa = XCConfigurationList;
