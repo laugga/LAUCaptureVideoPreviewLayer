@@ -56,6 +56,18 @@ NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
     LMTCaptureVideoPreviewLayerInternal * _internal;
 }
 
+#if TARGET_OS_SIMULATOR
+/*!
+ @property internal
+ @abstract
+ This property can be used to inject a specific LMTCaptureVideoPreviewLayerInternal instance.
+ 
+ @discussion
+ Only available for testing purposes. Needed to, for example, render a specific sample buffer.
+ */
+@property (nonatomic, strong) LMTCaptureVideoPreviewLayerInternal * internal;
+#endif
+
 @property (nonatomic, readwrite) CGFloat blur; // [0,1]
 
 /*!

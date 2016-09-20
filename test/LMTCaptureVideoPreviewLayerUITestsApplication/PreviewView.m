@@ -27,6 +27,10 @@
 
 #import "PreviewView.h"
 
+#if TARGET_OS_SIMULATOR
+#import "MockLMTCaptureVideoPreviewLayerInternal.h"
+#endif
+
 @implementation PreviewView
 
 - (void)layoutSubviews
@@ -42,19 +46,21 @@
 
 - (void)setCaptureSession:(id)captureSession
 {
+#if !TARGET_OS_SIMULATOR
     if (captureSession)
+#endif
     {
         // Create the session video preview layer
         LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
         [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
+    
+#if TARGET_OS_SIMULATOR
+        // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
+        [videoPreviewLayer setInternal:[MockLMTCaptureVideoPreviewLayerInternal new]];
+#endif
         
         [self setVideoPreviewLayer:videoPreviewLayer];
-    }
-    else
-    {
-        // Remove preview layer from superview
-        [self setVideoPreviewLayer:nil];
     }
 }
 

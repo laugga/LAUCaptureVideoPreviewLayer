@@ -136,19 +136,19 @@
     {
         return;
     }
-    
-    NSError * error = nil;
+
+#if !TARGET_OS_SIMULATOR
     
     // Create Session
-    AVCaptureSession * captureSession = [AVCaptureSession new];
-    
+    _session = [AVCaptureSession new];
+
     // Pick Framerate and Session Preset
     NSString * sessionPreset = AVCaptureSessionPresetPhoto; // Use high preset
     
     // For single core systems like iPhone 4 and iPod Touch 4th Generation we use a lower resolution and framerate to maintain real-time performance.
     if ([NSProcessInfo processInfo].processorCount == 1)
     {
-        if ([captureSession canSetSessionPreset:AVCaptureSessionPreset640x480])
+        if ([_session canSetSessionPreset:AVCaptureSessionPreset640x480])
         {
             sessionPreset = AVCaptureSessionPreset640x480;
         }
@@ -156,15 +156,14 @@
     else
     {
         // When using the CPU renderers or the CoreImage renderer we lower the resolution to 720p so that all devices can maintain real-time performance (this is primarily for A5 based devices like iPhone 4s and iPod Touch 5th Generation).
-        if ([captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720])
+        if ([_session canSetSessionPreset:AVCaptureSessionPreset1280x720])
         {
             sessionPreset = AVCaptureSessionPreset1280x720;
         }
     }
     
     // Assign capture session
-    captureSession.sessionPreset = sessionPreset;
-    _session = captureSession;
+    _session.sessionPreset = sessionPreset;
     
     // Select a video device, make an input
     NSInteger desiredPosition = AVCaptureDevicePositionBack;
@@ -172,6 +171,7 @@
     AVCaptureDevice * captureDevice = [self captureDeviceForPosition:desiredPosition];
     [self setCaptureDevice:captureDevice];
     
+    NSError * error = nil;
     AVCaptureDeviceInput * deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:_device error:&error];
     
     // Check for error
@@ -192,11 +192,13 @@
         return; // stop
     }
     
-    // Setup camera preview
-    [_previewView setCaptureSession:_session];
-    
     // Observe for specific notifications related with the session
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:_session];
+    
+#endif
+    
+    // Setup camera preview
+    [_previewView setCaptureSession:_session];
 }
 
 - (void)teardownCaptureSession

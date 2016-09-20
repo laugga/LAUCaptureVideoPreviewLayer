@@ -10,6 +10,7 @@
 		38C069E51D913C9C009B1140 /* LMTCaptureVideoPreviewLayerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F2F1D91359B0055EFD3 /* LMTCaptureVideoPreviewLayerUITests.m */; };
 		38C069E81D913F4B009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */; };
 		38C069EB1D91407F009B1140 /* PreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069EA1D91407F009B1140 /* PreviewView.m */; };
+		38C069F21D915CA8009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */; };
 		38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */; };
 		38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */; };
 		38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F341D9136470055EFD3 /* AppDelegate.m */; };
@@ -46,6 +47,8 @@
 		38C069DB1D913C84009B1140 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		38C069E91D91407F009B1140 /* PreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviewView.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.h; sourceTree = SOURCE_ROOT; };
 		38C069EA1D91407F009B1140 /* PreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviewView.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.m; sourceTree = SOURCE_ROOT; };
+		38C069EF1D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MockLMTCaptureVideoPreviewLayerInternal.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/MockLMTCaptureVideoPreviewLayerInternal.h; sourceTree = SOURCE_ROOT; };
+		38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MockLMTCaptureVideoPreviewLayerInternal.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/MockLMTCaptureVideoPreviewLayerInternal.m; sourceTree = SOURCE_ROOT; };
 		38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerUtilities.h; sourceTree = "<group>"; };
 		38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerUtilities.m; sourceTree = "<group>"; };
 		38E03EFC1D9134C10055EFD3 /* UI Tests Application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UI Tests Application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +101,8 @@
 		38E03EFD1D9134C10055EFD3 /* LMTCaptureVideoPreviewLayerUITestsApplication */ = {
 			isa = PBXGroup;
 			children = (
+				38C069EF1D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.h */,
+				38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */,
 				38E03F331D9136470055EFD3 /* AppDelegate.h */,
 				38E03F341D9136470055EFD3 /* AppDelegate.m */,
 				38E03F351D9136470055EFD3 /* PreviewViewController.h */,
@@ -373,6 +378,7 @@
 				38E03F461D9136D90055EFD3 /* PreviewViewController.m in Sources */,
 				38C069EB1D91407F009B1140 /* PreviewView.m in Sources */,
 				38E03F4B1D9136E60055EFD3 /* main.m in Sources */,
+				38C069F21D915CA8009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m in Sources */,
 				38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
