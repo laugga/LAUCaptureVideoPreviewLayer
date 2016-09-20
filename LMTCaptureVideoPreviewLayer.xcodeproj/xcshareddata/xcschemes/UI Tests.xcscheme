@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "38E03F131D9134C20055EFD3"
+               BlueprintIdentifier = "38C069DA1D913C84009B1140"
                BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
@@ -54,7 +54,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "38E03F131D9134C20055EFD3"
+            BlueprintIdentifier = "38C069DA1D913C84009B1140"
             BuildableName = "UI Tests.xctest"
             BlueprintName = "UI Tests"
             ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
@@ -72,7 +72,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "38E03F131D9134C20055EFD3"
+            BlueprintIdentifier = "38C069DA1D913C84009B1140"
             BuildableName = "UI Tests.xctest"
             BlueprintName = "UI Tests"
             ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">

@@ -174,7 +174,10 @@
     glActiveTexture(GL_TEXTURE0);
     
     // OpenGL pre-warm
-    [self drawColor:self.backgroundColor];
+    if (!_internal.sampleBuffer)
+    {
+        [self drawColor:self.backgroundColor];
+    }
     
     // Create and setup displayLink
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
@@ -185,6 +188,47 @@
 - (void)teardown
 {
     // TODO
+}
+
++ (Class)layerClass
+{
+    return [LMTCaptureVideoPreviewLayer class];
+}
+
+- (void)renderInContext:(CGContextRef)context
+{
+    // Assuming kEAGLColorFormatRGBA8 format is used
+    NSInteger pixelsDataSize = _onscreenColorRenderbufferWidth * _onscreenColorRenderbufferHeight * 4;
+    GLubyte * pixelsData = (GLubyte * )calloc(pixelsDataSize, sizeof(GLubyte));
+    
+    // Read pixel data from the framebuffer
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    glReadPixels(0, 0, _onscreenColorRenderbufferWidth, _onscreenColorRenderbufferHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelsData);
+    
+    // Create a CGImage instance with the pixels data
+    // Use kCGImageAlphaNoneSkipLast for opaque views (ignore the alpha channel) or kCGImageAlphaPremultipliedLast for non-opaque views
+    CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, pixelsData, pixelsDataSize, NULL);
+    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+    CGImageRef image = CGImageCreate(_onscreenColorRenderbufferWidth,
+                                       _onscreenColorRenderbufferHeight,
+                                       8,
+                                       32,
+                                       _onscreenColorRenderbufferWidth * 4,
+                                       colorspace,
+                                       kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                       dataProvider,
+                                       NULL,
+                                       true,
+                                       kCGRenderingIntentDefault);
+    
+    // Flip the CGImage by rendering it to the flipped bitmap context (UIKit coordinate system is the inverse of the Quartz/OpenGL coordinate system)
+    CGContextSetBlendMode(context, kCGBlendModeCopy);
+    CGContextDrawImage(context, CGRectMake(0.0, 0.0, _onscreenColorRenderbufferWidth / self.contentsScale, _onscreenColorRenderbufferHeight / self.contentsScale), image);
+    
+    free(pixelsData);
+    CFRelease(dataProvider);
+    CFRelease(colorspace);
+    CGImageRelease(image);
 }
 
 #pragma mark -

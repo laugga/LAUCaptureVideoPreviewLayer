@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "38E03F131D9134C20055EFD3"
-               BuildableName = "UI Tests.xctest"
-               BlueprintName = "UI Tests"
+               BlueprintIdentifier = "38C069F91D917F46009B1140"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
                ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
             </BuildableReference>
          </TestableReference>

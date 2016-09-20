@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "38E03EFB1D9134C10055EFD3"
-               BuildableName = "UI Tests Application.app"
-               BlueprintName = "UI Tests Application"
+               BlueprintIdentifier = "38C069F91D917F46009B1140"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
                ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,23 +28,13 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "38C069DA1D913C84009B1140"
-               BuildableName = "UI Tests.xctest"
-               BlueprintName = "UI Tests"
-               ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "38E03EFB1D9134C10055EFD3"
-            BuildableName = "UI Tests Application.app"
-            BlueprintName = "UI Tests Application"
+            BlueprintIdentifier = "38C069DA1D913C84009B1140"
+            BuildableName = "UI Tests.xctest"
+            BlueprintName = "UI Tests"
             ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -61,16 +51,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "38E03EFB1D9134C10055EFD3"
-            BuildableName = "UI Tests Application.app"
-            BlueprintName = "UI Tests Application"
-            ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -80,16 +60,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "38E03EFB1D9134C10055EFD3"
-            BuildableName = "UI Tests Application.app"
-            BlueprintName = "UI Tests Application"
-            ReferencedContainer = "container:LMTCaptureVideoPreviewLayer.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
