@@ -791,15 +791,29 @@
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
         
         // X
-        _filterKernelStep[0] = 0.0f;
-        _filterKernelStep[1] = 1.0f;
+        _filterKernelStep[0] = 1.0f;
+        _filterKernelStep[1] = 0.0f;
         
         // Draw 1st pass (offscreen)
         pixelBufferTexture = [self drawPixelBuffer:pixelBuffer onOffscreenTextureInstance:&_offscreenTextureInstance1];
         
         // Y
+        _filterKernelStep[0] = 0.0f;
+        _filterKernelStep[1] = 1.0f;
+        
+        // Draw 2nd pass (offscreen)
+        [self drawOffscreenTextureInstance:&_offscreenTextureInstance1 onOffscreenTextureInstance:&_offscreenTextureInstance2];
+        
+        // X
         _filterKernelStep[0] = 1.0f;
         _filterKernelStep[1] = 0.0f;
+        
+        // Draw 1st pass (offscreen)
+        [self drawOffscreenTextureInstance:&_offscreenTextureInstance2 onOffscreenTextureInstance:&_offscreenTextureInstance1];
+        
+        // Y
+        _filterKernelStep[0] = 0.0f;
+        _filterKernelStep[1] = 1.0f;
         
         // Draw 2nd pass (offscreen)
         [self drawOffscreenTextureInstance:&_offscreenTextureInstance1 onOffscreenTextureInstance:&_offscreenTextureInstance2];
