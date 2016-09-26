@@ -1,9 +1,9 @@
 /*
  
- LMTCaptureVideoPreviewLayerShaders.h
+ LMTCaptureVideoPreviewLayerGaussianFilterWeights.h
  LMTCaptureVideoPreviewLayer
  
- Copyright (c) 2016 Coletiv Studio.
+ Copyright (c) 2016 Luis Laugga.
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -25,68 +25,36 @@
  
 */
 
-#ifndef LMTCaptureVideoPreviewLayerShaders_h
-#define LMTCaptureVideoPreviewLayerShaders_h
+#ifndef LMTCaptureVideoPreviewLayerGaussianFilterWeights_h
+#define LMTCaptureVideoPreviewLayerGaussianFilterWeights_h
 
-static const char * VertexShaderSource =
-{
-    "// (In) Vertex attributes                              \n"
-    "attribute vec4 VertPosition;                           \n"
-    "attribute vec2 VertTextureCoordinate;                  \n"
-    
-    "// (Out) Fragment variables                            \n"
-    "varying vec2 FragTextureCoordinate;                    \n"
-    
-    "void main()                                            \n"
-    "{                                                      \n"
-    "    FragTextureCoordinate = VertTextureCoordinate.xy;  \n"
-    "    gl_Position = VertPosition;                        \n"
-    "}                                                      \n"
+/* 
+ This values are generated from the matlab script:
+ docs/matlab/LMTCaptureVideoPreviewLayer.m
+ See project documentation for more details
+ */
 
+// Min sigma value for t = 0
+static unsigned int const kGaussianFilterWeightsMinSigma = 0.5;
+
+// Max sigma value for t = 1
+static unsigned int const kGaussianFilterWeightsMaxSigma = 3.0;
+
+// Number of generated filter kernels
+static unsigned int const kGaussianFilterWeightsCount = 11;
+
+static double const kGaussianFilterWeights[11][16] = {
+    { /* t */ 0.000000, /* sigma */ 0.500000, /* size */ 3,  /* weights */ 0.106507,0.786986,0.106507 },
+    { /* t */ 0.100000, /* sigma */ 0.525000, /* size */ 5,  /* weights */ 0.000532,0.122790,0.753356,0.122790,0.000532 },
+    { /* t */ 0.200000, /* sigma */ 0.600000, /* size */ 5,  /* weights */ 0.002566,0.165525,0.663818,0.165525,0.002566 },
+    { /* t */ 0.300000, /* sigma */ 0.725000, /* size */ 5,  /* weights */ 0.012250,0.212576,0.550347,0.212576,0.012250 },
+    { /* t */ 0.400000, /* sigma */ 0.900000, /* size */ 5,  /* weights */ 0.037657,0.239936,0.444814,0.239936,0.037657 },
+    { /* t */ 0.500000, /* sigma */ 1.125000, /* size */ 7,  /* weights */ 0.010143,0.073120,0.239196,0.355081,0.239196,0.073120,0.010143 },
+    { /* t */ 0.600000, /* sigma */ 1.400000, /* size */ 7,  /* weights */ 0.028995,0.103818,0.223173,0.288026,0.223173,0.103818,0.028995 },
+    { /* t */ 0.700000, /* sigma */ 1.725000, /* size */ 9,  /* weights */ 0.015852,0.051392,0.119063,0.197107,0.233173,0.197107,0.119063,0.051392,0.015852 },
+    { /* t */ 0.800000, /* sigma */ 2.100000, /* size */ 11, /* weights */ 0.011253,0.031220,0.069041,0.121704,0.171011,0.191542,0.171011,0.121704,0.069041,0.031220,0.011253 },
+    { /* t */ 0.900000, /* sigma */ 2.525000, /* size */ 13, /* weights */ 0.009478,0.022457,0.045486,0.078758,0.116570,0.147490,0.159523,0.147490,0.116570,0.078758,0.045486,0.022457,0.009478 },
+    { /* t */ 1.000000, /* sigma */ 3.000000, /* size */ 13, /* weights */ 0.018544,0.034167,0.056332,0.083109,0.109719,0.129618,0.137023,0.129618,0.109719,0.083109,0.056332,0.034167,0.018544 }
 };
 
-static const char * FragmentShaderSource =
-{
-    "#ifdef GL_ES                                                           \n"
-    "precision highp float;                                                 \n"
-    "#endif                                                                 \n"
-    
-    "// (In) Texture coordinate for the fragment                            \n"
-    "varying vec2 FragTextureCoordinate;                                    \n"
-    
-    "// Uniforms (VideoFrame)                                               \n"
-    "uniform sampler2D FragTextureData;                                     \n"
-    
-    "// Uniforms (Filter)                                                   \n"
-    "uniform bool FragFilterEnabled; // Skip filter if enabled is false     \n"
-    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  \n"
-    "uniform int FragFilterKernelSize; // Size = N                          \n"
-    "uniform int FragFilterKernelRadius; // Radius = N - 1                  \n"
-    "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel      \n"
-    "uniform vec2 FragFilterSplitPassDirectionVector; // Apply kernel in direction, x or y           \n"
-    
-    "void main()                                                            \n"
-    "{                                                                      \n"
-    "    // Check if filter is not enabled or texture coordinate is outside the FragTextureFilterBounds\n"
-    "    if (FragFilterEnabled == false || (FragTextureCoordinate.x < FragFilterBounds.x || FragTextureCoordinate.y < FragFilterBounds.y || FragTextureCoordinate.x > FragFilterBounds.z || FragTextureCoordinate.y > FragFilterBounds.w))\n"
-    "{                                                                      \n"
-    "        gl_FragColor = texture2D(FragTextureData, FragTextureCoordinate);\n"
-    "    }\n"
-     "   else\n"
-    "    {\n"
-     "       // Weighted color sum of all the neighbour pixel\n"
-      "      vec4 weightedColor = vec4(0.0);\n"
-            
-       "     // Convolve with the provided Kernel in one direction\n"
-        "    for (int offset = -FragFilterKernelRadius; offset <= FragFilterKernelRadius; ++offset)\n"
-         "   {\n"
-          "      weightedColor += texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterSplitPassDirectionVector)) * FragFilterKernelWeights[FragFilterKernelRadius+offset];\n"
-           " }\n"
-            
-            "gl_FragColor = weightedColor;\n"
-        "}\n"
-    "}\n"
-};
-
-
-#endif /* LMTCaptureVideoPreviewLayerShaders_h */
+#endif /* LMTCaptureVideoPreviewLayerGaussianFilterWeights_h */

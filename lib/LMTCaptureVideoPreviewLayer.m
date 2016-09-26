@@ -30,6 +30,7 @@
 #import "LMTCaptureVideoPreviewLayerStructures.h"
 #import "LMTCaptureVideoPreviewLayerShaders.h"
 #import "LMTCaptureVideoPreviewLayerUtilities.h"
+#import "LMTCaptureVideoPreviewLayerGaussianFilterWeights.h"
 
 #import <AVFoundation/AVCaptureOutput.h>
 #import <QuartzCore/CAEAGLLayer.h>
@@ -955,95 +956,45 @@
 #pragma mark -
 #pragma mark Filtering (Kernel)
 
-unsigned int filterSizeForSigma(double sigma)
+double filterStepForIndex(int index)
 {
-    return (2.0f*ceil(2.0f*sigma)+1);
+    return kGaussianFilterWeights[index][0];
 }
 
-unsigned int filterRadiusForSigma(double sigma)
+double filterSigmaForIndex(int index)
 {
-    return floor(filterSizeForSigma(sigma)/2.0f);
+    return kGaussianFilterWeights[index][1];
 }
 
-double filterGaussian2d(double x, double y, double sigma)
+unsigned int filterSizeForIndex(int index)
 {
-    double xSq = pow(x, 2);
-    double ySq = pow(y, 2);
-    double sigmaSq = pow(sigma, 2);
-    
-    return exp( -1.0f * ( (xSq/(2.0f*sigmaSq)) + (ySq/(2.0f*sigmaSq)) ) );
+    return (int)kGaussianFilterWeights[index][2];
 }
 
-//function g2dm = Gaussian2dMatrix(SIGMA)
-//fs = filterSize(SIGMA);
-//fr = filterRadius(SIGMA);
-//g2dm = zeros(fs, fs);
-//for x = 1:fs
-//for y = 1:fs
-//g2dm(y,x) = Gaussian2d(x-fr, y-fr, SIGMA);
-//end
-//end
-//g2dm = (g2dm / sum(sum(g2dm))) % normalize matrix so that the final weights will sum to 1
-//end
-
-void filterGaussianKernel(double sigma, double ** matrix)
+unsigned int filterRadiusForSize(double filterSize)
 {
-    unsigned int filterSize = filterSizeForSigma(sigma);
-    unsigned int filterRadius = filterRadiusForSigma(sigma);
-    
-    for (unsigned int x=0; x<filterSize; ++x)
-    {
-        for (unsigned int y=0; y<filterSize; ++y)
-        {
-            matrix[x][y] = filterGaussian2d(x-filterRadius, y-filterRadius, sigma);
-        }
-    }
-    
-    // TODO normalize matrix
+    return floor(filterSize/2.0f);
 }
 
-void createFilterKernel(float t, double sigma, FilterKernel_t * filterKernel)
+double filterWeightForIndex(int index, int weightIndex)
 {
-//    // Lerp sigma value between 0.1 and the best sigma for the kernelRadius
-//    float sigma = expLerp(t, minSigmaForKernelSize, maxSigmaForKernelSize);
-//    
-//    // Create 1D kernel
-//    GLfloat * kernelValue = calloc(kernelSize, sizeof(GLfloat)); // float
-//    for (int i=0; i<=kernelRadius; ++i)
-//    {
-//        kernelValue[kernelRadius-i] = kernelValue[kernelRadius+i] = normalProbabilityDensityFunction(i, sigma);
-//    }
-//    
-//    // Calculate the kernel sum
-//    GLfloat kernelSum = 0.0;
-//    for (int i=0; i<kernelSize; ++i)
-//    {
-//        kernelSum += kernelValue[i];
-//    }
-//    
-//    // Normalize so kernelSum is 1.0
-//    GLfloat kernelSumInv = 1.0f/kernelSum;
-//    kernelSum = 0.0;
-//    for (int i=0; i<kernelSize; ++i)
-//    {
-//        kernelValue[i] *= kernelSumInv;
-//        kernelSum += kernelValue[i];
-//    }
+    return kGaussianFilterWeights[index][3+weightIndex]; // FIXME improve this...wrong things can happen
+}
 
-    GLfloat kGaussianFilterWeights[13] = {0.0185, 0.0342, 0.0563, 0.0831, 0.1097, 0.1296, 0.1370, 0.1296, 0.1097, 0.0831, 0.0563, 0.0342, 0.0185};
-
-    GLuint filterSize = filterSizeForSigma(sigma);
-    GLuint filterRadius = filterRadiusForSigma(sigma);
+void createFilterKernel(float i, FilterKernel_t * filterKernel)
+{
+    GLuint filterSize = filterSizeForIndex(i);
+    GLuint filterRadius = filterRadiusForSize(filterSize);
     
     // Create 1D kernel
     GLfloat * filterWeights = calloc(filterSize, sizeof(GLfloat)); // float
-    for (int i=0; i<filterSize; ++i)
+    for (int weightIndex=0; weightIndex<filterSize; ++weightIndex)
     {
-        filterWeights[i] = kGaussianFilterWeights[i];
+        filterWeights[weightIndex] = filterWeightForIndex(i, weightIndex);
     }
 
     // Log kernel
-    printf("kernel (step = %f, size = %u, radius = %u, sigma = %f) [", t, filterSize, filterRadius, sigma);
+    printf("kernel (step = %f, size = %u, radius = %u, sigma = %f) [", filterStepForIndex(i), filterSize, filterRadius, filterSigmaForIndex(i));
     for (int i = 0; i<filterSize; ++i)
     {
         printf(" %f ", filterWeights[i]);
@@ -1070,22 +1021,14 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
         return;
     }
     
-    // Define the standard deviation (constant)
-    static double const kSigma = 3.0;
-
     // Define how many filter kernels should be generated
-    size_t filterKernelCount = 10;
+    size_t filterKernelCount = kGaussianFilterWeightsCount;
     FilterKernel_t * filterKernelArray = (FilterKernel_t *)calloc(filterKernelCount, sizeof(FilterKernel_t));
-    
-    // t, used for linear interpolation
-    float t = 0.0f;
-    float tDelta = 1.0f/(float)(filterKernelCount-1);
     
     // Create all filter kernels
     for (int i=0; i<filterKernelCount; ++i)
     {
-        createFilterKernel(t, kSigma, &filterKernelArray[i]);
-        t += tDelta;
+        createFilterKernel(i, &filterKernelArray[i]);
     }
     
     // Store in the TextureInstance

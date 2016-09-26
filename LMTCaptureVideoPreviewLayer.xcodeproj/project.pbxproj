@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		389C83951D9971F000467EB3 /* LMTCaptureVideoPreviewLayerGaussianFilterWeights.h in Headers */ = {isa = PBXBuildFile; fileRef = 389C83941D9971F000467EB3 /* LMTCaptureVideoPreviewLayerGaussianFilterWeights.h */; };
 		38C069E51D913C9C009B1140 /* LMTCaptureVideoPreviewLayerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F2F1D91359B0055EFD3 /* LMTCaptureVideoPreviewLayerUITests.m */; };
 		38C069E81D913F4B009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */; };
 		38C069EB1D91407F009B1140 /* PreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069EA1D91407F009B1140 /* PreviewView.m */; };
@@ -57,6 +58,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		389C83941D9971F000467EB3 /* LMTCaptureVideoPreviewLayerGaussianFilterWeights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerGaussianFilterWeights.h; sourceTree = "<group>"; };
 		38C069DB1D913C84009B1140 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		38C069E91D91407F009B1140 /* PreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviewView.h; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.h; sourceTree = SOURCE_ROOT; };
 		38C069EA1D91407F009B1140 /* PreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviewView.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/PreviewView.m; sourceTree = SOURCE_ROOT; };
@@ -251,6 +253,7 @@
 				38E212881D32552C00AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.m */,
 				38E2128E1D32576A00AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h */,
 				38E212A51D325F4200AAE5F6 /* LMTCaptureVideoPreviewLayerShaders.h */,
+				389C83941D9971F000467EB3 /* LMTCaptureVideoPreviewLayerGaussianFilterWeights.h */,
 				38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */,
 				38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */,
 			);
@@ -267,6 +270,7 @@
 			files = (
 				38E2129B1D3258B300AAE5F6 /* LMTCaptureVideoPreviewLayerStructures.h in Headers */,
 				38E212A11D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayer.h in Headers */,
+				389C83951D9971F000467EB3 /* LMTCaptureVideoPreviewLayerGaussianFilterWeights.h in Headers */,
 				38E212A31D3258B800AAE5F6 /* LMTCaptureVideoPreviewLayerInternal.h in Headers */,
 				38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */,
 			);
@@ -826,6 +830,7 @@
 				38C069E41D913C84009B1140 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		38C06A011D917F46009B1140 /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
@@ -834,6 +839,7 @@
 				38C06A031D917F46009B1140 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		38E03F1B1D9134C20055EFD3 /* Build configuration list for PBXNativeTarget "UI Tests Application" */ = {
 			isa = XCConfigurationList;
