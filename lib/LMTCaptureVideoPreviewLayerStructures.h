@@ -37,8 +37,10 @@ struct UniformHandles {
     
     GLuint FragFilterEnabled; // bool
     GLuint FragFilterBounds; // vec4
+    
+    GLuint FragFilterSplitPassDirectionVector; // vec2 (x or y step direction)
+    
     GLuint FragFilterKernelWeights; // float[]
-    GLuint FragFilterKernelStep; // vec2 (x or y step direction)
     GLuint FragFilterKernelRadius; // float
     GLuint FragFilterKernelSize; // float
 };

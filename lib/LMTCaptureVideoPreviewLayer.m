@@ -61,8 +61,7 @@
     
     // Offscreen Framebuffer
     OffscreenTextureInstance_t _pixelBufferTextureInstance;
-    OffscreenTextureInstance_t _offscreenTextureInstance1;
-    OffscreenTextureInstance_t _offscreenTextureInstance2;
+    OffscreenTextureInstance_t _offscreenTextureInstances[2];
     
     // Onscreen Framebuffer
     GLuint _onscreenFramebuffer;
@@ -72,25 +71,23 @@
     struct TextureInstance _onscreenTextureInstance;
     
     // Filter (Kernel)
-    GLfloat _filterKernelStep[2]; // Direction: X or Y
     size_t _filterKernelCount; // Number of filter kernels created
     size_t _filterKernelIndex; // Currently loaded filter kernel
     FilterKernel_t * _filterKernelArray; // Kernels used for the interpolation between [0,1]
     
-    // Filter (Downsample)
-    GLfloat _filterDownsampleFactor; // Downsample offscreen textures by a factor. Example: 2 means reducing the dimensions by 1/2 in each dimension
+    // Filter (Configuration)
+    GLfloat _filterSplitPassDirectionVector[2]; // Separable filter, apply 2x each in a specific direction (x or y)
+    GLuint _filterMultiplePassCount; // Number of times filter should be applied before onscreen rendering
+    GLfloat _filterDownsamplingFactor; // Downsample offscreen textures by a factor (ie. 2 = resize dimensions by 1/2)
     
     // Filter (Intensity)
-    float _filterIntensity;
+    float _filterIntensity; // [0,1], 0 means no filter is applied
     dispatch_source_t _filterIntensityTransitionTimer; // Use for animated transition between different indices
     float _filterIntensityTransitionTarget;
 }
 @end
 
 @implementation LMTCaptureVideoPreviewLayer
-
-#define mPixelBufferDownsampledWidth(pixelBuffer) (((GLfloat)CVPixelBufferGetWidth(pixelBuffer))/_filterDownsampleFactor)
-#define mPixelBufferDownsampledHeight(pixelBuffer) (((GLfloat)CVPixelBufferGetHeight(pixelBuffer))/_filterDownsampleFactor)
 
 #pragma mark -
 #pragma mark Initialization
@@ -139,8 +136,8 @@
         // Disable depth testing
         glDisable(GL_DEPTH_TEST);
         
-        // Preemptively load filter kernel
-        [self loadFilterKernel];
+        // Preemptively load filter in memory
+        [self loadFilter];
     }
     return self;
 }
@@ -164,10 +161,10 @@
     _blurFilterUniforms.FragTextureData = glGetUniformLocation(_blurFilterProgram, "FragTextureData");
     _blurFilterUniforms.FragFilterEnabled = glGetUniformLocation(_blurFilterProgram, "FragFilterEnabled");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
+    _blurFilterUniforms.FragFilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FragFilterSplitPassDirectionVector");
     _blurFilterUniforms.FragFilterKernelRadius = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelRadius");
     _blurFilterUniforms.FragFilterKernelSize = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSize");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
-    _blurFilterUniforms.FragFilterKernelStep = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelStep");
     
     // Use the blur filter glsl program
     glUseProgram(_blurFilterProgram);
@@ -435,22 +432,20 @@
     glBindVertexArrayOES(0);
 }
 
-- (CVOpenGLESTextureRef)drawPixelBuffer:(CVPixelBufferRef)pixelBuffer onOffscreenTextureInstance:(OffscreenTextureInstance_t *)offscreenTextureInstance
+- (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(OffscreenTextureInstance_t *)textureInstance
 {
-    // Check dimensions of the pixelBuffer
-    GLfloat width = mPixelBufferDownsampledWidth(pixelBuffer);
-    GLfloat height = mPixelBufferDownsampledHeight(pixelBuffer);
+    // Downsample input pixelBuffer by a specific factor
+    GLfloat width = ((GLfloat)CVPixelBufferGetWidth(pixelBuffer))/_filterDownsamplingFactor;
+    GLfloat height = ((GLfloat)CVPixelBufferGetHeight(pixelBuffer))/_filterDownsamplingFactor;
     
     // Get the OpenGL texture
     CVOpenGLESTextureRef oglTexture = [self oglTextureFromPixelBuffer:pixelBuffer];
     
     // Create a temporary offscreen texture instance wrapping the pixelBuffer
-    _pixelBufferTextureInstance.textureWidth = width;
-    _pixelBufferTextureInstance.textureHeight = height;
-    _pixelBufferTextureInstance.textureTarget = CVOpenGLESTextureGetTarget(oglTexture);
-    _pixelBufferTextureInstance.textureName = CVOpenGLESTextureGetName(oglTexture);
-    
-    [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:offscreenTextureInstance];
+    textureInstance->textureWidth = width;
+    textureInstance->textureHeight = height;
+    textureInstance->textureTarget = CVOpenGLESTextureGetTarget(oglTexture);
+    textureInstance->textureName = CVOpenGLESTextureGetName(oglTexture);
     
     return oglTexture;
 }
@@ -496,7 +491,7 @@
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Set the filter step
-    glUniform2f(_blurFilterUniforms.FragFilterKernelStep, _filterKernelStep[0]/srcTextureInstance->textureWidth, _filterKernelStep[1]/srcTextureInstance->textureHeight);
+    glUniform2f(_blurFilterUniforms.FragFilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/srcTextureInstance->textureWidth, _filterSplitPassDirectionVector[1]/srcTextureInstance->textureHeight);
     
     // Bind VAO
     glBindVertexArrayOES(destTextureInstance->vertexArray);
@@ -790,39 +785,32 @@
         [self setFilterEnabled:YES];
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
         
-        // X
-        _filterKernelStep[0] = 1.0f;
-        _filterKernelStep[1] = 0.0f;
+        // Set the filter split-pass direction vector
+        [self switchFilterSplitPassDirectionVector];
         
-        // Draw 1st pass (offscreen)
-        pixelBufferTexture = [self drawPixelBuffer:pixelBuffer onOffscreenTextureInstance:&_offscreenTextureInstance1];
+        // Set the pixelBuffer to a texture instance
+        // We'll use two texture instances and ping-pong between them
+        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
         
-        // Y
-        _filterKernelStep[0] = 0.0f;
-        _filterKernelStep[1] = 1.0f;
+        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
+        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
         
-        // Draw 2nd pass (offscreen)
-        [self drawOffscreenTextureInstance:&_offscreenTextureInstance1 onOffscreenTextureInstance:&_offscreenTextureInstance2];
-        
-        // X
-        _filterKernelStep[0] = 1.0f;
-        _filterKernelStep[1] = 0.0f;
-        
-        // Draw 1st pass (offscreen)
-        [self drawOffscreenTextureInstance:&_offscreenTextureInstance2 onOffscreenTextureInstance:&_offscreenTextureInstance1];
-        
-        // Y
-        _filterKernelStep[0] = 0.0f;
-        _filterKernelStep[1] = 1.0f;
-        
-        // Draw 2nd pass (offscreen)
-        [self drawOffscreenTextureInstance:&_offscreenTextureInstance1 onOffscreenTextureInstance:&_offscreenTextureInstance2];
+        // Draw the offscreen texture instances and keep applying the filter (ping, pong, ping, pong)
+        // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
+        for (int p=1; p<(2*_filterMultiplePassCount); ++p)
+        {
+            // Separable filtering, switch split-direction (vertical or horizontal)
+            [self switchFilterSplitPassDirectionVector];
+            
+            // Draw split-pass (offscreen)
+            [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
+        }
         
         // Disabled filtering for final onscreen rendering
         [self setFilterEnabled:NO];
         
         // Draw (onscreen)
-        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstance2];
+        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
     }
     else
     {
@@ -873,7 +861,7 @@
 - (void)setFilterIntensity:(float)intensity
 {
     // Load filter kernel (will do nothing if it's already loaded)
-    [self loadFilterKernel];
+    [self loadFilter];
     
     // Clamp intensity between [0,1] range
     float clampedIntensity =  MAX(0, MIN(1, intensity));
@@ -947,10 +935,22 @@
     dispatch_resume(_filterIntensityTransitionTimer);
 }
 
+- (void)switchFilterSplitPassDirectionVector
+{
+    if (_filterSplitPassDirectionVector[0] == 0)
+    {
+        _filterSplitPassDirectionVector[0] = 1;
+        _filterSplitPassDirectionVector[1] = 0;
+    }
+    else
+    {
+        _filterSplitPassDirectionVector[0] = 0;
+        _filterSplitPassDirectionVector[1] = 1;
+    }
+}
+
 #pragma mark -
 #pragma mark Filtering (Kernel)
-
-static double const kDownsamplingFactor = 4.0;
 
 unsigned int filterSizeForSigma(double sigma)
 {
@@ -1059,7 +1059,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     free(filterKernel->weights);
 }
 
-- (void)loadFilterKernel
+- (void)loadFilter
 {
     // Skip if it's already loaded
     if (_filterKernelCount)
@@ -1089,8 +1089,9 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     _filterKernelCount = filterKernelCount;
     _filterKernelArray = filterKernelArray;
     
-    // TEMP
-    _filterDownsampleFactor = kDownsamplingFactor;
+    // Filter parameters
+    _filterDownsamplingFactor = 4.0f;
+    _filterMultiplePassCount = 2;
 }
 
 @end
