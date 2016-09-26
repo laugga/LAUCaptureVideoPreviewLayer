@@ -75,7 +75,7 @@
     size_t _filterKernelIndex; // Currently loaded filter kernel
     FilterKernel_t * _filterKernelArray; // Kernels used for the interpolation between [0,1]
     
-    // Filter (Configuration)
+    // Filter (Parameters)
     GLfloat _filterSplitPassDirectionVector[2]; // Separable filter, apply 2x each in a specific direction (x or y)
     GLuint _filterMultiplePassCount; // Number of times filter should be applied before onscreen rendering
     GLfloat _filterDownsamplingFactor; // Downsample offscreen textures by a factor (ie. 2 = resize dimensions by 1/2)
@@ -239,7 +239,7 @@
     [self setFilterIntensity:_blur animated:YES];
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark AVCaptureSession
 
 - (AVCaptureSession *)session
@@ -501,7 +501,7 @@
 }
 
 #pragma mark -
-#pragma mark Onscreen rendering (2nd pass)
+#pragma mark Onscreen rendering
 
 - (GLuint)createOnscreenFramebufferForLayer:(CAEAGLLayer *)layer
 {
@@ -836,27 +836,7 @@
 }
 
 #pragma mark -
-#pragma mark Filtering (Parameters)
-
-- (void)setFilterEnabled:(BOOL)filterEnabled
-{
-    glUniform1i(_blurFilterUniforms.FragFilterEnabled, (filterEnabled ? 1 : 0));
-}
-
-- (void)setFilterBoundsRect:(CGRect)filterBoundsRect
-{
-    GLfloat xMin = filterBoundsRect.origin.x;
-    GLfloat xMax = xMin + filterBoundsRect.size.width;
-    GLfloat yMin = filterBoundsRect.origin.y;
-    GLfloat yMax = yMin + filterBoundsRect.size.height;
-    
-    // Bounds within the texture that are filtered [xMin, yMin, xMax, yMax]
-    // The textureCoordinates mapping rotate the texture 90 degrees clockwise
-    // We need to flip x/y in textureFilterBounds to work with the rotation
-    GLfloat filterBounds[4] = { yMin, 1.0 - xMax, yMax, 1.0 - xMin };
-    
-    glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
-}
+#pragma mark Filtering (Intensity)
 
 - (void)setFilterIntensity:(float)intensity
 {
@@ -933,6 +913,29 @@
     });
     
     dispatch_resume(_filterIntensityTransitionTimer);
+}
+
+#pragma mark -
+#pragma mark Filtering (Parameters)
+
+- (void)setFilterEnabled:(BOOL)filterEnabled
+{
+    glUniform1i(_blurFilterUniforms.FragFilterEnabled, (filterEnabled ? 1 : 0));
+}
+
+- (void)setFilterBoundsRect:(CGRect)filterBoundsRect
+{
+    GLfloat xMin = filterBoundsRect.origin.x;
+    GLfloat xMax = xMin + filterBoundsRect.size.width;
+    GLfloat yMin = filterBoundsRect.origin.y;
+    GLfloat yMax = yMin + filterBoundsRect.size.height;
+    
+    // Bounds within the texture that are filtered [xMin, yMin, xMax, yMax]
+    // The textureCoordinates mapping rotate the texture 90 degrees clockwise
+    // We need to flip x/y in textureFilterBounds to work with the rotation
+    GLfloat filterBounds[4] = { yMin, 1.0 - xMax, yMax, 1.0 - xMin };
+    
+    glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
 }
 
 - (void)switchFilterSplitPassDirectionVector
