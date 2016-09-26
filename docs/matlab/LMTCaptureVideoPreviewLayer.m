@@ -3,27 +3,34 @@
 % Filter test-image using a gaussian filter kernel and display it. 
 % Copyright 2016 Luis Laugga
 
-DOWNSAMPLING_FACTOR = 4;
-SIGMA = 3;
-fs = filterSize(SIGMA);
-gaussianFilterKernel = Gaussian2dMatrix(SIGMA);
+% Generate multiple gaussian filter kernels for the iOS implementation
+kMinSigma = 0.5;
+kMaxSigma = 3;
+for t = 0:10
+gaussianFilterWeights(t/10, kMinSigma, kMaxSigma);
+end
 
-testImage = readTestImage('test-image.png', DOWNSAMPLING_FACTOR);
+% kDOWNSAMPLING_FACTOR = 4;
+% kSIGMA = 3;
+% fs = filterSize(SIGMA);
+% gaussianFilterKernel = Gaussian2dMatrix(kSIGMA);
+% 
+% testImage = readTestImage('test-image.png', kDOWNSAMPLING_FACTOR);
 
 % Normal 2d convolution
-filteredTestImage1stPass = imfilter(testImage, gaussianFilterKernel, 'conv');
-filteredTestImage2ndPass = imfilter(filteredTestImage1stPass, gaussianFilterKernel, 'conv'); % 2nd gaussian filter pass (better than a bigger kernel?)
-writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-2d-convolution.png', DOWNSAMPLING_FACTOR);
+% filteredTestImage1stPass = imfilter(testImage, gaussianFilterKernel, 'conv');
+% filteredTestImage2ndPass = imfilter(filteredTestImage1stPass, gaussianFilterKernel, 'conv'); % 2nd gaussian filter pass (better than a bigger kernel?)
+% writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-2d-convolution.png', kDOWNSAMPLING_FACTOR);
 % imshow(filteredTestImage2ndPass);
 
 % Using separable filters, with two one-dimensional Gaussian blurs
-horizontalGaussianFilterKernel = HorizontalGaussian2dMatrix(gaussianFilterKernel);
-verticalGaussianFilterKernel = VerticalGaussian2dMatrix(gaussianFilterKernel);
-filteredTestImage1stPassH = imfilter(testImage, horizontalGaussianFilterKernel, 'conv');
-filteredTestImage1stPassV = imfilter(filteredTestImage1stPassH, verticalGaussianFilterKernel, 'conv');
-filteredTestImage2ndPassH = imfilter(filteredTestImage1stPassV, horizontalGaussianFilterKernel, 'conv');
-filteredTestImage2ndPassV = imfilter(filteredTestImage2ndPassH, verticalGaussianFilterKernel, 'conv');
-writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-separable-filters.png', DOWNSAMPLING_FACTOR);
+% horizontalGaussianFilterKernel = HorizontalGaussian2dMatrix(gaussianFilterKernel);
+% verticalGaussianFilterKernel = VerticalGaussian2dMatrix(gaussianFilterKernel);
+% filteredTestImage1stPassH = imfilter(testImage, horizontalGaussianFilterKernel, 'conv');
+% filteredTestImage1stPassV = imfilter(filteredTestImage1stPassH, verticalGaussianFilterKernel, 'conv');
+% filteredTestImage2ndPassH = imfilter(filteredTestImage1stPassV, horizontalGaussianFilterKernel, 'conv');
+% filteredTestImage2ndPassV = imfilter(filteredTestImage2ndPassH, verticalGaussianFilterKernel, 'conv');
+% writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-separable-filters.png', kDOWNSAMPLING_FACTOR);
 %imshow(filteredTestImage2ndPassV);
 
 % Gaussian(0,SIGMA);
@@ -56,10 +63,6 @@ end
 
 function fr = filterRadius(SIGMA)
 fr = ceil(filterSize(SIGMA)/2);
-end
-
-function s = sigma(filterSize) % filterSize must be an odd and integer nunber
-s = (filterSize-1)/4;
 end
 
 function g = Gaussian(x, SIGMA)
@@ -95,7 +98,7 @@ for x = 1:fs
         g2dm(y,x) = Gaussian2d(x-fr, y-fr, SIGMA);
     end
 end
-g2dm = (g2dm / sum(sum(g2dm))) % normalize matrix so that the final weights will sum to 1
+g2dm = (g2dm / sum(sum(g2dm))); % normalize matrix so that the final weights will sum to 1
 end
 
 function hg2dm = HorizontalGaussian2dMatrix(g2dm)
@@ -128,5 +131,26 @@ end
 c2dm = (c2dm / sum(sum(c2dm))) % normalize matrix so that the final weights will sum to 1
 end
 
+% Utility functions used for kernel generation
 
+function lerpValue = lerp(t, min, max)
+lerpValue = (1-t)*min + t*max;
+end
 
+function expLerpValue = expLerp(t, min, max)
+expLerpValue = lerp(t*t, min, max);
+end
+
+function weights = gaussianFilterWeights(t, minSigma, maxSigma)
+sigma = expLerp(t, minSigma, maxSigma);
+gaussianFilterKernel = Gaussian2dMatrix(sigma);
+[m,n] = size(gaussianFilterKernel);
+weights = zeros(1,m);
+for x = 1:m
+    weights(1,x) = gaussianFilterKernel(x, x);
+end
+weights = (weights.^0.5) % sqrt elements so horizontal x vertical = gaussian 2d matrix weights
+weightsString = sprintf('%f,' , weights);
+weightsString = weightsString(1:end-1);
+fprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* weights */ %s },', t, sigma, m, weightsString);
+end
