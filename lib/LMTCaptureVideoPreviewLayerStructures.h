@@ -37,7 +37,7 @@ struct UniformHandles {
     
     GLuint FragFilterEnabled; // bool
     GLuint FragFilterBounds; // vec4
-    GLuint FragFilterKernelValue; // float[]
+    GLuint FragFilterKernelWeights; // float[]
     GLuint FragFilterKernelStep; // vec2 (x or y step direction)
     GLuint FragFilterKernelRadius; // float
     GLuint FragFilterKernelSize; // float
@@ -48,13 +48,13 @@ struct AttributeHandles {
     GLuint VertTextureCoordinate;
 };
 
-struct TextureFilterKernel {
-    GLint kernelRadius;
-    GLint kernelSize;
-    GLfloat * kernelValue;
+struct FilterKernel {
+    GLuint radius;
+    GLuint size; // NxN
+    GLfloat * weights;
 };
 
-typedef struct TextureFilterKernel TextureFilterKernel_t;
+typedef struct FilterKernel FilterKernel_t;
 
 struct OffscreenTextureInstance {
     

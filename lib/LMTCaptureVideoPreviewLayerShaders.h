@@ -62,7 +62,7 @@ static const char * FragmentShaderSource =
     "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  \n"
     "uniform int FragFilterKernelSize; // Size = N                          \n"
     "uniform int FragFilterKernelRadius; // Radius = N - 1                  \n"
-    "uniform float FragFilterKernelValue[50]; // 1D convolution kernel      \n"
+    "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel      \n"
     "uniform vec2 FragFilterKernelStep; // Step direction, x or y           \n"
     
     "void main()                                                            \n"
@@ -80,7 +80,7 @@ static const char * FragmentShaderSource =
        "     // Convolve with the provided Kernel in one direction\n"
         "    for (int offset = -FragFilterKernelRadius; offset <= FragFilterKernelRadius; ++offset)\n"
          "   {\n"
-          "      weightedColor += texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterKernelStep)) * FragFilterKernelValue[FragFilterKernelRadius+offset];\n"
+          "      weightedColor += texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterKernelStep)) * FragFilterKernelWeights[FragFilterKernelRadius+offset];\n"
            " }\n"
             
             "gl_FragColor = weightedColor;\n"

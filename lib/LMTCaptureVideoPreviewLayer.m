@@ -75,7 +75,7 @@
     GLfloat _filterKernelStep[2]; // Direction: X or Y
     size_t _filterKernelCount; // Number of filter kernels created
     size_t _filterKernelIndex; // Currently loaded filter kernel
-    TextureFilterKernel_t * _filterKernelArray; // Kernels used for the interpolation between [0,1]
+    FilterKernel_t * _filterKernelArray; // Kernels used for the interpolation between [0,1]
     
     // Filter (Downsample)
     GLfloat _filterDownsampleFactor; // Downsample offscreen textures by a factor. Example: 2 means reducing the dimensions by 1/2 in each dimension
@@ -166,7 +166,7 @@
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
     _blurFilterUniforms.FragFilterKernelRadius = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelRadius");
     _blurFilterUniforms.FragFilterKernelSize = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSize");
-    _blurFilterUniforms.FragFilterKernelValue = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelValue");
+    _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
     _blurFilterUniforms.FragFilterKernelStep = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelStep");
     
     // Use the blur filter glsl program
@@ -791,15 +791,15 @@
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
         
         // X
-        _filterKernelStep[0] = 1.0f;
-        _filterKernelStep[1] = 0.0f;
+        _filterKernelStep[0] = 0.0f;
+        _filterKernelStep[1] = 1.0f;
         
         // Draw 1st pass (offscreen)
         pixelBufferTexture = [self drawPixelBuffer:pixelBuffer onOffscreenTextureInstance:&_offscreenTextureInstance1];
         
         // Y
-        _filterKernelStep[0] = 0.0f;
-        _filterKernelStep[1] = 1.0f;
+        _filterKernelStep[0] = 1.0f;
+        _filterKernelStep[1] = 0.0f;
         
         // Draw 2nd pass (offscreen)
         [self drawOffscreenTextureInstance:&_offscreenTextureInstance1 onOffscreenTextureInstance:&_offscreenTextureInstance2];
@@ -873,11 +873,11 @@
     // Assign the mapped index
     _filterKernelIndex =  MAX(0, MIN(_filterKernelCount-1, mappedIndex));
     
-    TextureFilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
+    FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
     
-    glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.kernelRadius);
-    glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.kernelSize);
-    glUniform1fv(_blurFilterUniforms.FragFilterKernelValue, filterKernel.kernelSize, filterKernel.kernelValue);
+    glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
+    glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
+    glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.size, filterKernel.weights);
 }
 
 - (void)setFilterIntensity:(float)intensity animated:(BOOL)animated
@@ -936,83 +936,113 @@
 #pragma mark -
 #pragma mark Filtering (Kernel)
 
-double normalProbabilityDensityFunction(double x, double sigma)
+static double const kDownsamplingFactor = 4.0;
+
+unsigned int filterSizeForSigma(double sigma)
 {
-    return 0.39894f * exp(-0.5f*x*x / (sigma*sigma)) / sigma;
+    return (2.0f*ceil(2.0f*sigma)+1);
 }
 
-float lerp(float t, float min, float max)
+unsigned int filterRadiusForSigma(double sigma)
 {
-    return (1-t)*min + t*max;
+    return floor(filterSizeForSigma(sigma)/2.0f);
 }
 
-float smoothStep(float t, float min, float max)
+double filterGaussian2d(double x, double y, double sigma)
 {
-    return lerp(t*t*t * (t * (6.0f*t - 15.0f) + 10.0f), min, max);
-}
-
-float coserp(float t, float min, float max)
-{
-    return lerp(1.0f - cosf(t * M_PI * 0.5f), min, max);
-}
-
-float expLerp(float t, float min, float max)
-{
-    return lerp(t*t, min, max);
-}
-
-void createTextureFilterKernel(float t, unsigned int kernelRadius, TextureFilterKernel_t * textureFilterKernel)
-{
-    GLint kernelSize = 2 * kernelRadius + 1;
+    double xSq = pow(x, 2);
+    double ySq = pow(y, 2);
+    double sigmaSq = pow(sigma, 2);
     
-    // "rule of thumb" sigma = kernelSize / 3
-    float const maxSigmaForKernelSize = ((float)kernelSize) / 3.0f;
-    float const minSigmaForKernelSize = 0.1f;
+    return exp( -1.0f * ( (xSq/(2.0f*sigmaSq)) + (ySq/(2.0f*sigmaSq)) ) );
+}
+
+//function g2dm = Gaussian2dMatrix(SIGMA)
+//fs = filterSize(SIGMA);
+//fr = filterRadius(SIGMA);
+//g2dm = zeros(fs, fs);
+//for x = 1:fs
+//for y = 1:fs
+//g2dm(y,x) = Gaussian2d(x-fr, y-fr, SIGMA);
+//end
+//end
+//g2dm = (g2dm / sum(sum(g2dm))) % normalize matrix so that the final weights will sum to 1
+//end
+
+void filterGaussianKernel(double sigma, double ** matrix)
+{
+    unsigned int filterSize = filterSizeForSigma(sigma);
+    unsigned int filterRadius = filterRadiusForSigma(sigma);
     
-    // Lerp sigma value between 0.1 and the best sigma for the kernelRadius
-    float sigma = expLerp(t, minSigmaForKernelSize, maxSigmaForKernelSize);
+    for (unsigned int x=0; x<filterSize; ++x)
+    {
+        for (unsigned int y=0; y<filterSize; ++y)
+        {
+            matrix[x][y] = filterGaussian2d(x-filterRadius, y-filterRadius, sigma);
+        }
+    }
+    
+    // TODO normalize matrix
+}
+
+void createFilterKernel(float t, double sigma, FilterKernel_t * filterKernel)
+{
+//    // Lerp sigma value between 0.1 and the best sigma for the kernelRadius
+//    float sigma = expLerp(t, minSigmaForKernelSize, maxSigmaForKernelSize);
+//    
+//    // Create 1D kernel
+//    GLfloat * kernelValue = calloc(kernelSize, sizeof(GLfloat)); // float
+//    for (int i=0; i<=kernelRadius; ++i)
+//    {
+//        kernelValue[kernelRadius-i] = kernelValue[kernelRadius+i] = normalProbabilityDensityFunction(i, sigma);
+//    }
+//    
+//    // Calculate the kernel sum
+//    GLfloat kernelSum = 0.0;
+//    for (int i=0; i<kernelSize; ++i)
+//    {
+//        kernelSum += kernelValue[i];
+//    }
+//    
+//    // Normalize so kernelSum is 1.0
+//    GLfloat kernelSumInv = 1.0f/kernelSum;
+//    kernelSum = 0.0;
+//    for (int i=0; i<kernelSize; ++i)
+//    {
+//        kernelValue[i] *= kernelSumInv;
+//        kernelSum += kernelValue[i];
+//    }
+
+    GLfloat kGaussianFilterWeights[13] = {0.0185, 0.0342, 0.0563, 0.0831, 0.1097, 0.1296, 0.1370, 0.1296, 0.1097, 0.0831, 0.0563, 0.0342, 0.0185};
+
+    GLuint filterSize = filterSizeForSigma(sigma);
+    GLuint filterRadius = filterRadiusForSigma(sigma);
     
     // Create 1D kernel
-    GLfloat * kernelValue = calloc(kernelSize, sizeof(GLfloat)); // float
-    for (int i=0; i<=kernelRadius; ++i)
+    GLfloat * filterWeights = calloc(filterSize, sizeof(GLfloat)); // float
+    for (int i=0; i<filterSize; ++i)
     {
-        kernelValue[kernelRadius-i] = kernelValue[kernelRadius+i] = normalProbabilityDensityFunction(i, sigma);
+        filterWeights[i] = kGaussianFilterWeights[i];
     }
-    
-    // Calculate the kernel sum
-    GLfloat kernelSum = 0.0;
-    for (int i=0; i<kernelSize; ++i)
-    {
-        kernelSum += kernelValue[i];
-    }
-    
-    // Normalize so kernelSum is 1.0
-    GLfloat kernelSumInv = 1.0f/kernelSum;
-    kernelSum = 0.0;
-    for (int i=0; i<kernelSize; ++i)
-    {
-        kernelValue[i] *= kernelSumInv;
-        kernelSum += kernelValue[i];
-    }
-    
+
     // Log kernel
-    printf("kernel (step = %f, r = %u, s = %f, sum = %f) [", t, kernelRadius, sigma, kernelSum);
-    for (int i = 0; i<kernelSize; ++i)
+    printf("kernel (step = %f, size = %u, radius = %u, sigma = %f) [", t, filterSize, filterRadius, sigma);
+    for (int i = 0; i<filterSize; ++i)
     {
-        printf(" %f ", kernelValue[i]);
+        printf(" %f ", filterWeights[i]);
     }
     printf("]\n");
     
-    textureFilterKernel->kernelRadius = kernelRadius;
-    textureFilterKernel->kernelSize = kernelSize;
-    textureFilterKernel->kernelValue = kernelValue;
+    filterKernel->radius = filterRadius;
+    filterKernel->size = filterSize;
+    filterKernel->weights = filterWeights;
 }
 
-void releaseTextureFilterKernel(TextureFilterKernel_t * textureFilterKernel)
+void releaseFilterKernel(FilterKernel_t * filterKernel)
 {
-    textureFilterKernel->kernelSize = 0;
-    textureFilterKernel->kernelRadius = 0;
-    free(textureFilterKernel->kernelValue);
+    filterKernel->size = 0;
+    filterKernel->radius = 0;
+    free(filterKernel->weights);
 }
 
 - (void)loadFilterKernel
@@ -1023,29 +1053,30 @@ void releaseTextureFilterKernel(TextureFilterKernel_t * textureFilterKernel)
         return;
     }
     
-    unsigned int const kernelRadius = 1.0;
-    
-    // Define how many kernels should be generated
-    size_t textureFilterKernelCount = 10;
-    TextureFilterKernel_t * textureFilterKernelArray = (TextureFilterKernel_t *)calloc(textureFilterKernelCount, sizeof(TextureFilterKernel_t));
+    // Define the standard deviation (constant)
+    static double const kSigma = 3.0;
+
+    // Define how many filter kernels should be generated
+    size_t filterKernelCount = 10;
+    FilterKernel_t * filterKernelArray = (FilterKernel_t *)calloc(filterKernelCount, sizeof(FilterKernel_t));
     
     // t, used for linear interpolation
     float t = 0.0f;
-    float tDelta = 1.0f/(float)(textureFilterKernelCount-1);
+    float tDelta = 1.0f/(float)(filterKernelCount-1);
     
     // Create all filter kernels
-    for (int i=0; i<textureFilterKernelCount; ++i)
+    for (int i=0; i<filterKernelCount; ++i)
     {
-        createTextureFilterKernel(t, kernelRadius, &textureFilterKernelArray[i]);
+        createFilterKernel(t, kSigma, &filterKernelArray[i]);
         t += tDelta;
     }
     
     // Store in the TextureInstance
-    _filterKernelCount = textureFilterKernelCount;
-    _filterKernelArray = textureFilterKernelArray;
+    _filterKernelCount = filterKernelCount;
+    _filterKernelArray = filterKernelArray;
     
     // TEMP
-    _filterDownsampleFactor =   .0f;
+    _filterDownsampleFactor = kDownsamplingFactor;
 }
 
 @end
