@@ -199,6 +199,7 @@
     
     // Setup camera preview
     [_previewView setCaptureSession:_session];
+
 }
 
 - (void)teardownCaptureSession

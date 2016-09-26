@@ -13,9 +13,10 @@
 		38C069F21D915CA8009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */; };
 		38C06A0E1D918A99009B1140 /* libLMTCaptureVideoPreviewLayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01C02121620D8B4003DA76F /* libLMTCaptureVideoPreviewLayer.a */; };
 		38C06A171D918E7C009B1140 /* LMTCaptureVideoPreviewLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C06A131D918E7C009B1140 /* LMTCaptureVideoPreviewLayerTests.m */; };
-		38C06A181D918E7C009B1140 /* test-screenshot-1.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C06A141D918E7C009B1140 /* test-screenshot-1.png */; };
 		38C06A191D918E7C009B1140 /* UIImage+Compare.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C06A161D918E7C009B1140 /* UIImage+Compare.m */; };
 		38C06A1E1D919047009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 38C06A1D1D919047009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */; };
+		38C06A231D92D50F009B1140 /* Samples.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38C06A221D92D50F009B1140 /* Samples.xcassets */; };
+		38C06A241D92D50F009B1140 /* Samples.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38C06A221D92D50F009B1140 /* Samples.xcassets */; };
 		38E03EE81D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */; };
 		38E03EE91D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */; };
 		38E03F451D9136D90055EFD3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E03F341D9136470055EFD3 /* AppDelegate.m */; };
@@ -63,12 +64,12 @@
 		38C069F01D915C9F009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MockLMTCaptureVideoPreviewLayerInternal.m; path = test/LMTCaptureVideoPreviewLayerUITestsApplication/MockLMTCaptureVideoPreviewLayerInternal.m; sourceTree = SOURCE_ROOT; };
 		38C069FA1D917F46009B1140 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		38C06A131D918E7C009B1140 /* LMTCaptureVideoPreviewLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LMTCaptureVideoPreviewLayerTests.m; path = test/LMTCaptureVideoPreviewLayerTests/LMTCaptureVideoPreviewLayerTests.m; sourceTree = SOURCE_ROOT; };
-		38C06A141D918E7C009B1140 /* test-screenshot-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "test-screenshot-1.png"; path = "test/LMTCaptureVideoPreviewLayerTests/test-screenshot-1.png"; sourceTree = SOURCE_ROOT; };
 		38C06A151D918E7C009B1140 /* UIImage+Compare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Compare.h"; path = "test/LMTCaptureVideoPreviewLayerTests/UIImage+Compare.h"; sourceTree = SOURCE_ROOT; };
 		38C06A161D918E7C009B1140 /* UIImage+Compare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Compare.m"; path = "test/LMTCaptureVideoPreviewLayerTests/UIImage+Compare.m"; sourceTree = SOURCE_ROOT; };
 		38C06A1A1D918E81009B1140 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = test/LMTCaptureVideoPreviewLayerTests/Info.plist; sourceTree = SOURCE_ROOT; };
 		38C06A1C1D919047009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MockLMTCaptureVideoPreviewLayerInternal.h; path = test/LMTCaptureVideoPreviewLayerTests/MockLMTCaptureVideoPreviewLayerInternal.h; sourceTree = SOURCE_ROOT; };
 		38C06A1D1D919047009B1140 /* MockLMTCaptureVideoPreviewLayerInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MockLMTCaptureVideoPreviewLayerInternal.m; path = test/LMTCaptureVideoPreviewLayerTests/MockLMTCaptureVideoPreviewLayerInternal.m; sourceTree = SOURCE_ROOT; };
+		38C06A221D92D50F009B1140 /* Samples.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Samples.xcassets; path = test/Samples.xcassets; sourceTree = SOURCE_ROOT; };
 		38E03EE61D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTCaptureVideoPreviewLayerUtilities.h; sourceTree = "<group>"; };
 		38E03EE71D9130440055EFD3 /* LMTCaptureVideoPreviewLayerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTCaptureVideoPreviewLayerUtilities.m; sourceTree = "<group>"; };
 		38E03EFC1D9134C10055EFD3 /* UI Tests Application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UI Tests Application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,7 +135,6 @@
 				38C06A151D918E7C009B1140 /* UIImage+Compare.h */,
 				38C06A161D918E7C009B1140 /* UIImage+Compare.m */,
 				38C06A131D918E7C009B1140 /* LMTCaptureVideoPreviewLayerTests.m */,
-				38C06A141D918E7C009B1140 /* test-screenshot-1.png */,
 				38C06A1A1D918E81009B1140 /* Info.plist */,
 			);
 			name = LMTCaptureVideoPreviewLayerTests;
@@ -199,6 +199,7 @@
 		A039A76D161F8C08009E4C10 /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				38C06A221D92D50F009B1140 /* Samples.xcassets */,
 				38C069FB1D917F46009B1140 /* LMTCaptureVideoPreviewLayerTests */,
 				38E03F171D9134C20055EFD3 /* LMTCaptureVideoPreviewLayerUITests */,
 				38E03EFD1D9134C10055EFD3 /* LMTCaptureVideoPreviewLayerUITestsApplication */,
@@ -406,7 +407,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38C06A181D918E7C009B1140 /* test-screenshot-1.png in Resources */,
+				38C06A241D92D50F009B1140 /* Samples.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,6 +416,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				38E03F481D9136E00055EFD3 /* LaunchScreen.storyboard in Resources */,
+				38C06A231D92D50F009B1140 /* Samples.xcassets in Resources */,
 				38E03F4A1D9136E30055EFD3 /* Assets.xcassets in Resources */,
 				38E03F491D9136E00055EFD3 /* Main.storyboard in Resources */,
 			);
@@ -541,6 +543,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = "-TEST=1";
 				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_TARGET_NAME = "UI Tests Application";
@@ -597,6 +600,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = "-TEST=1";
 				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayerUITests.LMTCaptureVideoPreviewLayerUnitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -652,6 +656,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = "-TEST=1";
 				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.lightmate.LMTCaptureVideoPreviewLayerUITestsApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -698,6 +703,7 @@
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACH_O_TYPE = staticlib;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "-DEBUG=1";
 				OTHER_LDFLAGS = "-ObjC";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(PROJECT_NAME)_PrivateHeaders";
 				PRODUCT_NAME = LMTCaptureVideoPreviewLayer;

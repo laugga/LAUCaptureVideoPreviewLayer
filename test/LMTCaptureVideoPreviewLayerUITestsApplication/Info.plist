@@ -47,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Used for the purposes of testing LMTCaptureVideoPreviewLayer</string>
 </dict>
 </plist>

@@ -77,6 +77,9 @@
     size_t _filterKernelIndex; // Currently loaded filter kernel
     TextureFilterKernel_t * _filterKernelArray; // Kernels used for the interpolation between [0,1]
     
+    // Filter (Downsample)
+    GLfloat _filterDownsampleFactor; // Downsample offscreen textures by a factor. Example: 2 means reducing the dimensions by 1/2 in each dimension
+    
     // Filter (Intensity)
     float _filterIntensity;
     dispatch_source_t _filterIntensityTransitionTimer; // Use for animated transition between different indices
@@ -86,9 +89,8 @@
 
 @implementation LMTCaptureVideoPreviewLayer
 
-#define kTextureDownsampleScale (4.0f)
-#define mPixelBufferDownsampledWidth(pixelBuffer) (((GLfloat)CVPixelBufferGetWidth(pixelBuffer))/kTextureDownsampleScale)
-#define mPixelBufferDownsampledHeight(pixelBuffer) (((GLfloat)CVPixelBufferGetHeight(pixelBuffer))/kTextureDownsampleScale)
+#define mPixelBufferDownsampledWidth(pixelBuffer) (((GLfloat)CVPixelBufferGetWidth(pixelBuffer))/_filterDownsampleFactor)
+#define mPixelBufferDownsampledHeight(pixelBuffer) (((GLfloat)CVPixelBufferGetHeight(pixelBuffer))/_filterDownsampleFactor)
 
 #pragma mark -
 #pragma mark Initialization
@@ -1021,7 +1023,7 @@ void releaseTextureFilterKernel(TextureFilterKernel_t * textureFilterKernel)
         return;
     }
     
-    unsigned int const kernelRadius = 16.0;
+    unsigned int const kernelRadius = 1.0;
     
     // Define how many kernels should be generated
     size_t textureFilterKernelCount = 10;
@@ -1041,6 +1043,9 @@ void releaseTextureFilterKernel(TextureFilterKernel_t * textureFilterKernel)
     // Store in the TextureInstance
     _filterKernelCount = textureFilterKernelCount;
     _filterKernelArray = textureFilterKernelArray;
+    
+    // TEMP
+    _filterDownsampleFactor =   .0f;
 }
 
 @end

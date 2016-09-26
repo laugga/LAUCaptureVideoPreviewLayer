@@ -43,7 +43,7 @@
 
 + (CVPixelBufferRef)pixelBufferFromImageNamed:(NSString *)imageName
 {
-    CGImageRef image = [UIImage imageNamed:imageName].CGImage;
+    CGImageRef image = [UIImage imageNamed:@"test-image-1.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil].CGImage;
     
     if (!image) {
         Log(@"Failed to load image %@", imageName);

@@ -39,7 +39,7 @@
     
     // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
     MockLMTCaptureVideoPreviewLayerInternal * mockLMTCaptureVideoPreviewLayerInternal = [MockLMTCaptureVideoPreviewLayerInternal new];
-    mockLMTCaptureVideoPreviewLayerInternal.sampleBufferImage = [UIImage imageNamed:@"test-screenshot-1.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    mockLMTCaptureVideoPreviewLayerInternal.sampleBufferImage = [UIImage imageNamed:@"test-image-1.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     [videoPreviewLayer setInternal:mockLMTCaptureVideoPreviewLayerInternal];
     
     // Set bounds and draw once

@@ -56,7 +56,7 @@ NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
     LMTCaptureVideoPreviewLayerInternal * _internal;
 }
 
-#if TARGET_OS_SIMULATOR
+#if DEBUG
 /*!
  @property internal
  @abstract
