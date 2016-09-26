@@ -30,7 +30,7 @@
 #import "LMTCaptureVideoPreviewLayerStructures.h"
 #import "LMTCaptureVideoPreviewLayerShaders.h"
 #import "LMTCaptureVideoPreviewLayerUtilities.h"
-#import "LMTCaptureVideoPreviewLayerGaussianFilterWeights.h"
+#import "LMTCaptureVideoPreviewLayerGaussianFilterKernel.h"
 
 #import <AVFoundation/AVCaptureOutput.h>
 #import <QuartzCore/CAEAGLLayer.h>
@@ -956,45 +956,22 @@
 #pragma mark -
 #pragma mark Filtering (Kernel)
 
-double filterStepForIndex(int index)
+void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
 {
-    return kGaussianFilterWeights[index][0];
-}
-
-double filterSigmaForIndex(int index)
-{
-    return kGaussianFilterWeights[index][1];
-}
-
-unsigned int filterSizeForIndex(int index)
-{
-    return (int)kGaussianFilterWeights[index][2];
-}
-
-unsigned int filterRadiusForSize(double filterSize)
-{
-    return floor(filterSize/2.0f);
-}
-
-double filterWeightForIndex(int index, int weightIndex)
-{
-    return kGaussianFilterWeights[index][3+weightIndex]; // FIXME improve this...wrong things can happen
-}
-
-void createFilterKernel(float i, FilterKernel_t * filterKernel)
-{
-    GLuint filterSize = filterSizeForIndex(i);
-    GLuint filterRadius = filterRadiusForSize(filterSize);
+    GLuint filterSize = gaussianFilterSizeForKernelIndex(kernelIndex);
+    GLuint filterRadius = gaussianFilterRadiusForKernelIndex(kernelIndex);
+    GLfloat filterSigma = gaussianFilterSigmaForKernelIndex(kernelIndex);
+    GLfloat filterStep = gaussianFilterStepForKernelIndex(kernelIndex);
     
     // Create 1D kernel
     GLfloat * filterWeights = calloc(filterSize, sizeof(GLfloat)); // float
     for (int weightIndex=0; weightIndex<filterSize; ++weightIndex)
     {
-        filterWeights[weightIndex] = filterWeightForIndex(i, weightIndex);
+        filterWeights[weightIndex] = gaussianFilterWeightForIndexes(kernelIndex, weightIndex);
     }
 
     // Log kernel
-    printf("kernel (step = %f, size = %u, radius = %u, sigma = %f) [", filterStepForIndex(i), filterSize, filterRadius, filterSigmaForIndex(i));
+    printf("kernel (step = %f, size = %u, radius = %u, sigma = %f) [", filterStep, filterSize, filterRadius, filterSigma);
     for (int i = 0; i<filterSize; ++i)
     {
         printf(" %f ", filterWeights[i]);
@@ -1022,7 +999,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     }
     
     // Define how many filter kernels should be generated
-    size_t filterKernelCount = kGaussianFilterWeightsCount;
+    size_t filterKernelCount = gaussianFilterKernelCount();
     FilterKernel_t * filterKernelArray = (FilterKernel_t *)calloc(filterKernelCount, sizeof(FilterKernel_t));
     
     // Create all filter kernels

@@ -1,6 +1,6 @@
 /*
  
- LMTCaptureVideoPreviewLayerGaussianFilterWeights.h
+ LMTCaptureVideoPreviewLayerGaussianFilterKernel.h
  LMTCaptureVideoPreviewLayer
  
  Copyright (c) 2016 Luis Laugga.
@@ -25,8 +25,8 @@
  
 */
 
-#ifndef LMTCaptureVideoPreviewLayerGaussianFilterWeights_h
-#define LMTCaptureVideoPreviewLayerGaussianFilterWeights_h
+#ifndef LMTCaptureVideoPreviewLayerGaussianFilterKernel_h
+#define LMTCaptureVideoPreviewLayerGaussianFilterKernel_h
 
 /* 
  This values are generated from the matlab script:
@@ -34,16 +34,12 @@
  See project documentation for more details
  */
 
-// Min sigma value for t = 0
-static unsigned int const kGaussianFilterWeightsMinSigma = 0.5;
-
-// Max sigma value for t = 1
-static unsigned int const kGaussianFilterWeightsMaxSigma = 3.0;
-
 // Number of generated filter kernels
-static unsigned int const kGaussianFilterWeightsCount = 11;
+static unsigned int const kGaussianFilterKernelCount = 11;
 
-static double const kGaussianFilterWeights[11][16] = {
+// For each step [0,1] there's a different kernel.
+// These kernels are used to animate between filter intensity values
+static float const kGaussianFilterKernel[11][16] = {
     { /* t */ 0.000000, /* sigma */ 0.500000, /* size */ 3,  /* weights */ 0.106507,0.786986,0.106507 },
     { /* t */ 0.100000, /* sigma */ 0.525000, /* size */ 5,  /* weights */ 0.000532,0.122790,0.753356,0.122790,0.000532 },
     { /* t */ 0.200000, /* sigma */ 0.600000, /* size */ 5,  /* weights */ 0.002566,0.165525,0.663818,0.165525,0.002566 },
@@ -57,4 +53,34 @@ static double const kGaussianFilterWeights[11][16] = {
     { /* t */ 1.000000, /* sigma */ 3.000000, /* size */ 13, /* weights */ 0.018544,0.034167,0.056332,0.083109,0.109719,0.129618,0.137023,0.129618,0.109719,0.083109,0.056332,0.034167,0.018544 }
 };
 
-#endif /* LMTCaptureVideoPreviewLayerGaussianFilterWeights_h */
+unsigned int gaussianFilterKernelCount()
+{
+    return kGaussianFilterKernelCount;
+}
+
+float gaussianFilterStepForKernelIndex(int kernelIndex)
+{
+    return kGaussianFilterKernel[kernelIndex][0];
+}
+
+float gaussianFilterSigmaForKernelIndex(int kernelIndex)
+{
+    return kGaussianFilterKernel[kernelIndex][1];
+}
+
+unsigned int gaussianFilterSizeForKernelIndex(int kernelIndex)
+{
+    return (unsigned int)kGaussianFilterKernel[kernelIndex][2];
+}
+
+unsigned int gaussianFilterRadiusForKernelIndex(int kernelIndex)
+{
+    return (unsigned int)floor(gaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
+}
+
+float gaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
+{
+    return kGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
+}
+
+#endif /* LMTCaptureVideoPreviewLayerGaussianFilterKernel_h */
