@@ -1014,7 +1014,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     
     // Filter parameters
     _filterDownsamplingFactor = 4.0f;
-    _filterMultiplePassCount = 2;
+    _filterMultiplePassCount = 4;
 }
 
 @end

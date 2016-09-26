@@ -4,11 +4,11 @@
 % Copyright 2016 Luis Laugga
 
 % Generate multiple gaussian filter kernels for the iOS implementation
-kMinSigma = 0.5;
-kMaxSigma = 3;
-for t = 0:10
-gaussianFilterWeights(t/10, kMinSigma, kMaxSigma);
-end
+kMinSigma = 0.25;
+kMaxSigma = 2;
+kKernelCount = 11;
+gaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
+
 
 % kDOWNSAMPLING_FACTOR = 4;
 % kSIGMA = 3;
@@ -141,7 +141,7 @@ function expLerpValue = expLerp(t, min, max)
 expLerpValue = lerp(t*t, min, max);
 end
 
-function weights = gaussianFilterWeights(t, minSigma, maxSigma)
+function outputString = gaussianFilterWeights(t, minSigma, maxSigma)
 sigma = expLerp(t, minSigma, maxSigma);
 gaussianFilterKernel = Gaussian2dMatrix(sigma);
 [m,n] = size(gaussianFilterKernel);
@@ -149,8 +149,16 @@ weights = zeros(1,m);
 for x = 1:m
     weights(1,x) = gaussianFilterKernel(x, x);
 end
-weights = (weights.^0.5) % sqrt elements so horizontal x vertical = gaussian 2d matrix weights
+weights = (weights.^0.5); % sqrt elements so horizontal x vertical = gaussian 2d matrix weights
 weightsString = sprintf('%f,' , weights);
 weightsString = weightsString(1:end-1);
-fprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* weights */ %s },', t, sigma, m, weightsString);
+outputString = sprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* weights */ %s },', t, sigma, m, weightsString);
+end
+
+function outputString = gaussianFilterKernels(kernelCount, minSigma, maxSigma)
+    outputString = '';
+    for t = 0:(kernelCount-1)
+        outputString = sprintf('%s\n%s', outputString, gaussianFilterWeights(t/10, minSigma, maxSigma));
+    end
+    outputString
 end
