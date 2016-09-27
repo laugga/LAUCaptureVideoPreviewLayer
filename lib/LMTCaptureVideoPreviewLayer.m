@@ -201,9 +201,13 @@
     NSInteger pixelsDataSize = _onscreenColorRenderbufferWidth * _onscreenColorRenderbufferHeight * 4;
     GLubyte * pixelsData = (GLubyte * )calloc(pixelsDataSize, sizeof(GLubyte));
     
+    [self drawPixelBuffer:nil];
+    
     // Read pixel data from the framebuffer
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glReadPixels(0, 0, _onscreenColorRenderbufferWidth, _onscreenColorRenderbufferHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelsData);
+    
+    checkFramebufferStatusComplete();
     
     // Create a CGImage instance with the pixels data
     // Use kCGImageAlphaNoneSkipLast for opaque views (ignore the alpha channel) or kCGImageAlphaPremultipliedLast for non-opaque views
@@ -1014,7 +1018,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     
     // Filter parameters
     _filterDownsamplingFactor = 4.0f;
-    _filterMultiplePassCount = 4;
+    _filterMultiplePassCount = 2;
 }
 
 @end
