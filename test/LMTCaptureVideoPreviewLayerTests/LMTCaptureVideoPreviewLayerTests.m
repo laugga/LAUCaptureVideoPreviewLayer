@@ -35,7 +35,6 @@
     LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:nil];
     [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
     [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
-    [videoPreviewLayer setBlur:1.0];
     
     // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
     MockLMTCaptureVideoPreviewLayerInternal * mockLMTCaptureVideoPreviewLayerInternal = [MockLMTCaptureVideoPreviewLayerInternal new];
@@ -46,6 +45,7 @@
     videoPreviewLayer.bounds = CGRectMake(0, 0, 375, 667);
     [videoPreviewLayer layoutIfNeeded];
     [videoPreviewLayer performSelectorOnMainThread:@selector(drawPixelBuffer:) withObject:nil waitUntilDone:YES];
+    [videoPreviewLayer setBlur:1.0];
     
     UIImage * sourceImage = [UIImage imageFromLayer:videoPreviewLayer];
     
@@ -58,7 +58,8 @@
 
 - (void)testRenderedImageSimilarityWithTargetImage {
     
-    UIImage * targetImage = [UIImage imageNamed:@"target-image.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    UIImage * targetImage1 = [UIImage imageNamed:@"target-image-12px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    UIImage * targetImage2 = [UIImage imageNamed:@"target-image-36px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     
     // Create the session video preview layer
     LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:nil];
@@ -69,18 +70,21 @@
     MockLMTCaptureVideoPreviewLayerInternal * mockLMTCaptureVideoPreviewLayerInternal = [MockLMTCaptureVideoPreviewLayerInternal new];
     mockLMTCaptureVideoPreviewLayerInternal.sampleBufferImage = [UIImage imageNamed:@"source-image.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     [videoPreviewLayer setInternal:mockLMTCaptureVideoPreviewLayerInternal];
-    
-    [videoPreviewLayer setBlur:1.0];
-    
     // Set bounds and draw once
     videoPreviewLayer.bounds = CGRectMake(0, 0, 375, 667);
     [videoPreviewLayer layoutIfNeeded];
     [videoPreviewLayer performSelectorOnMainThread:@selector(drawPixelBuffer:) withObject:nil waitUntilDone:YES];
-      
-    UIImage * renderedImage = [UIImage imageFromLayer:videoPreviewLayer];
-    CGFloat similarity = [renderedImage similarityWithImage:targetImage];
+    [videoPreviewLayer setBlur:1.0];
     
-    XCTAssertTrue(similarity == 0.0f, @"Images must be the same");
+    UIImage * renderedImage = [UIImage imageFromLayer:videoPreviewLayer];
+    
+    CGFloat similarity1 = [renderedImage similarityWithImage:targetImage1];
+    CGFloat similarity2 = [renderedImage similarityWithImage:targetImage2];
+    
+    NSLog(@"*** Similarity between rendered image and reference image 1 is %f ***", similarity1);
+    NSLog(@"*** Similarity between rendered image and reference image 2 is %f ***", similarity2);
+    
+    XCTAssertTrue(similarity1 < 0.1f, @"Images must be the similar within 0.1 tolerance");
 }
 
 //- (void)testPerformanceExample {

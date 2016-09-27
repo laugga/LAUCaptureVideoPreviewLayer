@@ -203,27 +203,28 @@
     
     [self drawPixelBuffer:nil];
     
+    // Bind the offscreen framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, _onscreenFramebuffer);
+    
     // Read pixel data from the framebuffer
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glReadPixels(0, 0, _onscreenColorRenderbufferWidth, _onscreenColorRenderbufferHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelsData);
-    
-    checkFramebufferStatusComplete();
     
     // Create a CGImage instance with the pixels data
     // Use kCGImageAlphaNoneSkipLast for opaque views (ignore the alpha channel) or kCGImageAlphaPremultipliedLast for non-opaque views
     CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, pixelsData, pixelsDataSize, NULL);
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
     CGImageRef image = CGImageCreate(_onscreenColorRenderbufferWidth,
-                                       _onscreenColorRenderbufferHeight,
-                                       8,
-                                       32,
-                                       _onscreenColorRenderbufferWidth * 4,
-                                       colorspace,
-                                       kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
-                                       dataProvider,
-                                       NULL,
-                                       true,
-                                       kCGRenderingIntentDefault);
+                                     _onscreenColorRenderbufferHeight,
+                                     8,
+                                     32,
+                                     _onscreenColorRenderbufferWidth * 4,
+                                     colorspace,
+                                     kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                     dataProvider,
+                                     NULL,
+                                     true,
+                                     kCGRenderingIntentDefault);
     
     // Flip the CGImage by rendering it to the flipped bitmap context (UIKit coordinate system is the inverse of the Quartz/OpenGL coordinate system)
     CGContextSetBlendMode(context, kCGBlendModeCopy);
@@ -240,8 +241,13 @@
 
 - (void)setBlur:(CGFloat)blur
 {
+    [self setBlur:blur animated:NO];
+}
+
+- (void)setBlur:(CGFloat)blur animated:(BOOL)animated
+{
     _blur = blur;
-    [self setFilterIntensity:_blur animated:YES];
+    [self setFilterIntensity:_blur animated:animated];
 }
 
 #pragma mark -

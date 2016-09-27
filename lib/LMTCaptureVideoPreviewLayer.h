@@ -68,7 +68,30 @@ NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
 @property (nonatomic, strong) LMTCaptureVideoPreviewLayerInternal * internal;
 #endif
 
+/*!
+ @property blur
+ @abstract
+ The intensity of the gaussian blur effect. If the value is 0 no blur effect is
+ applied to the preview layer.
+ 
+ @discussion
+ Internally the layer has multiple gaussian blur kernels with different radius
+ and std. deviation. 
+ */
 @property (nonatomic, readwrite) CGFloat blur; // [0,1]
+
+/*!
+ @method setBlur:animated:
+ @abstract
+ Changes the blur effect of the LMTCaptureVideoPreviewLayer with an animated
+ transition from the current value to the specified value.
+ 
+ @param blur
+ The blur intensity value, from 0.0 to 1.0.
+ @param animated
+ YES to enable the animated transition.
+ */
+- (void)setBlur:(CGFloat)blur animated:(BOOL)animated;
 
 /*!
  @method layerWithSession:

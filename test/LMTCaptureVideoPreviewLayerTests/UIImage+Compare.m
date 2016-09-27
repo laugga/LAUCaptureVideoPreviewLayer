@@ -102,8 +102,8 @@
     
     // Compare each pixel color
     // The comparison of each pixel contributes to the final similarity score
-    NSUInteger comparedPixelCount = 0; // Increment for every pixel compared
-    NSUInteger comparedPixelSum = 0; // Total sum of all pixel compare operations
+    CGFloat comparedPixelCount = 0; // Increment for every pixel compared
+    CGFloat comparedPixelSum = 0; // Total sum of all pixel compare operations
     
     size_t self_imagePixelCount = self_imageSize.width * self_imageSize.height;
     size_t imagePixelCount = imageSize.width * imageSize.height;
@@ -115,7 +115,7 @@
     {
         // 0 they are the same rgb colors, 1 they are totally different colors
         comparedPixelSum += CGImagePixelDataCompare(*self_imagePixel, *imagePixel);
-        comparedPixelCount += 1;
+        comparedPixelCount += 1.0;
         
         ++self_imagePixel;
         ++imagePixel;
