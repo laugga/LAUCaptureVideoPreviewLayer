@@ -56,4 +56,95 @@
     return imageFromLayer;
 }
 
+- (CGFloat)similarityWithImage:(UIImage *)image
+{
+    NSAssert(image, @"image is nil");
+    
+    CGImageRef self_cgImage = self.CGImage;
+    CGImageRef cgImage = image.CGImage;
+    
+    CGSize self_imageSize = CGSizeMake(CGImageGetWidth(self_cgImage), CGImageGetHeight(self_cgImage));
+    CGSize imageSize = CGSizeMake(CGImageGetWidth(cgImage), CGImageGetHeight(cgImage));
+    
+    size_t self_imageSizeBytes = self_imageSize.height * CGImageGetBytesPerRow(self_cgImage);
+    size_t imageSizeBytes = imageSize.height * CGImageGetBytesPerRow(cgImage);
+    
+    void * self_imagePixelData = calloc(self_imageSizeBytes, 1);
+    void * imagePixelData = calloc(imageSizeBytes, 1);
+    
+    NSAssert(self_imagePixelData, @"self_imageData is NULL");
+    NSAssert(imagePixelData, @"imageData is NULL");
+    
+    CGContextRef self_imageContext = CGBitmapContextCreate(self_imagePixelData,
+                                                           self_imageSize.width,
+                                                           self_imageSize.height,
+                                                           CGImageGetBitsPerComponent(self_cgImage),
+                                                           CGImageGetBytesPerRow(self_cgImage),
+                                                           CGImageGetColorSpace(self_cgImage),
+                                                           (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    
+    CGContextRef imageContext = CGBitmapContextCreate(imagePixelData,
+                                                      imageSize.width,
+                                                      imageSize.height,
+                                                      CGImageGetBitsPerComponent(cgImage),
+                                                      CGImageGetBytesPerRow(cgImage),
+                                                      CGImageGetColorSpace(cgImage),
+                                                      (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    
+    NSAssert(self_imageContext, @"self_imageContext is NULL");
+    NSAssert(imageContext, @"imageContext is NULL");
+    
+    CGContextDrawImage(self_imageContext, CGRectMake(0, 0, self_imageSize.width, self_imageSize.height), self_cgImage);
+    CGContextDrawImage(imageContext, CGRectMake(0, 0, imageSize.width, imageSize.height), cgImage);
+    
+    CGContextRelease(self_imageContext);
+    CGContextRelease(imageContext);
+    
+    // Compare each pixel color
+    // The comparison of each pixel contributes to the final similarity score
+    NSUInteger comparedPixelCount = 0; // Increment for every pixel compared
+    NSUInteger comparedPixelSum = 0; // Total sum of all pixel compare operations
+    
+    size_t self_imagePixelCount = self_imageSize.width * self_imageSize.height;
+    size_t imagePixelCount = imageSize.width * imageSize.height;
+    
+    CGImagePixelData * self_imagePixel = self_imagePixelData;
+    CGImagePixelData * imagePixel = imagePixelData;
+    
+    while (comparedPixelCount < self_imagePixelCount && comparedPixelCount < imagePixelCount)
+    {
+        // 0 they are the same rgb colors, 1 they are totally different colors
+        comparedPixelSum += CGImagePixelDataCompare(*self_imagePixel, *imagePixel);
+        comparedPixelCount += 1;
+        
+        ++self_imagePixel;
+        ++imagePixel;
+    }
+
+    free(self_imagePixelData);
+    free(imagePixelData);
+    
+    return comparedPixelSum/comparedPixelCount;
+}
+
+typedef union {
+    uint32_t raw;
+    unsigned char bytes[4];
+    struct {
+        char red;
+        char green;
+        char blue;
+        char alpha;
+    } __attribute__ ((packed)) rgba;
+} CGImagePixelData;
+
+float CGImagePixelDataCompare(CGImagePixelData cgImagePixelData1, CGImagePixelData cgImagePixelData2)
+{
+    float redCmp = ((float)abs(cgImagePixelData1.rgba.red - cgImagePixelData2.rgba.red)) / 255.0f;
+    float greenCmp = ((float)abs(cgImagePixelData1.rgba.green - cgImagePixelData2.rgba.green)) / 255.0f;
+    float blueCmp = ((float)abs(cgImagePixelData1.rgba.blue - cgImagePixelData2.rgba.blue)) / 255.0f;
+    
+    return (redCmp + greenCmp + blueCmp) / 3.0f;
+}
+
 @end

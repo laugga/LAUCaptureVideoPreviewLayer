@@ -30,5 +30,6 @@
 @interface UIImage (Compare)
 
 + (UIImage *)imageFromLayer:(CALayer *)layer;
+- (CGFloat)similarityWithImage:(UIImage *)image;
 
 @end

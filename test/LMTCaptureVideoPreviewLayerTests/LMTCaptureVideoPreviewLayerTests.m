@@ -48,7 +48,9 @@
     [videoPreviewLayer performSelectorOnMainThread:@selector(drawPixelBuffer:) withObject:nil waitUntilDone:YES];
     
     UIImage * image = [UIImage imageFromLayer:videoPreviewLayer];
+    CGFloat similarity = [image similarityWithImage:image];
     
+    XCTAssertTrue(similarity == 0.0f, @"Images must be the same");
     XCTAssertNotNil(image, @"Image is nil");
 }
 
