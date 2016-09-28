@@ -92,12 +92,14 @@
     if (sender.state == UIGestureRecognizerStateBegan)
     {
         // Switch to blur = 1.0 when user presses
-        _videoPreviewLayer.blur = 1.0;
+        //_videoPreviewLayer.blur = 1.0;
+        [_videoPreviewLayer setBlur:1.0 animated:YES];
     }
     else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateFailed)
     {
         // Turn blur off when user stops pressing
-        _videoPreviewLayer.blur = 0.0f;
+        //_videoPreviewLayer.blur = 0.0f;
+        [_videoPreviewLayer setBlur:0.0 animated:YES];
     }
 }
 
