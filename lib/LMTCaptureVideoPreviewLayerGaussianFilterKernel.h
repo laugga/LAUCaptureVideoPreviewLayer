@@ -90,19 +90,23 @@ float sepGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 #pragma mark -
 #pragma mark Fixed function sampling weights and offsets
 
+#define FixedFunctionSamplingGaussianFilterEnabled 1
+
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
 static float const kFfsGaussianFilterKernel[11][50] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* samples */ 1, /* offsets */ 0.000670, /* weights */ 0.500000 },
-    { /* t */ 0.111111, /* sigma */ 1.277778, /* size */ 7, /* samples */ 2, /* offsets */ 0.595538,2.177820, /* weights */ 0.387887,0.112113 },
-    { /* t */ 0.222222, /* sigma */ 2.305556, /* size */ 11, /* samples */ 3, /* offsets */ 0.645447,2.384542,4.300154, /* weights */ 0.248037,0.196167,0.055797 },
-    { /* t */ 0.333333, /* sigma */ 3.333333, /* size */ 15, /* samples */ 4, /* offsets */ 0.656593,2.443986,4.400112,6.357783, /* weights */ 0.178527,0.184198,0.099491,0.037784 },
-    { /* t */ 0.444444, /* sigma */ 4.361111, /* size */ 19, /* samples */ 5, /* offsets */ 0.660799,2.467186,4.441124,6.415382,8.390095, /* weights */ 0.138873,0.159170,0.110692,0.062548,0.028717 },
-    { /* t */ 0.555556, /* sigma */ 5.388889, /* size */ 23, /* samples */ 6, /* offsets */ 0.662830,2.478491,4.461338,6.444275,8.427343,10.410580, /* weights */ 0.113481,0.136971,0.107856,0.074089,0.044396,0.023207 },
-    { /* t */ 0.666667, /* sigma */ 6.416667, /* size */ 27, /* samples */ 7, /* offsets */ 0.663963,2.484825,4.472704,6.460615,8.448572,10.436589,12.424679, /* weights */ 0.095884,0.119155,0.100630,0.077162,0.053721,0.033958,0.019490 },
-    { /* t */ 0.777778, /* sigma */ 7.444444, /* size */ 31, /* samples */ 8, /* offsets */ 0.664659,2.488724,4.479712,6.470712,8.461731,10.452775,12.443850,14.434961, /* weights */ 0.082989,0.105005,0.092598,0.075996,0.058046,0.041262,0.027297,0.016807 },
-    { /* t */ 0.888889, /* sigma */ 8.472222, /* size */ 35, /* samples */ 9, /* offsets */ 0.665117,2.491294,4.484332,6.477376,8.470430,10.463494,12.456573,14.449668,16.442783, /* weights */ 0.073140,0.093651,0.084978,0.072943,0.059230,0.045497,0.033060,0.022725,0.014777 },
+    { /* t */ 0.100000, /* sigma */ 1.175000, /* size */ 7, /* samples */ 2, /* offsets */ 0.582001,2.140545, /* weights */ 0.407006,0.092994 },
+    { /* t */ 0.200000, /* sigma */ 2.100000, /* size */ 11, /* samples */ 3, /* offsets */ 0.641014,2.361954,4.264948, /* weights */ 0.266782,0.190745,0.042473 },
+    { /* t */ 0.300000, /* sigma */ 3.025000, /* size */ 15, /* samples */ 4, /* offsets */ 0.654416,2.432120,4.379477,6.329525, /* weights */ 0.193274,0.189051,0.089808,0.027867 },
+    { /* t */ 0.400000, /* sigma */ 3.950000, /* size */ 17, /* samples */ 5, /* offsets */ 0.000000,1.475984,3.444153,5.412774,7.382089, /* weights */ 0.052112,0.192622,0.140526,0.079658,0.035082 },
+    { /* t */ 0.500000, /* sigma */ 4.875000, /* size */ 21, /* samples */ 6, /* offsets */ 0.000000,1.484226,3.463249,5.442400,7.421753,9.401376, /* weights */ 0.042224,0.160323,0.130192,0.089504,0.052091,0.025665 },
+    { /* t */ 0.600000, /* sigma */ 5.800000, /* size */ 25, /* samples */ 7, /* offsets */ 0.000000,1.488854,3.474013,5.459217,7.444493,9.429865,11.415359, /* weights */ 0.035490,0.136814,0.118049,0.090517,0.061680,0.037350,0.020099 },
+    { /* t */ 0.700000, /* sigma */ 6.725000, /* size */ 29, /* samples */ 8, /* offsets */ 0.000000,1.491709,3.480662,5.469634,7.458636,9.447678,11.436770,13.425923, /* weights */ 0.030607,0.119109,0.106707,0.087548,0.065781,0.045264,0.028523,0.016461 },
+    { /* t */ 0.800000, /* sigma */ 7.650000, /* size */ 33, /* samples */ 9, /* offsets */ 0.000000,1.493593,3.485053,5.476522,7.468005,9.459506,11.451031,13.442584,15.434171, /* weights */ 0.026906,0.105358,0.096766,0.083027,0.066551,0.049835,0.034863,0.022784,0.013910 },
+    { /* t */ 0.900000, /* sigma */ 8.575000, /* size */ 37, /* samples */ 10, /* offsets */ 0.000000,1.494900,3.488102,5.481309,7.474523,9.467745,11.460980,13.454229,15.447495,17.440780, /* weights */ 0.024003,0.094399,0.088214,0.078084,0.065469,0.051996,0.039117,0.027874,0.018815,0.012030 },
     { /* t */ 1.000000, /* sigma */ 9.500000, /* size */ 39, /* samples */ 10, /* offsets */ 0.665434,2.493075,4.487537,6.482002,8.476472,10.470947,12.465429,14.459920,16.454421,18.448932, /* weights */ 0.065375,0.084402,0.078120,0.069179,0.058613,0.047513,0.036851,0.027345,0.019414,0.013187 },
+
 };
 
 float ffsGaussianFilterStepForKernelIndex(int kernelIndex)
@@ -130,13 +134,13 @@ unsigned int ffsGaussianFilterSamplesForKernelIndex(int kernelIndex)
     return (unsigned int)kFfsGaussianFilterKernel[kernelIndex][3];
 }
 
-float gaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
+float ffsGaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
 {
     unsigned int samples = ffsGaussianFilterSamplesForKernelIndex(kernelIndex);
     return kFfsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // FIXME improve this...wrong things can happen
 }
 
-float gaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
+float ffsGaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
 {
     return kFfsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // FIXME improve this...wrong things can happen
 }

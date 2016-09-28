@@ -134,9 +134,6 @@
             return nil;
         }
         
-        // Disable depth testing
-        glDisable(GL_DEPTH_TEST);
-        
         // Preemptively load filter in memory
         [self loadFilter];
     }
@@ -149,9 +146,44 @@
     
     // Create the onscreen framebuffer
     [self createOnscreenFramebufferForLayer:self];
+
+    // Load glsl program, uniforms and attributes
+    [self loadProgram];
+    
+    // Disable depth testing
+    glDisable(GL_DEPTH_TEST);
+    
+    // Use texture 0
+    glActiveTexture(GL_TEXTURE0);
+    
+    // OpenGL pre-warm
+    if (!_internal.sampleBuffer)
+    {
+        [self drawColor:self.backgroundColor];
+    }
+    
+    // Set filter intensity from blur value
+    [self setFilterIntensity:_blur];
+    
+    // Create and setup displayLink
+    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    _displayLink.frameInterval = 2;
+}
+
+- (void)loadProgram
+{
+    if (_blurFilterProgram)
+    {
+        return;
+    }
     
     // Load blur filter program
+#if FixedFunctionSamplingGaussianFilterEnabled
+    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceFfs);
+#else
     _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceSep);
+#endif
     validateProgram(_blurFilterProgram);
     
     // Bind blur filter attributes
@@ -163,29 +195,21 @@
     _blurFilterUniforms.FragFilterEnabled = glGetUniformLocation(_blurFilterProgram, "FragFilterEnabled");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
     _blurFilterUniforms.FragFilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FragFilterSplitPassDirectionVector");
+#if FixedFunctionSamplingGaussianFilterEnabled
+    _blurFilterUniforms.FragFilterKernelSamples = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSamples");
+    _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
+    _blurFilterUniforms.FragFilterKernelOffsets = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelOffsets");
+#else
     _blurFilterUniforms.FragFilterKernelRadius = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelRadius");
     _blurFilterUniforms.FragFilterKernelSize = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSize");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
+#endif
     
     // Use the blur filter glsl program
     glUseProgram(_blurFilterProgram);
-    
-    // Use texture 0
-    glActiveTexture(GL_TEXTURE0);
-    
-    // OpenGL pre-warm
-    if (!_internal.sampleBuffer)
-    {
-        [self drawColor:self.backgroundColor];
-    }
-    
-    // Create and setup displayLink
-    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    _displayLink.frameInterval = 2;
 }
 
-- (void)teardown
+- (void)unloadProgram
 {
     // TODO
 }
@@ -851,6 +875,12 @@
 
 - (void)setFilterIntensity:(float)intensity
 {
+    // Bail out if the program hasn't been loaded yet
+    if (!_blurFilterProgram)
+    {
+        return;
+    }
+    
     // Load filter kernel (will do nothing if it's already loaded)
     [self loadFilter];
     
@@ -868,9 +898,15 @@
     
     FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
     
+#if FixedFunctionSamplingGaussianFilterEnabled
+    glUniform1i(_blurFilterUniforms.FragFilterKernelSamples, filterKernel.samples);
+    glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
+    glUniform1fv(_blurFilterUniforms.FragFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
+#else
     glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
     glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
     glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.size, filterKernel.weights);
+#endif
 }
 
 - (void)setFilterIntensity:(float)intensity animated:(BOOL)animated
@@ -968,6 +1004,36 @@
 
 void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
 {
+#if FixedFunctionSamplingGaussianFilterEnabled
+    GLuint filterSamples = ffsGaussianFilterSamplesForKernelIndex(kernelIndex);
+    GLuint filterRadius = ffsGaussianFilterRadiusForKernelIndex(kernelIndex);
+    GLfloat filterSigma = ffsGaussianFilterSigmaForKernelIndex(kernelIndex);
+    GLfloat filterStep = ffsGaussianFilterStepForKernelIndex(kernelIndex);
+    
+    // Create 1D kernel
+    GLfloat * filterWeights = calloc(filterSamples, sizeof(GLfloat)); // float
+    GLfloat * filterOffsets = calloc(filterSamples, sizeof(GLfloat)); // float
+    for (int sampleIndex=0; sampleIndex<filterSamples; ++sampleIndex)
+    {
+        filterWeights[sampleIndex] = ffsGaussianFilterWeightForIndexes(kernelIndex, sampleIndex);
+        filterOffsets[sampleIndex] = ffsGaussianFilterOffsetForIndexes(kernelIndex, sampleIndex);
+    }
+    
+    // Log kernel
+    printf("kernel (step = %f, radius = %u, sigma = %f, samples = %u) [", filterStep, filterRadius, filterSigma, filterSamples);
+    for (int i = 0; i<filterSamples; ++i)
+    {
+        printf(" (%f, %f) ", filterWeights[i], filterOffsets[i]);
+    }
+    printf("]\n");
+    
+    filterKernel->radius = filterRadius;
+    filterKernel->samples = filterSamples;
+    filterKernel->weights = filterWeights;
+    filterKernel->offsets = filterOffsets;
+    
+#else
+    
     GLuint filterSize = sepGaussianFilterSizeForKernelIndex(kernelIndex);
     GLuint filterRadius = sepGaussianFilterRadiusForKernelIndex(kernelIndex);
     GLfloat filterSigma = sepGaussianFilterSigmaForKernelIndex(kernelIndex);
@@ -991,6 +1057,7 @@ void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
     filterKernel->radius = filterRadius;
     filterKernel->size = filterSize;
     filterKernel->weights = filterWeights;
+#endif
 }
 
 void releaseFilterKernel(FilterKernel_t * filterKernel)
@@ -998,6 +1065,10 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     filterKernel->size = 0;
     filterKernel->radius = 0;
     free(filterKernel->weights);
+
+#if FixedFunctionSamplingGaussianFilterEnabled
+    free(filterKernel->offsets);
+#endif
 }
 
 - (void)loadFilter

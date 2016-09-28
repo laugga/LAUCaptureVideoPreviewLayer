@@ -43,6 +43,9 @@ struct UniformHandles {
     GLuint FragFilterKernelWeights; // float[]
     GLuint FragFilterKernelRadius; // float
     GLuint FragFilterKernelSize; // float
+    
+    GLuint FragFilterKernelOffsets; // float[]
+    GLuint FragFilterKernelSamples; // float
 };
 
 struct AttributeHandles {
@@ -52,8 +55,10 @@ struct AttributeHandles {
 
 struct FilterKernel {
     GLuint radius;
-    GLuint size; // NxN
     GLfloat * weights;
+    GLuint samples; // s
+    GLfloat * offsets;
+    GLuint size; // m
 };
 
 typedef struct FilterKernel FilterKernel_t;
