@@ -151,7 +151,7 @@
     [self createOnscreenFramebufferForLayer:self];
     
     // Load blur filter program
-    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSource);
+    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceSep);
     validateProgram(_blurFilterProgram);
     
     // Bind blur filter attributes

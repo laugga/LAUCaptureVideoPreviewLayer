@@ -45,7 +45,7 @@ static const char * VertexShaderSource =
 
 };
 
-static const char * FragmentShaderSource =
+static const char * FragmentShaderSourceSep =
 {
     "#ifdef GL_ES                                                           \n"
     "precision highp float;                                                 \n"
@@ -88,5 +88,52 @@ static const char * FragmentShaderSource =
     "}\n"
 };
 
+static const char * FragmentShaderSourceFfs =
+{
+    "#ifdef GL_ES                                                           								\n"
+    "precision highp float;                                                 								\n"
+    "#endif                                                                 								\n"
+    
+    "// (In) Texture coordinate for the fragment                            								\n"
+    "varying vec2 FragTextureCoordinate;                                    								\n"
+    
+    "// Uniforms (VideoFrame)                                               								\n"
+    "uniform sampler2D FragTextureData;                                     								\n"
+    
+    "// Uniforms (Filter)                                                   								\n"
+    "uniform bool FragFilterEnabled; // Skip filter if enabled is false     								\n"
+    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  								\n"
+    "uniform int FragFilterKernelSamples; // Samples per pixel              								\n"
+    "uniform float FragFilterKernelWeights[25]; // Weights                                                  \n"
+    "uniform float FragFilterKernelOffsets[25]; // Offsets      											\n"
+    "uniform vec2 FragFilterSplitPassDirectionVector; // Direction           								\n"
+    
+    "void main()                                                           									\n"
+    "{                                                                      								\n"
+    "    if (FragFilterEnabled == false ||              													\n"
+    "		 (FragTextureCoordinate.x < FragFilterBounds.x ||                                               \n"
+    "		  FragTextureCoordinate.y < FragFilterBounds.y ||                                               \n"
+    "		  FragTextureCoordinate.x > FragFilterBounds.z ||                                               \n"
+    "		  FragTextureCoordinate.y > FragFilterBounds.w))                                                \n"
+    "    {                                                                                                  \n"
+    "        gl_FragColor = texture2D(FragTextureData, FragTextureCoordinate);                              \n"
+    "    }																									\n"
+    "    else																							    \n"
+    "    {                                                                                                  \n"
+    "        // Weighted color sum of all the neighbour pixel												\n"
+    "        vec4 weightedColor = vec4(0.0);																\n"
+    
+    "        // Sample with the provided weights and offsets in one direction                                                                   \n"
+    "        for (int s = 0; s < FragFilterKernelSamples; ++s)                                                                                  \n"
+    "        {                                                                                                                                  \n"
+    "           float weight = FragFilterKernelWeights[s];                                                                                      \n"
+    "			float offset = FragFilterKernelOffsets[s];                                                                                      \n"
+    "		 	weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy - offset*FragFilterSplitPassDirectionVector) +	\n"
+    "						     weight * texture2D(FragTextureData, FragTextureCoordinate.xy + offset*FragFilterSplitPassDirectionVector);		\n"
+    "        }                                                                                                                                  \n"
+    "        gl_FragColor = weightedColor;																										\n"
+    "    }                                                                                                                                      \n"
+    "}                                                                                                                                          \n"
+};
 
 #endif /* LMTCaptureVideoPreviewLayerShaders_h */
