@@ -62,7 +62,7 @@ static const char * FragmentShaderSource =
     "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  \n"
     "uniform int FragFilterKernelSize; // Size = N                          \n"
     "uniform int FragFilterKernelRadius; // Radius = N - 1                  \n"
-    "uniform float FragFilterKernelWeights[20]; // 1D convolution kernel      \n"
+    "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel      \n"
     "uniform vec2 FragFilterSplitPassDirectionVector; // Apply kernel in direction, x or y           \n"
     
     "void main()                                                            \n"
