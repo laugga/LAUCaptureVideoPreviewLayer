@@ -8,7 +8,7 @@
 
 kMinSigma = 0.25;  % Min std. deviation used
 kMaxSigma = 9.5;   % Max std. deviation used
-kKernelCount = 10; % Number of different kernels generated, interval [kMinSigma, kMaxSigma]
+kKernelCount = 11; % Number of different kernels generated, interval [kMinSigma, kMaxSigma]
 kDownsamplingFactor = 4; % Downsampling is one of the implementation optimization techniques
 
 %% Generate kernels values for the iOS implementation
