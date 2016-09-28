@@ -37,9 +37,17 @@
 // Number of generated filter kernels
 static unsigned int const kGaussianFilterKernelCount = 11;
 
+unsigned int gaussianFilterKernelCount()
+{
+    return kGaussianFilterKernelCount;
+}
+
+#pragma mark -
+#pragma mark Weight for separable filtering
+
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
-static float const kGaussianFilterKernel[11][50] = { 
+static float const kSepGaussianFilterKernel[11][50] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* weights */ 0.000335,0.999330,0.000335 },
     { /* t */ 0.100000, /* sigma */ 1.697019, /* size */ 9, /* weights */ 0.014720,0.049627,0.118230,0.199036,0.236774,0.199036,0.118230,0.049627,0.014720 },
     { /* t */ 0.200000, /* sigma */ 3.108407, /* size */ 15, /* weights */ 0.010325,0.020232,0.035748,0.056954,0.081816,0.105976,0.123774,0.130348,0.123774,0.105976,0.081816,0.056954,0.035748,0.020232,0.010325 },
@@ -54,34 +62,83 @@ static float const kGaussianFilterKernel[11][50] = {
  
 };
 
-unsigned int gaussianFilterKernelCount()
+float sepGaussianFilterStepForKernelIndex(int kernelIndex)
 {
-    return kGaussianFilterKernelCount;
+    return kSepGaussianFilterKernel[kernelIndex][0];
 }
 
-float gaussianFilterStepForKernelIndex(int kernelIndex)
+float sepGaussianFilterSigmaForKernelIndex(int kernelIndex)
 {
-    return kGaussianFilterKernel[kernelIndex][0];
+    return kSepGaussianFilterKernel[kernelIndex][1];
 }
 
-float gaussianFilterSigmaForKernelIndex(int kernelIndex)
+unsigned int sepGaussianFilterSizeForKernelIndex(int kernelIndex)
 {
-    return kGaussianFilterKernel[kernelIndex][1];
+    return (unsigned int)kSepGaussianFilterKernel[kernelIndex][2];
 }
 
-unsigned int gaussianFilterSizeForKernelIndex(int kernelIndex)
+unsigned int sepGaussianFilterRadiusForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)kGaussianFilterKernel[kernelIndex][2];
+    return (unsigned int)floor(sepGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
 }
 
-unsigned int gaussianFilterRadiusForKernelIndex(int kernelIndex)
+float sepGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 {
-    return (unsigned int)floor(gaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
+    return kSepGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
 }
 
-float gaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
+#pragma mark -
+#pragma mark Fixed function sampling weights and offsets
+
+// For each step [0,1] there's a different kernel.
+// These kernels are used to animate between filter intensity values
+static float const kFfsGaussianFilterKernel[11][50] = {
+    { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* samples */ 1, /* offsets */ 0.000670, /* weights */ 0.500000 },
+    { /* t */ 0.111111, /* sigma */ 1.277778, /* size */ 7, /* samples */ 2, /* offsets */ 0.595538,2.177820, /* weights */ 0.387887,0.112113 },
+    { /* t */ 0.222222, /* sigma */ 2.305556, /* size */ 11, /* samples */ 3, /* offsets */ 0.645447,2.384542,4.300154, /* weights */ 0.248037,0.196167,0.055797 },
+    { /* t */ 0.333333, /* sigma */ 3.333333, /* size */ 15, /* samples */ 4, /* offsets */ 0.656593,2.443986,4.400112,6.357783, /* weights */ 0.178527,0.184198,0.099491,0.037784 },
+    { /* t */ 0.444444, /* sigma */ 4.361111, /* size */ 19, /* samples */ 5, /* offsets */ 0.660799,2.467186,4.441124,6.415382,8.390095, /* weights */ 0.138873,0.159170,0.110692,0.062548,0.028717 },
+    { /* t */ 0.555556, /* sigma */ 5.388889, /* size */ 23, /* samples */ 6, /* offsets */ 0.662830,2.478491,4.461338,6.444275,8.427343,10.410580, /* weights */ 0.113481,0.136971,0.107856,0.074089,0.044396,0.023207 },
+    { /* t */ 0.666667, /* sigma */ 6.416667, /* size */ 27, /* samples */ 7, /* offsets */ 0.663963,2.484825,4.472704,6.460615,8.448572,10.436589,12.424679, /* weights */ 0.095884,0.119155,0.100630,0.077162,0.053721,0.033958,0.019490 },
+    { /* t */ 0.777778, /* sigma */ 7.444444, /* size */ 31, /* samples */ 8, /* offsets */ 0.664659,2.488724,4.479712,6.470712,8.461731,10.452775,12.443850,14.434961, /* weights */ 0.082989,0.105005,0.092598,0.075996,0.058046,0.041262,0.027297,0.016807 },
+    { /* t */ 0.888889, /* sigma */ 8.472222, /* size */ 35, /* samples */ 9, /* offsets */ 0.665117,2.491294,4.484332,6.477376,8.470430,10.463494,12.456573,14.449668,16.442783, /* weights */ 0.073140,0.093651,0.084978,0.072943,0.059230,0.045497,0.033060,0.022725,0.014777 },
+    { /* t */ 1.000000, /* sigma */ 9.500000, /* size */ 39, /* samples */ 10, /* offsets */ 0.665434,2.493075,4.487537,6.482002,8.476472,10.470947,12.465429,14.459920,16.454421,18.448932, /* weights */ 0.065375,0.084402,0.078120,0.069179,0.058613,0.047513,0.036851,0.027345,0.019414,0.013187 },
+};
+
+float ffsGaussianFilterStepForKernelIndex(int kernelIndex)
 {
-    return kGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
+    return kFfsGaussianFilterKernel[kernelIndex][0];
+}
+
+float ffsGaussianFilterSigmaForKernelIndex(int kernelIndex)
+{
+    return kFfsGaussianFilterKernel[kernelIndex][1];
+}
+
+unsigned int ffsGaussianFilterSizeForKernelIndex(int kernelIndex)
+{
+    return (unsigned int)kFfsGaussianFilterKernel[kernelIndex][2];
+}
+
+unsigned int ffsGaussianFilterRadiusForKernelIndex(int kernelIndex)
+{
+    return (unsigned int)floor(ffsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
+}
+
+unsigned int ffsGaussianFilterSamplesForKernelIndex(int kernelIndex)
+{
+    return (unsigned int)kFfsGaussianFilterKernel[kernelIndex][3];
+}
+
+float gaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
+{
+    unsigned int samples = ffsGaussianFilterSamplesForKernelIndex(kernelIndex);
+    return kFfsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // FIXME improve this...wrong things can happen
+}
+
+float gaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
+{
+    return kFfsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // FIXME improve this...wrong things can happen
 }
 
 #endif /* LMTCaptureVideoPreviewLayerGaussianFilterKernel_h */

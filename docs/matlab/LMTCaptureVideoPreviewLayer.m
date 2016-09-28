@@ -8,7 +8,7 @@
 
 kMinSigma = 0.25;  % Min std. deviation used
 kMaxSigma = 9.5;   % Max std. deviation used
-kKernelCount = 30; % Number of different kernels generated, interval [kMinSigma, kMaxSigma]
+kKernelCount = 10; % Number of different kernels generated, interval [kMinSigma, kMaxSigma]
 kDownsamplingFactor = 4; % Downsampling is one of the implementation optimization techniques
 
 %% Generate kernels values for the iOS implementation
@@ -231,7 +231,7 @@ end
 
 weightsStr = sprintf('%f,' , ffsWeights);
 weightsStr = weightsStr(1:end-1);
-offsetsStr = sprintf('%f, ' , ffsOffsets);
+offsetsStr = sprintf('%f,' , ffsOffsets);
 offsetsStr = offsetsStr(1:end-1);
 outputStr = sprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* samples */ %d, /* offsets */ %s, /* weights */ %s },', t, sigma, m, ffsSamples, offsetsStr, weightsStr);
 end

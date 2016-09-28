@@ -968,16 +968,16 @@
 
 void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
 {
-    GLuint filterSize = gaussianFilterSizeForKernelIndex(kernelIndex);
-    GLuint filterRadius = gaussianFilterRadiusForKernelIndex(kernelIndex);
-    GLfloat filterSigma = gaussianFilterSigmaForKernelIndex(kernelIndex);
-    GLfloat filterStep = gaussianFilterStepForKernelIndex(kernelIndex);
+    GLuint filterSize = sepGaussianFilterSizeForKernelIndex(kernelIndex);
+    GLuint filterRadius = sepGaussianFilterRadiusForKernelIndex(kernelIndex);
+    GLfloat filterSigma = sepGaussianFilterSigmaForKernelIndex(kernelIndex);
+    GLfloat filterStep = sepGaussianFilterStepForKernelIndex(kernelIndex);
     
     // Create 1D kernel
     GLfloat * filterWeights = calloc(filterSize, sizeof(GLfloat)); // float
     for (int weightIndex=0; weightIndex<filterSize; ++weightIndex)
     {
-        filterWeights[weightIndex] = gaussianFilterWeightForIndexes(kernelIndex, weightIndex);
+        filterWeights[weightIndex] = sepGaussianFilterWeightForIndexes(kernelIndex, weightIndex);
     }
 
     // Log kernel
