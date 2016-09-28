@@ -5,23 +5,24 @@
 
 % Generate multiple gaussian filter kernels for the iOS implementation
 kMinSigma = 0.25;
-kMaxSigma = 2;
+kMaxSigma = 9.5;
 kKernelCount = 11;
 gaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
 
+kDOWNSAMPLING_FACTOR = 4;
+kSIGMA = 9.5;
+fs = filterSize(kSIGMA);
+fr = filterRadius(kSIGMA)
+gaussianFilterKernel = Gaussian2dMatrix(kSIGMA);
 
-% kDOWNSAMPLING_FACTOR = 4;
-% kSIGMA = 3;
-% fs = filterSize(SIGMA);
-% gaussianFilterKernel = Gaussian2dMatrix(kSIGMA);
-% 
-% testImage = readTestImage('test-image.png', kDOWNSAMPLING_FACTOR);
+testImage = readTestImage('test-image.png', kDOWNSAMPLING_FACTOR);
+cameraImage = readTestImage('camera-image.png', kDOWNSAMPLING_FACTOR);
 
 % Normal 2d convolution
-% filteredTestImage1stPass = imfilter(testImage, gaussianFilterKernel, 'conv');
-% filteredTestImage2ndPass = imfilter(filteredTestImage1stPass, gaussianFilterKernel, 'conv'); % 2nd gaussian filter pass (better than a bigger kernel?)
-% writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-2d-convolution.png', kDOWNSAMPLING_FACTOR);
-% imshow(filteredTestImage2ndPass);
+filteredTestImage1stPass = imfilter(cameraImage, gaussianFilterKernel, 'conv');
+filteredTestImage2ndPass = imfilter(filteredTestImage1stPass, gaussianFilterKernel, 'conv'); % 2nd gaussian filter pass (better than a bigger kernel?)
+writeTestImage(filteredTestImage2ndPass, 'filtered-camera-image-2d-convolution.png', kDOWNSAMPLING_FACTOR);
+imshow(filteredTestImage2ndPass);
 
 % Using separable filters, with two one-dimensional Gaussian blurs
 % horizontalGaussianFilterKernel = HorizontalGaussian2dMatrix(gaussianFilterKernel);
@@ -141,8 +142,13 @@ function expLerpValue = expLerp(t, min, max)
 expLerpValue = lerp(t*t, min, max);
 end
 
+function easeOutQuadValue = easeOutQuad(t, min, max) 
+tSin = sin(t * pi * 0.5);
+easeOutQuadValue = (1-tSin)*min + tSin*max;
+end
+
 function outputString = gaussianFilterWeights(t, minSigma, maxSigma)
-sigma = expLerp(t, minSigma, maxSigma);
+sigma = easeOutQuad(t, minSigma, maxSigma);
 gaussianFilterKernel = Gaussian2dMatrix(sigma);
 [m,n] = size(gaussianFilterKernel);
 weights = zeros(1,m);
