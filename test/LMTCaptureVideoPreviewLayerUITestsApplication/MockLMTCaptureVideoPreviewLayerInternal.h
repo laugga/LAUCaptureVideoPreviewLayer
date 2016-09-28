@@ -29,4 +29,6 @@
 
 @interface MockLMTCaptureVideoPreviewLayerInternal : LMTCaptureVideoPreviewLayerInternal
 
+@property (nonatomic, copy) UIImage * sampleBufferImage;
+
 @end

@@ -54,14 +54,22 @@
         LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
         [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
-        [videoPreviewLayer setBlur:1.0];
     
 #if TARGET_OS_SIMULATOR
         // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
         [videoPreviewLayer setInternal:[MockLMTCaptureVideoPreviewLayerInternal new]];
 #endif
         
+        [videoPreviewLayer setBlur:1.0];
         [self setVideoPreviewLayer:videoPreviewLayer];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [videoPreviewLayer setBlur:0 animated:YES];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [videoPreviewLayer setBlur:1 animated:YES];
+        });
     }
 }
 

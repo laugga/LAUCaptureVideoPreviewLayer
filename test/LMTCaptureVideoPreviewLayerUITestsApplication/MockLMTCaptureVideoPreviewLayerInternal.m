@@ -36,43 +36,11 @@
 
 - (CMSampleBufferRef)sampleBuffer
 {
-    CMSampleBufferRef sampleBuffer = [[self class] sampleBufferFromImageNamed:@"test-screenshot-1.png"];
-
-    return sampleBuffer;
-}
-
-+ (CVPixelBufferRef)pixelBufferFromImageNamed:(NSString *)imageName
-{
-    CGImageRef image = [UIImage imageNamed:@"test-image-1.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil].CGImage;
+    self.sampleBufferImage = [UIImage imageNamed:@"source-image" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     
-    if (!image) {
-        Log(@"Failed to load image %@", imageName);
-        return NULL;
-    }
+    NSAssert(self.sampleBufferImage != NULL, @"MockLMTCaptureVideoPreviewLayerInternal: sampleBufferImage is nil");
     
-    size_t width = CGImageGetWidth(image);
-    size_t height = CGImageGetHeight(image);
-    
-    CVPixelBufferRef pixelBuffer = NULL;
-    NSDictionary * pixelBufferAttributes = @{ (NSString *)kCVPixelBufferCGImageCompatibilityKey: @YES,
-                                              (NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey: @YES };
-    
-    CVReturn result = CVPixelBufferCreate(NULL, width, height, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)pixelBufferAttributes, &pixelBuffer);
-    
-    if (result != kCVReturnSuccess) {
-        Log(@"Failed to create pixelBuffer from image %@", imageName);
-        return NULL;
-    }
-    
-    CIContext * coreImageContext = [CIContext contextWithCGContext:UIGraphicsGetCurrentContext() options:nil];
-    [coreImageContext render:[CIImage imageWithCGImage:image] toCVPixelBuffer:pixelBuffer];
-    
-    return pixelBuffer;
-}
-
-+ (CMSampleBufferRef)sampleBufferFromImageNamed:(NSString *)imageName
-{
-    CVPixelBufferRef pixelBuffer = [self pixelBufferFromImageNamed:imageName];
+    CVPixelBufferRef pixelBuffer = [[self class] pixelBufferFromCGImage:self.sampleBufferImage.CGImage];
     
     CMSampleBufferRef sampleBuffer = NULL;
     
@@ -91,6 +59,30 @@
                                        &sampleBuffer);
     
     return sampleBuffer;
+}
+
++ (CVPixelBufferRef)pixelBufferFromCGImage:(CGImageRef)image
+{
+    NSAssert(image != NULL, @"MockLMTCaptureVideoPreviewLayerInternal: pixelBufferFromCGImage failed because image is NULL");
+    
+    size_t width = CGImageGetWidth(image);
+    size_t height = CGImageGetHeight(image);
+    
+    CVPixelBufferRef pixelBuffer = NULL;
+    NSDictionary * pixelBufferAttributes = @{ (NSString *)kCVPixelBufferCGImageCompatibilityKey: @YES,
+                                              (NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey: @YES };
+    
+    CVReturn result = CVPixelBufferCreate(NULL, width, height, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)pixelBufferAttributes, &pixelBuffer);
+    
+    if (result != kCVReturnSuccess) {
+        Log(@"MockLMTCaptureVideoPreviewLayerInternal: Failed to create pixelBuffer from image %@", image);
+        return NULL;
+    }
+    
+    CIContext * coreImageContext = [CIContext contextWithCGContext:UIGraphicsGetCurrentContext() options:nil];
+    [coreImageContext render:[CIImage imageWithCGImage:image] toCVPixelBuffer:pixelBuffer];
+    
+    return pixelBuffer;
 }
 
 @end
