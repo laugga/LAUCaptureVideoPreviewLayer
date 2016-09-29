@@ -28,6 +28,8 @@
 #ifndef LMTCaptureVideoPreviewLayerGaussianFilterKernel_h
 #define LMTCaptureVideoPreviewLayerGaussianFilterKernel_h
 
+#import <assert.h>
+
 /* 
  This values are generated from the matlab script:
  docs/matlab/LMTCaptureVideoPreviewLayer.m
@@ -47,7 +49,7 @@ unsigned int gaussianFilterKernelCount()
 
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
-static float const kDtsGaussianFilterKernel[11][50] = {
+static float const kDtsGaussianFilterKernel[11][45] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* weights */ 0.000335,0.999330,0.000335 },
     { /* t */ 0.100000, /* sigma */ 1.697019, /* size */ 9, /* weights */ 0.014720,0.049627,0.118230,0.199036,0.236774,0.199036,0.118230,0.049627,0.014720 },
     { /* t */ 0.200000, /* sigma */ 3.108407, /* size */ 15, /* weights */ 0.010325,0.020232,0.035748,0.056954,0.081816,0.105976,0.123774,0.130348,0.123774,0.105976,0.081816,0.056954,0.035748,0.020232,0.010325 },
@@ -64,27 +66,41 @@ static float const kDtsGaussianFilterKernel[11][50] = {
 
 float dtsGaussianFilterStepForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return kDtsGaussianFilterKernel[kernelIndex][0];
 }
 
 float dtsGaussianFilterSigmaForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return kDtsGaussianFilterKernel[kernelIndex][1];
 }
 
 unsigned int dtsGaussianFilterSizeForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return (unsigned int)kDtsGaussianFilterKernel[kernelIndex][2];
 }
 
 unsigned int dtsGaussianFilterRadiusForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return (unsigned int)floor(dtsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
 }
 
 float dtsGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 {
-    return kDtsGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
+    assert(kernelIndex < kGaussianFilterKernelCount);
+
+    unsigned int size = dtsGaussianFilterSizeForKernelIndex(kernelIndex);
+    
+    assert(weightIndex < size);
+    
+    return kDtsGaussianFilterKernel[kernelIndex][3+weightIndex]; // TODO make this safer :)
 }
 
 #pragma mark -
@@ -94,7 +110,7 @@ float dtsGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
-static float const kBtsGaussianFilterKernel[11][50] = {
+static float const kBtsGaussianFilterKernel[11][25] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* samples */ 1, /* offsets */ 0.000670, /* weights */ 0.500000 },
     { /* t */ 0.100000, /* sigma */ 1.175000, /* size */ 7, /* samples */ 2, /* offsets */ 0.582001,2.140545, /* weights */ 0.407006,0.092994 },
     { /* t */ 0.200000, /* sigma */ 2.100000, /* size */ 11, /* samples */ 3, /* offsets */ 0.641014,2.361954,4.264948, /* weights */ 0.266782,0.190745,0.042473 },
@@ -111,38 +127,59 @@ static float const kBtsGaussianFilterKernel[11][50] = {
 
 float btsGaussianFilterStepForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return kBtsGaussianFilterKernel[kernelIndex][0];
 }
 
 float btsGaussianFilterSigmaForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return kBtsGaussianFilterKernel[kernelIndex][1];
 }
 
 unsigned int btsGaussianFilterSizeForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return (unsigned int)kBtsGaussianFilterKernel[kernelIndex][2];
 }
 
 unsigned int btsGaussianFilterRadiusForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return (unsigned int)floor(btsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
 }
 
 unsigned int btsGaussianFilterSamplesForKernelIndex(int kernelIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     return (unsigned int)kBtsGaussianFilterKernel[kernelIndex][3];
 }
 
 float btsGaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
 {
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
     unsigned int samples = btsGaussianFilterSamplesForKernelIndex(kernelIndex);
-    return kBtsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // FIXME improve this...wrong things can happen
+    
+    assert(sampleIndex < samples);
+    
+    return kBtsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // TODO make this safer :)
 }
 
 float btsGaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
 {
-    return kBtsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // FIXME improve this...wrong things can happen
+    assert(kernelIndex < kGaussianFilterKernelCount);
+    
+    unsigned int samples = btsGaussianFilterSamplesForKernelIndex(kernelIndex);
+    
+    assert(sampleIndex < samples);
+    
+    return kBtsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // TODO make this safer :)
 }
 
 #endif /* LMTCaptureVideoPreviewLayerGaussianFilterKernel_h */
