@@ -559,7 +559,7 @@
     
     if (!checkFramebufferStatusComplete())
     {
-        [self teardown];
+        [self unloadProgram];
         return NO;
     }
     
