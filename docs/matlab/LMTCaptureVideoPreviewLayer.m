@@ -13,17 +13,19 @@ kDownsamplingFactor = 4; % Downsampling is one of the implementation optimizatio
 
 %% Generate kernels values for the iOS implementation
 
-% 1. Kernels for the normal, separable filter implementation
-gaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
-% 2. Kernels for the fixed function sampling optimization (see docs)
-fixedFunctionSamplingGaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
+% 1. Kernels for the normal, separable filter implementation using discrete
+% texture sampling. It generates a separable filter kernel with weights.
+discreteTextureSamplingGaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
+% 2. Kernels for the bilinear texture sampling optimization technique. 
+% It generates a sample pairs with weights and offsets (see docs).
+bilinearTextureSamplingGaussianFilterKernels(kKernelCount, kMinSigma, kMaxSigma);
 
 %% Research + Playground
 
 % Filter size, radius and kernel used
 fs = filterSize(kMaxSigma);
 fr = filterRadius(kMaxSigma)
-gaussianFilterKernel = Gaussian2dMatrix(kSIGMA);
+gaussianFilterKernel = Gaussian2dMatrix(kMaxSigma);
 % Test images
 testImage1 = readTestImage('test-image-1.png', kDownsamplingFactor);
 testImage2 = readTestImage('test-image-2.png', kDownsamplingFactor);
@@ -39,7 +41,7 @@ filteredTestImage1stPassH = imfilter(testImage1, horizontalGaussianFilterKernel,
 filteredTestImage1stPassV = imfilter(filteredTestImage1stPassH, verticalGaussianFilterKernel, 'conv');
 filteredTestImage2ndPassH = imfilter(filteredTestImage1stPassV, horizontalGaussianFilterKernel, 'conv');
 filteredTestImage2ndPassV = imfilter(filteredTestImage2ndPassH, verticalGaussianFilterKernel, 'conv');
-writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-separable-filters.png', kDOWNSAMPLING_FACTOR);
+writeTestImage(filteredTestImage2ndPass, 'filtered-test-image-separable-filters.png', kDownsamplingFactor);
 %imshow(filteredTestImage2ndPassV);
 % Random stuff
 %Gaussian(0,SIGMA);
@@ -144,9 +146,9 @@ end
 c2dm = (c2dm / sum(sum(c2dm))) % normalize matrix so that the final weights will sum to 1
 end
 
-%% Kernel generation for 1) separable gaussian blur filter
+%% Kernel generation for 1) separable gaussian blur filter with discrete sampling
 
-function outputStr = gaussianFilterWeights(t, minSigma, maxSigma)
+function outputStr = discreteTextureSamplingGaussianFilterWeights(t, minSigma, maxSigma)
 sigma = lerp(t, minSigma, maxSigma);
 gaussianFilterKernel = Gaussian2dMatrix(sigma);
 [m,n] = size(gaussianFilterKernel);
@@ -160,17 +162,17 @@ weightsStr = weightsStr(1:end-1);
 outputStr = sprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* weights */ %s },', t, sigma, m, weightsStr);
 end
 
-function gaussianFilterKernelsStr = gaussianFilterKernels(kernelCount, minSigma, maxSigma)
-gaussianFilterKernelsStr = '';
+function discreteTextureSamplingGaussianFilterKernelsStr = discreteTextureSamplingGaussianFilterKernels(kernelCount, minSigma, maxSigma)
+discreteTextureSamplingGaussianFilterKernelsStr = '';
 for t = 0:(kernelCount-1)
-    gaussianFilterKernelsStr = sprintf('%s\n%s', gaussianFilterKernelsStr, gaussianFilterWeights(t/(kernelCount-1), minSigma, maxSigma));
+    discreteTextureSamplingGaussianFilterKernelsStr = sprintf('%s\n%s', discreteTextureSamplingGaussianFilterKernelsStr, discreteTextureSamplingGaussianFilterWeights(t/(kernelCount-1), minSigma, maxSigma));
 end
-gaussianFilterKernelsStr
+discreteTextureSamplingGaussianFilterKernelsStr
 end
 
-%% Kernel generation for 2) fixed function sampling optimized implementation
+%% Kernel generation for 2) bilinear texture sampling implementation
 
-function outputStr = fixedFunctionSamplingGaussianFilterWeightsAndOffsets(t, minSigma, maxSigma)
+function outputStr = bilinearTextureSamplingGaussianFilterWeightsAndOffsets(t, minSigma, maxSigma)
 sigma = lerp(t, minSigma, maxSigma);
 gaussianFilterKernel = Gaussian2dMatrix(sigma);
 [m,n] = size(gaussianFilterKernel);
@@ -182,18 +184,19 @@ weights = (weights.^0.5);
 
 % Numbers of samples needed for a kernel with size m
 % For each sample we need to calculate a weight and offset
-% Using the fixed function sampling we reduce the total number of texture reads from m to ceil(m/2)
-ffsSamples = floor(floor(m/2)/2)+1;
-ffsWeights = zeros(1,ffsSamples);
-ffsWeightsSum = 0;
-ffsOffsets = zeros(1,ffsSamples);
+% Using the bilinear texture filtering available in the GPU we reduce 
+% the total number of texture reads from m to ceil(m/2)
+btsSamples = floor(floor(m/2)/2)+1;
+btsWeights = zeros(1,btsSamples);
+btsWeightsSum = 0;
+btsOffsets = zeros(1,btsSamples);
 
 % Start with the edge of the normal gaussian filter kernel towards the center
 % The edge weight of the kernel + neighbor 
 centerPixel = ceil(m/2); 
 currentPixel = m;
 neighborPixel = currentPixel - 1;
-ffsIndex = ffsSamples;
+btsIndex = btsSamples;
 while currentPixel > centerPixel 
     neighborPixel = currentPixel - 1;
     % Skip the the center pixel and neighbor, the weight of both will be calculated at the end
@@ -201,19 +204,19 @@ while currentPixel > centerPixel
         weightCurrentPixel = weights(1,currentPixel);
         weightNeighborPixel = weights(1,neighborPixel);
         % Sum weights of current + neighbor 
-        ffsWeights(1,ffsIndex) = weightCurrentPixel + weightNeighborPixel;
-        ffsWeightsSum = ffsWeightsSum + ffsWeights(1,ffsIndex);
+        btsWeights(1,btsIndex) = weightCurrentPixel + weightNeighborPixel;
+        btsWeightsSum = btsWeightsSum + btsWeights(1,btsIndex);
         % The offset value is interpolated based on the weight of both
-        ffsOffsets(1,ffsIndex) = (neighborPixel-centerPixel) + (weightCurrentPixel/(weightCurrentPixel + weightNeighborPixel));
+        btsOffsets(1,btsIndex) = (neighborPixel-centerPixel) + (weightCurrentPixel/(weightCurrentPixel + weightNeighborPixel));
         % Move to next sample, closer to the center pixel
-        ffsIndex = ffsIndex - 1;
+        btsIndex = btsIndex - 1;
     end
     currentPixel = currentPixel - 2; % Skip neighbor pixel
 end
 
 % calculate weight of the center pixel. The total must be 0.5 for
 % left/right side, so the center pixel weight = 0.5 - sum
-ffsWeights(1,1) = 0.5 - ffsWeightsSum;
+btsWeights(1,1) = 0.5 - btsWeightsSum;
 
 % calculate offset of the center pixel if it also includes the neighbors
 % For example, for n=5 it's only the center pixel but for n=7 it include 
@@ -224,24 +227,24 @@ if neighborPixel == centerPixel
    weightCenterPixel = weights(1,centerPixel);
    weightNeighborPixel = weights(1,centerPixel+1);
    % In this case the center pixel is split in 2 samples
-   ffsOffsets(1,1) = weightNeighborPixel / (weightNeighborPixel + weightCenterPixel/2); 
+   btsOffsets(1,1) = weightNeighborPixel / (weightNeighborPixel + weightCenterPixel/2); 
 else
-   ffsOffsets(1,1) = 0.0; % only the centerPixel
+   btsOffsets(1,1) = 0.0; % only the centerPixel
 end
 
-weightsStr = sprintf('%f,' , ffsWeights);
+weightsStr = sprintf('%f,' , btsWeights);
 weightsStr = weightsStr(1:end-1);
-offsetsStr = sprintf('%f,' , ffsOffsets);
+offsetsStr = sprintf('%f,' , btsOffsets);
 offsetsStr = offsetsStr(1:end-1);
-outputStr = sprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* samples */ %d, /* offsets */ %s, /* weights */ %s },', t, sigma, m, ffsSamples, offsetsStr, weightsStr);
+outputStr = sprintf('{ /* t */ %f, /* sigma */ %f, /* size */ %d, /* samples */ %d, /* offsets */ %s, /* weights */ %s },', t, sigma, m, btsSamples, offsetsStr, weightsStr);
 end
 
-function fixedFunctionSamplingGaussianFilterKernelsStr = fixedFunctionSamplingGaussianFilterKernels(kernelCount, minSigma, maxSigma)
-    fixedFunctionSamplingGaussianFilterKernelsStr = '';
+function bilinearTextureSamplingGaussianFilterKernelsStr = bilinearTextureSamplingGaussianFilterKernels(kernelCount, minSigma, maxSigma)
+    bilinearTextureSamplingGaussianFilterKernelsStr = '';
     for t = 0:(kernelCount-1)
-        fixedFunctionSamplingGaussianFilterKernelsStr = sprintf('%s\n%s', fixedFunctionSamplingGaussianFilterKernelsStr, fixedFunctionSamplingGaussianFilterWeightsAndOffsets(t/(kernelCount-1), minSigma, maxSigma));
+        bilinearTextureSamplingGaussianFilterKernelsStr = sprintf('%s\n%s', bilinearTextureSamplingGaussianFilterKernelsStr, bilinearTextureSamplingGaussianFilterWeightsAndOffsets(t/(kernelCount-1), minSigma, maxSigma));
     end
-    fixedFunctionSamplingGaussianFilterKernelsStr
+    bilinearTextureSamplingGaussianFilterKernelsStr
 end
 
 %% Lerp and easing functions
