@@ -60,6 +60,7 @@
     
     UIImage * targetImage1 = [UIImage imageNamed:@"target-image-12px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     UIImage * targetImage2 = [UIImage imageNamed:@"target-image-36px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    UIImage * targetImage3 = [UIImage imageNamed:@"target-image-48px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     
     // Create the session video preview layer
     LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:nil];
@@ -80,11 +81,14 @@
     
     CGFloat similarity1 = [renderedImage similarityWithImage:targetImage1];
     CGFloat similarity2 = [renderedImage similarityWithImage:targetImage2];
+    CGFloat similarity3 = [renderedImage similarityWithImage:targetImage3];
     
     NSLog(@"*** Similarity between rendered image and reference image 1 is %f ***", similarity1);
     NSLog(@"*** Similarity between rendered image and reference image 2 is %f ***", similarity2);
+    NSLog(@"*** Similarity between rendered image and reference image 3 is %f ***", similarity3);
     
-    XCTAssertTrue(similarity1 < 0.1f, @"Images must be the similar within 0.1 tolerance");
+    XCTAssertTrue(similarity2 < 0.1f, @"For Radius = 36px the images must be the similar within 0.1 tolerance");
+    XCTAssertTrue(similarity3 < 0.08f, @"For Radius = 48px the images must be the similar within 0.08 tolerance");
 }
 
 //- (void)testPerformanceExample {

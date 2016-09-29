@@ -45,50 +45,54 @@ static const char * VertexShaderSource =
 
 };
 
-static const char * FragmentShaderSourceSep =
+static const char * FragmentShaderSourceDiscreteTextureSampling =
 {
-    "#ifdef GL_ES                                                           \n"
-    "precision highp float;                                                 \n"
-    "#endif                                                                 \n"
+    "#ifdef GL_ES                                                                                           \n"
+    "precision highp float;                                                                                 \n"
+    "#endif                                                                                                 \n"
     
-    "// (In) Texture coordinate for the fragment                            \n"
-    "varying vec2 FragTextureCoordinate;                                    \n"
+    "// (In) Texture coordinate for the fragment                                                            \n"
+    "varying vec2 FragTextureCoordinate;                                                                    \n"
     
-    "// Uniforms (VideoFrame)                                               \n"
-    "uniform sampler2D FragTextureData;                                     \n"
+    "// Uniforms (VideoFrame)                                                                               \n"
+    "uniform sampler2D FragTextureData;                                                                     \n"
     
-    "// Uniforms (Filter)                                                   \n"
-    "uniform bool FragFilterEnabled; // Skip filter if enabled is false     \n"
-    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  \n"
-    "uniform int FragFilterKernelSize; // Size = N                          \n"
-    "uniform int FragFilterKernelRadius; // Radius = N - 1                  \n"
-    "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel      \n"
-    "uniform vec2 FragFilterSplitPassDirectionVector; // Apply kernel in direction, x or y           \n"
+    "// Uniforms (Filter)                                                                                   \n"
+    "uniform bool FragFilterEnabled; // Skip filter if enabled is false                                     \n"
+    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }                                  \n"
+    "uniform int FragFilterKernelSize; // Size = N                                                          \n"
+    "uniform int FragFilterKernelRadius; // Radius = N - 1                                                  \n"
+    "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel                                    \n"
+    "uniform vec2 FragFilterSplitPassDirectionVector; // Apply kernel in direction, x or y                  \n"
     
-    "void main()                                                            \n"
-    "{                                                                      \n"
-    "    // Check if filter is not enabled or texture coordinate is outside the FragTextureFilterBounds\n"
-    "    if (FragFilterEnabled == false || (FragTextureCoordinate.x < FragFilterBounds.x || FragTextureCoordinate.y < FragFilterBounds.y || FragTextureCoordinate.x > FragFilterBounds.z || FragTextureCoordinate.y > FragFilterBounds.w))\n"
-    "{                                                                      \n"
-    "        gl_FragColor = texture2D(FragTextureData, FragTextureCoordinate);\n"
-    "    }\n"
-     "   else\n"
-    "    {\n"
-     "       // Weighted color sum of all the neighbour pixel\n"
-      "      vec4 weightedColor = vec4(0.0);\n"
+    "void main()                                                                                            \n"
+    "{                                                                                                      \n"
+    "   // Check if filter is not enabled or texture coordinate is outside the FragTextureFilterBounds      \n"
+    "   if (FragFilterEnabled == false ||                                                                   \n"
+    "       (FragTextureCoordinate.x < FragFilterBounds.x ||                                                \n"
+    "        FragTextureCoordinate.y < FragFilterBounds.y ||                                                \n"
+    "        FragTextureCoordinate.x > FragFilterBounds.z ||                                                \n"
+    "        FragTextureCoordinate.y > FragFilterBounds.w))                                                 \n"
+    "   {                                                                                                   \n"
+    "       gl_FragColor = texture2D(FragTextureData, FragTextureCoordinate);                               \n"
+    "   }                                                                                                   \n"
+    "   else                                                                                                \n"
+    "   {                                                                                                   \n"
+    "       // Weighted color sum of all the neighbour pixel                                                \n"
+    "       vec4 weightedColor = vec4(0.0);                                                                 \n"
             
-       "     // Convolve with the provided Kernel in one direction\n"
-        "    for (int offset = -FragFilterKernelRadius; offset <= FragFilterKernelRadius; ++offset)\n"
-         "   {\n"
-          "      weightedColor += texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterSplitPassDirectionVector)) * FragFilterKernelWeights[FragFilterKernelRadius+offset];\n"
-           " }\n"
-            
-            "gl_FragColor = weightedColor;\n"
-        "}\n"
-    "}\n"
+    "       // Convolve with the provided Kernel in one direction                                                                                       \n"
+    "       for (int offset = -FragFilterKernelRadius; offset <= FragFilterKernelRadius; ++offset)                                                      \n"
+    "       {                                                                                                                                           \n"
+    "           float weight = FragFilterKernelWeights[FragFilterKernelRadius+offset];                                                                  \n"
+    "           weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterSplitPassDirectionVector));    \n"
+    "       }                                                                                                                                           \n"
+    "       gl_FragColor = weightedColor;                                                                                                               \n"
+    "   }                                                                                                                                               \n"
+    "}                                                                                                                                                  \n"
 };
 
-static const char * FragmentShaderSourceFfs =
+static const char * FragmentShaderSourceBilinearTextureSampling =
 {
     "#ifdef GL_ES                                                           								\n"
     "precision highp float;                                                 								\n"

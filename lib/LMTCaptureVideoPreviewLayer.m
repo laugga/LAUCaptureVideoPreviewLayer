@@ -179,10 +179,10 @@
     }
     
     // Load blur filter program
-#if FixedFunctionSamplingGaussianFilterEnabled
-    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceFfs);
+#if BilinearTextureSamplingEnabled
+    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceBilinearTextureSampling);
 #else
-    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceSep);
+    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceDiscreteTextureSampling);
 #endif
     validateProgram(_blurFilterProgram);
     
@@ -195,7 +195,7 @@
     _blurFilterUniforms.FragFilterEnabled = glGetUniformLocation(_blurFilterProgram, "FragFilterEnabled");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
     _blurFilterUniforms.FragFilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FragFilterSplitPassDirectionVector");
-#if FixedFunctionSamplingGaussianFilterEnabled
+#if BilinearTextureSamplingEnabled
     _blurFilterUniforms.FragFilterKernelSamples = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSamples");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
     _blurFilterUniforms.FragFilterKernelOffsets = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelOffsets");
@@ -898,7 +898,7 @@
     
     FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
     
-#if FixedFunctionSamplingGaussianFilterEnabled
+#if BilinearTextureSamplingEnabled
     glUniform1i(_blurFilterUniforms.FragFilterKernelSamples, filterKernel.samples);
     glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
     glUniform1fv(_blurFilterUniforms.FragFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
@@ -1004,19 +1004,19 @@
 
 void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
 {
-#if FixedFunctionSamplingGaussianFilterEnabled
-    GLuint filterSamples = ffsGaussianFilterSamplesForKernelIndex(kernelIndex);
-    GLuint filterRadius = ffsGaussianFilterRadiusForKernelIndex(kernelIndex);
-    GLfloat filterSigma = ffsGaussianFilterSigmaForKernelIndex(kernelIndex);
-    GLfloat filterStep = ffsGaussianFilterStepForKernelIndex(kernelIndex);
+#if BilinearTextureSamplingEnabled
+    GLuint filterSamples = btsGaussianFilterSamplesForKernelIndex(kernelIndex);
+    GLuint filterRadius = btsGaussianFilterRadiusForKernelIndex(kernelIndex);
+    GLfloat filterSigma = btsGaussianFilterSigmaForKernelIndex(kernelIndex);
+    GLfloat filterStep = btsGaussianFilterStepForKernelIndex(kernelIndex);
     
     // Create 1D kernel
     GLfloat * filterWeights = calloc(filterSamples, sizeof(GLfloat)); // float
     GLfloat * filterOffsets = calloc(filterSamples, sizeof(GLfloat)); // float
     for (int sampleIndex=0; sampleIndex<filterSamples; ++sampleIndex)
     {
-        filterWeights[sampleIndex] = ffsGaussianFilterWeightForIndexes(kernelIndex, sampleIndex);
-        filterOffsets[sampleIndex] = ffsGaussianFilterOffsetForIndexes(kernelIndex, sampleIndex);
+        filterWeights[sampleIndex] = btsGaussianFilterWeightForIndexes(kernelIndex, sampleIndex);
+        filterOffsets[sampleIndex] = btsGaussianFilterOffsetForIndexes(kernelIndex, sampleIndex);
     }
     
     // Log kernel
@@ -1034,16 +1034,16 @@ void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
     
 #else
     
-    GLuint filterSize = sepGaussianFilterSizeForKernelIndex(kernelIndex);
-    GLuint filterRadius = sepGaussianFilterRadiusForKernelIndex(kernelIndex);
-    GLfloat filterSigma = sepGaussianFilterSigmaForKernelIndex(kernelIndex);
-    GLfloat filterStep = sepGaussianFilterStepForKernelIndex(kernelIndex);
+    GLuint filterSize = dtsGaussianFilterSizeForKernelIndex(kernelIndex);
+    GLuint filterRadius = dtsGaussianFilterRadiusForKernelIndex(kernelIndex);
+    GLfloat filterSigma = dtsGaussianFilterSigmaForKernelIndex(kernelIndex);
+    GLfloat filterStep = dtsGaussianFilterStepForKernelIndex(kernelIndex);
     
     // Create 1D kernel
     GLfloat * filterWeights = calloc(filterSize, sizeof(GLfloat)); // float
     for (int weightIndex=0; weightIndex<filterSize; ++weightIndex)
     {
-        filterWeights[weightIndex] = sepGaussianFilterWeightForIndexes(kernelIndex, weightIndex);
+        filterWeights[weightIndex] = dtsGaussianFilterWeightForIndexes(kernelIndex, weightIndex);
     }
 
     // Log kernel
@@ -1066,7 +1066,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     filterKernel->radius = 0;
     free(filterKernel->weights);
 
-#if FixedFunctionSamplingGaussianFilterEnabled
+#if BilinearTextureSamplingEnabled
     free(filterKernel->offsets);
 #endif
 }

@@ -43,11 +43,11 @@ unsigned int gaussianFilterKernelCount()
 }
 
 #pragma mark -
-#pragma mark Weight for separable filtering
+#pragma mark Separable filtering with discrete texture sampling weights
 
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
-static float const kSepGaussianFilterKernel[11][50] = {
+static float const kDtsGaussianFilterKernel[11][50] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* weights */ 0.000335,0.999330,0.000335 },
     { /* t */ 0.100000, /* sigma */ 1.697019, /* size */ 9, /* weights */ 0.014720,0.049627,0.118230,0.199036,0.236774,0.199036,0.118230,0.049627,0.014720 },
     { /* t */ 0.200000, /* sigma */ 3.108407, /* size */ 15, /* weights */ 0.010325,0.020232,0.035748,0.056954,0.081816,0.105976,0.123774,0.130348,0.123774,0.105976,0.081816,0.056954,0.035748,0.020232,0.010325 },
@@ -62,39 +62,39 @@ static float const kSepGaussianFilterKernel[11][50] = {
  
 };
 
-float sepGaussianFilterStepForKernelIndex(int kernelIndex)
+float dtsGaussianFilterStepForKernelIndex(int kernelIndex)
 {
-    return kSepGaussianFilterKernel[kernelIndex][0];
+    return kDtsGaussianFilterKernel[kernelIndex][0];
 }
 
-float sepGaussianFilterSigmaForKernelIndex(int kernelIndex)
+float dtsGaussianFilterSigmaForKernelIndex(int kernelIndex)
 {
-    return kSepGaussianFilterKernel[kernelIndex][1];
+    return kDtsGaussianFilterKernel[kernelIndex][1];
 }
 
-unsigned int sepGaussianFilterSizeForKernelIndex(int kernelIndex)
+unsigned int dtsGaussianFilterSizeForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)kSepGaussianFilterKernel[kernelIndex][2];
+    return (unsigned int)kDtsGaussianFilterKernel[kernelIndex][2];
 }
 
-unsigned int sepGaussianFilterRadiusForKernelIndex(int kernelIndex)
+unsigned int dtsGaussianFilterRadiusForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)floor(sepGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
+    return (unsigned int)floor(dtsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
 }
 
-float sepGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
+float dtsGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 {
-    return kSepGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
+    return kDtsGaussianFilterKernel[kernelIndex][3+weightIndex]; // FIXME improve this...wrong things can happen
 }
 
 #pragma mark -
-#pragma mark Fixed function sampling weights and offsets
+#pragma mark Bilinear texture sampling weights and offsets
 
-#define FixedFunctionSamplingGaussianFilterEnabled 1
+#define BilinearTextureSamplingEnabled 0
 
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
-static float const kFfsGaussianFilterKernel[11][50] = {
+static float const kBtsGaussianFilterKernel[11][50] = {
     { /* t */ 0.000000, /* sigma */ 0.250000, /* size */ 3, /* samples */ 1, /* offsets */ 0.000670, /* weights */ 0.500000 },
     { /* t */ 0.100000, /* sigma */ 1.175000, /* size */ 7, /* samples */ 2, /* offsets */ 0.582001,2.140545, /* weights */ 0.407006,0.092994 },
     { /* t */ 0.200000, /* sigma */ 2.100000, /* size */ 11, /* samples */ 3, /* offsets */ 0.641014,2.361954,4.264948, /* weights */ 0.266782,0.190745,0.042473 },
@@ -109,40 +109,40 @@ static float const kFfsGaussianFilterKernel[11][50] = {
 
 };
 
-float ffsGaussianFilterStepForKernelIndex(int kernelIndex)
+float btsGaussianFilterStepForKernelIndex(int kernelIndex)
 {
-    return kFfsGaussianFilterKernel[kernelIndex][0];
+    return kBtsGaussianFilterKernel[kernelIndex][0];
 }
 
-float ffsGaussianFilterSigmaForKernelIndex(int kernelIndex)
+float btsGaussianFilterSigmaForKernelIndex(int kernelIndex)
 {
-    return kFfsGaussianFilterKernel[kernelIndex][1];
+    return kBtsGaussianFilterKernel[kernelIndex][1];
 }
 
-unsigned int ffsGaussianFilterSizeForKernelIndex(int kernelIndex)
+unsigned int btsGaussianFilterSizeForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)kFfsGaussianFilterKernel[kernelIndex][2];
+    return (unsigned int)kBtsGaussianFilterKernel[kernelIndex][2];
 }
 
-unsigned int ffsGaussianFilterRadiusForKernelIndex(int kernelIndex)
+unsigned int btsGaussianFilterRadiusForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)floor(ffsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
+    return (unsigned int)floor(btsGaussianFilterSizeForKernelIndex(kernelIndex)/2.0f);
 }
 
-unsigned int ffsGaussianFilterSamplesForKernelIndex(int kernelIndex)
+unsigned int btsGaussianFilterSamplesForKernelIndex(int kernelIndex)
 {
-    return (unsigned int)kFfsGaussianFilterKernel[kernelIndex][3];
+    return (unsigned int)kBtsGaussianFilterKernel[kernelIndex][3];
 }
 
-float ffsGaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
+float btsGaussianFilterWeightForIndexes(int kernelIndex, int sampleIndex)
 {
-    unsigned int samples = ffsGaussianFilterSamplesForKernelIndex(kernelIndex);
-    return kFfsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // FIXME improve this...wrong things can happen
+    unsigned int samples = btsGaussianFilterSamplesForKernelIndex(kernelIndex);
+    return kBtsGaussianFilterKernel[kernelIndex][4+samples+sampleIndex]; // FIXME improve this...wrong things can happen
 }
 
-float ffsGaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
+float btsGaussianFilterOffsetForIndexes(int kernelIndex, int sampleIndex)
 {
-    return kFfsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // FIXME improve this...wrong things can happen
+    return kBtsGaussianFilterKernel[kernelIndex][4+sampleIndex]; // FIXME improve this...wrong things can happen
 }
 
 #endif /* LMTCaptureVideoPreviewLayerGaussianFilterKernel_h */
