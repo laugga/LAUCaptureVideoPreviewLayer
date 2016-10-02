@@ -66,7 +66,7 @@ static const char * FragmentShaderSourceDiscreteTextureSampling =
     "uniform sampler2D FragTextureData;                                                                     \n"
     
     "// Uniforms (Filter)                                                                                   \n"
-    "uniform bool FragFilterEnabled; // Skip filter if enabled is false                                     \n"
+    "uniform bool FilterEnabled; // Skip filter if enabled is false                                     \n"
     "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }                                  \n"
     "uniform int FragFilterKernelSize; // Size = N                                                          \n"
     "uniform int FragFilterKernelRadius; // Radius = N - 1                                                  \n"
@@ -76,7 +76,7 @@ static const char * FragmentShaderSourceDiscreteTextureSampling =
     "void main()                                                                                            \n"
     "{                                                                                                      \n"
     "   // Check if filter is not enabled or texture coordinate is outside the FragTextureFilterBounds      \n"
-    "   if (FragFilterEnabled == false ||                                                                   \n"
+    "   if (FilterEnabled == false ||                                                                   \n"
     "       (FragTextureCoordinate.x < FragFilterBounds.x ||                                                \n"
     "        FragTextureCoordinate.y < FragFilterBounds.y ||                                                \n"
     "        FragTextureCoordinate.x > FragFilterBounds.z ||                                                \n"
@@ -109,12 +109,15 @@ static const char * VertexShaderSourceBilinearTextureSampling =
     "attribute vec4 VertPosition;                                                                                            \n"
     "attribute vec2 VertTextureCoordinate;                                                                                   \n"
     
-    "// (In) Vertex uniforms                                                                                                 \n"
-    "uniform bool  VertFilterEnabled;                                                                                        \n"
-    "uniform int   VertFilterKernelSamples;                                                                                  \n"
-    "uniform float VertFilterKernelOffsets[14];                                                                              \n"
-    "uniform vec2  FilterSplitPassDirectionVector;                                                                           \n"
+    "// (In) Vertex uniforms (shared)                                                                                        \n"
+    "uniform bool  FilterEnabled;                                                                                            \n"
+    "uniform lowp int   FilterKernelSamples;                                                                                 \n"
+    "uniform highp vec2 FilterSplitPassDirectionVector;                                                                      \n"
 
+    "// (In) Vertex uniforms                                                                                                 \n"
+    "uniform float VertFilterKernelOffsets[14];                                                                              \n"
+    
+    
     "// (Out) Fragment variables                                                                                             \n"
     "varying vec2 FragTextureCoordinate;                                                                                     \n"
     "varying vec2 FragFilterSplitPassKernelOffsets[14];                                                                      \n"
@@ -122,10 +125,10 @@ static const char * VertexShaderSourceBilinearTextureSampling =
     "void main()                                                                                                             \n"
     "{                                                                                                                       \n"
     
-    "    if (VertFilterEnabled == true)                                                                                      \n"
+    "    if (FilterEnabled == true)                                                                                          \n"
     "    {                                                                                                                   \n"
     "        // Sample with the provided weights and offsets in one direction                                                \n"
-    "        for (int s = 0; s < VertFilterKernelSamples; ++s)                                                               \n"
+    "        for (int s = 0; s < FilterKernelSamples; ++s)                                                                   \n"
     "        {                                                                                                               \n"
     "           FragFilterSplitPassKernelOffsets[s] = VertFilterKernelOffsets[s]*FilterSplitPassDirectionVector;             \n"
     "        }                                                                                                               \n"
@@ -148,7 +151,7 @@ static const char * FragmentShaderSourceBilinearTextureSampling =
     "precision highp float;                                                 								\n"
     "#endif                                                                 								\n"
     
-    "// (In) Texture coordinate for the fragment                            								\n"
+    "// Texture coordinate for the fragment                                                                 \n"
     "varying vec2 FragTextureCoordinate;                                    								\n"
     "varying vec2 FragFilterSplitPassKernelOffsets[14];                                                     \n"
     
@@ -156,14 +159,14 @@ static const char * FragmentShaderSourceBilinearTextureSampling =
     "uniform sampler2D FragTextureData;                                     								\n"
     
     "// Uniforms (Filter)                                                   								\n"
-    "uniform bool  FragFilterEnabled; // Skip filter if enabled is false     								\n"
+    "uniform bool       FilterEnabled; // Skip filter if enabled is false                                   \n"
+    "uniform lowp int   FilterKernelSamples; // Samples per pixel                                           \n"
     "uniform vec4  FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  								\n"
-    "uniform int   FragFilterKernelSamples; // Samples per pixel              								\n"
     "uniform float FragFilterKernelWeights[14]; // Weights                                                  \n"
     
     "void main()                                                           									\n"
     "{                                                                      								\n"
-    "    if (FragFilterEnabled == false ||              													\n"
+    "    if (FilterEnabled == false ||                                                                      \n"
     "		 (FragTextureCoordinate.x < FragFilterBounds.x ||                                               \n"
     "		  FragTextureCoordinate.y < FragFilterBounds.y ||                                               \n"
     "		  FragTextureCoordinate.x > FragFilterBounds.z ||                                               \n"
@@ -177,7 +180,7 @@ static const char * FragmentShaderSourceBilinearTextureSampling =
     "        vec4 weightedColor = vec4(0.0);																\n"
     
     "        // Sample with the provided weights and offsets in one direction                                                                   \n"
-    "        for (int s = 0; s < FragFilterKernelSamples; ++s)                                                                                  \n"
+    "        for (int s = 0; s < FilterKernelSamples; ++s)                                                                                      \n"
     "        {                                                                                                                                  \n"
     "           float weight = FragFilterKernelWeights[s];                                                                                      \n"
     "			vec2 offset = FragFilterSplitPassKernelOffsets[s];                                                                              \n"
