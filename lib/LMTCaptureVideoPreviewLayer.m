@@ -180,9 +180,9 @@
     
     // Load blur filter program
 #if BilinearTextureSamplingEnabled
-    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceBilinearTextureSampling);
+    _blurFilterProgram = loadProgram(VertexShaderSourceBilinearTextureSampling, FragmentShaderSourceBilinearTextureSampling);
 #else
-    _blurFilterProgram = loadProgram(VertexShaderSource, FragmentShaderSourceDiscreteTextureSampling);
+    _blurFilterProgram = loadProgram(VertexShaderSourceDiscreteTextureSampling, FragmentShaderSourceDiscreteTextureSampling);
 #endif
     validateProgram(_blurFilterProgram);
     
@@ -191,19 +191,22 @@
     _blurFilterAttributes.VertTextureCoordinate = glGetAttribLocation(_blurFilterProgram, "VertTextureCoordinate");
     
     // Bind blur filter uniforms
+    _blurFilterUniforms.VertFilterEnabled = glGetUniformLocation(_blurFilterProgram, "VertFilterEnabled");
     _blurFilterUniforms.FragTextureData = glGetUniformLocation(_blurFilterProgram, "FragTextureData");
     _blurFilterUniforms.FragFilterEnabled = glGetUniformLocation(_blurFilterProgram, "FragFilterEnabled");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
-    _blurFilterUniforms.FragFilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FragFilterSplitPassDirectionVector");
 #if BilinearTextureSamplingEnabled
+    _blurFilterUniforms.VertFilterKernelSamples = glGetUniformLocation(_blurFilterProgram, "VertFilterKernelSamples");
+    _blurFilterUniforms.VertFilterKernelOffsets = glGetUniformLocation(_blurFilterProgram, "VertFilterKernelOffsets");
     _blurFilterUniforms.FragFilterKernelSamples = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSamples");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
-    _blurFilterUniforms.FragFilterKernelOffsets = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelOffsets");
 #else
     _blurFilterUniforms.FragFilterKernelRadius = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelRadius");
     _blurFilterUniforms.FragFilterKernelSize = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelSize");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
 #endif
+    
+    _blurFilterUniforms.FilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FilterSplitPassDirectionVector");
     
     // Use the blur filter glsl program
     glUseProgram(_blurFilterProgram);
@@ -526,7 +529,7 @@
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Set the filter step
-    glUniform2f(_blurFilterUniforms.FragFilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/srcTextureInstance->textureWidth, _filterSplitPassDirectionVector[1]/srcTextureInstance->textureHeight);
+    glUniform2f(_blurFilterUniforms.FilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/srcTextureInstance->textureWidth, _filterSplitPassDirectionVector[1]/srcTextureInstance->textureHeight);
     
     // Bind VAO
     glBindVertexArrayOES(destTextureInstance->vertexArray);
@@ -899,9 +902,10 @@
     FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
     
 #if BilinearTextureSamplingEnabled
+    glUniform1i(_blurFilterUniforms.VertFilterKernelSamples, filterKernel.samples);
+    glUniform1fv(_blurFilterUniforms.VertFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
     glUniform1i(_blurFilterUniforms.FragFilterKernelSamples, filterKernel.samples);
     glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
-    glUniform1fv(_blurFilterUniforms.FragFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
 #else
     glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
     glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
@@ -967,6 +971,7 @@
 
 - (void)setFilterEnabled:(BOOL)filterEnabled
 {
+    glUniform1i(_blurFilterUniforms.VertFilterEnabled, (filterEnabled ? 1 : 0));
     glUniform1i(_blurFilterUniforms.FragFilterEnabled, (filterEnabled ? 1 : 0));
 }
 

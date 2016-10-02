@@ -35,17 +35,21 @@ struct UniformHandles {
     
     GLuint FragTextureData;
     
+    GLuint VertFilterEnabled; // bool
     GLuint FragFilterEnabled; // bool
+    
     GLuint FragFilterBounds; // vec4
     
-    GLuint FragFilterSplitPassDirectionVector; // vec2 (x or y step direction)
+    GLuint VertFilterKernelOffsets; // float[]
     
     GLuint FragFilterKernelWeights; // float[]
     GLuint FragFilterKernelRadius; // float
     GLuint FragFilterKernelSize; // float
     
-    GLuint FragFilterKernelOffsets; // float[]
     GLuint FragFilterKernelSamples; // float
+    GLuint VertFilterKernelSamples; // float
+    
+    GLuint FilterSplitPassDirectionVector; // vec2 (x or y step direction)
 };
 
 struct AttributeHandles {

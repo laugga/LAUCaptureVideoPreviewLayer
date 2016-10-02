@@ -28,7 +28,10 @@
 #ifndef LMTCaptureVideoPreviewLayerShaders_h
 #define LMTCaptureVideoPreviewLayerShaders_h
 
-static const char * VertexShaderSource =
+/*!
+ Vertex Shader
+ */
+static const char * VertexShaderSourceDiscreteTextureSampling =
 {
     "// (In) Vertex attributes                              \n"
     "attribute vec4 VertPosition;                           \n"
@@ -42,9 +45,14 @@ static const char * VertexShaderSource =
     "    FragTextureCoordinate = VertTextureCoordinate.xy;  \n"
     "    gl_Position = VertPosition;                        \n"
     "}                                                      \n"
-
 };
 
+/*!
+ Fragment Shader
+ 
+ Implementation:
+ - Discrete Texture Sampling
+ */
 static const char * FragmentShaderSourceDiscreteTextureSampling =
 {
     "#ifdef GL_ES                                                                                           \n"
@@ -63,7 +71,7 @@ static const char * FragmentShaderSourceDiscreteTextureSampling =
     "uniform int FragFilterKernelSize; // Size = N                                                          \n"
     "uniform int FragFilterKernelRadius; // Radius = N - 1                                                  \n"
     "uniform float FragFilterKernelWeights[50]; // 1D convolution kernel                                    \n"
-    "uniform vec2 FragFilterSplitPassDirectionVector; // Apply kernel in direction, x or y                  \n"
+    "uniform vec2 FilterSplitPassDirectionVector; // Apply kernel in direction, x or y                      \n"
     
     "void main()                                                                                            \n"
     "{                                                                                                      \n"
@@ -85,13 +93,55 @@ static const char * FragmentShaderSourceDiscreteTextureSampling =
     "       for (int offset = -FragFilterKernelRadius; offset <= FragFilterKernelRadius; ++offset)                                                      \n"
     "       {                                                                                                                                           \n"
     "           float weight = FragFilterKernelWeights[FragFilterKernelRadius+offset];                                                                  \n"
-    "           weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FragFilterSplitPassDirectionVector));    \n"
+    "           weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy + (float(offset)*FilterSplitPassDirectionVector));        \n"
     "       }                                                                                                                                           \n"
     "       gl_FragColor = weightedColor;                                                                                                               \n"
     "   }                                                                                                                                               \n"
     "}                                                                                                                                                  \n"
 };
 
+/*!
+ Vertex Shader
+ */
+static const char * VertexShaderSourceBilinearTextureSampling =
+{
+    "// (In) Vertex attributes                                                                                               \n"
+    "attribute vec4 VertPosition;                                                                                            \n"
+    "attribute vec2 VertTextureCoordinate;                                                                                   \n"
+    
+    "// (In) Vertex uniforms                                                                                                 \n"
+    "uniform bool  VertFilterEnabled;                                                                                        \n"
+    "uniform int   VertFilterKernelSamples;                                                                                  \n"
+    "uniform float VertFilterKernelOffsets[14];                                                                              \n"
+    "uniform vec2  FilterSplitPassDirectionVector;                                                                           \n"
+
+    "// (Out) Fragment variables                                                                                             \n"
+    "varying vec2 FragTextureCoordinate;                                                                                     \n"
+    "varying vec2 FragFilterSplitPassKernelOffsets[14];                                                                      \n"
+    
+    "void main()                                                                                                             \n"
+    "{                                                                                                                       \n"
+    
+    "    if (VertFilterEnabled == true)                                                                                      \n"
+    "    {                                                                                                                   \n"
+    "        // Sample with the provided weights and offsets in one direction                                                \n"
+    "        for (int s = 0; s < VertFilterKernelSamples; ++s)                                                               \n"
+    "        {                                                                                                               \n"
+    "           FragFilterSplitPassKernelOffsets[s] = VertFilterKernelOffsets[s]*FilterSplitPassDirectionVector;             \n"
+    "        }                                                                                                               \n"
+    "    }                                                                                                                   \n"
+
+    "    FragTextureCoordinate = VertTextureCoordinate.xy;                                                                   \n"
+    "    gl_Position = VertPosition;                                                                                         \n"
+    "}                                                                                                                       \n"
+};
+
+/*!
+ Fragment Shader
+ 
+ Implementation:
+ - Bilinear Texture Sampling
+ */
 static const char * FragmentShaderSourceBilinearTextureSampling =
 {
     "#ifdef GL_ES                                                           								\n"
@@ -100,17 +150,16 @@ static const char * FragmentShaderSourceBilinearTextureSampling =
     
     "// (In) Texture coordinate for the fragment                            								\n"
     "varying vec2 FragTextureCoordinate;                                    								\n"
+    "varying vec2 FragFilterSplitPassKernelOffsets[14];                                                     \n"
     
     "// Uniforms (VideoFrame)                                               								\n"
     "uniform sampler2D FragTextureData;                                     								\n"
     
     "// Uniforms (Filter)                                                   								\n"
-    "uniform bool FragFilterEnabled; // Skip filter if enabled is false     								\n"
-    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  								\n"
-    "uniform int FragFilterKernelSamples; // Samples per pixel              								\n"
-    "uniform float FragFilterKernelWeights[25]; // Weights                                                  \n"
-    "uniform float FragFilterKernelOffsets[25]; // Offsets      											\n"
-    "uniform vec2 FragFilterSplitPassDirectionVector; // Direction           								\n"
+    "uniform bool  FragFilterEnabled; // Skip filter if enabled is false     								\n"
+    "uniform vec4  FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  								\n"
+    "uniform int   FragFilterKernelSamples; // Samples per pixel              								\n"
+    "uniform float FragFilterKernelWeights[14]; // Weights                                                  \n"
     
     "void main()                                                           									\n"
     "{                                                                      								\n"
@@ -131,9 +180,103 @@ static const char * FragmentShaderSourceBilinearTextureSampling =
     "        for (int s = 0; s < FragFilterKernelSamples; ++s)                                                                                  \n"
     "        {                                                                                                                                  \n"
     "           float weight = FragFilterKernelWeights[s];                                                                                      \n"
+    "			vec2 offset = FragFilterSplitPassKernelOffsets[s];                                                                              \n"
+    "		 	weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy - offset) +                                       \n"
+    "						     weight * texture2D(FragTextureData, FragTextureCoordinate.xy + offset);                                        \n"
+    "        }                                                                                                                                  \n"
+
+    "        gl_FragColor = weightedColor;																										\n"
+    "    }                                                                                                                                      \n"
+    "}                                                                                                                                          \n"
+};
+
+/*!
+ Vertex Shader
+ 
+ Implementation:
+ - Bilinear Texture Sampling
+ - Pre-computed texture coordinates
+ */
+static const char * VertexShaderSourceBtsCtc =
+{
+    "// (In) Vertex attributes                              \n"
+    "attribute vec4 VertPosition;                           \n"
+    "attribute vec2 VertTextureCoordinate;                  \n"
+    
+    "// Uniforms (Filter)                                   \n"
+    "uniform bool FragFilterEnabled;                        \n"
+    "uniform float FragFilterKernelOffsets[25]; // Offsets  \n"
+    "uniform vec2 FragFilterSplitPassDirectionVector;       \n"
+    
+    "// (Out) Fragment variables                            \n"
+    "varying vec2 FragTextureCoordinate;                    \n"
+    "varying vec2 FragComputedTextureCoordinates[14];       \n"
+    
+    "void main()                                                                                                                                \n"
+    "{                                                                                                                                          \n"
+    "    if (FragFilterEnabled == true)                                                                                                         \n"
+    "    {                                                                                                                                      \n"
+    "        // Calculate the texture coordinates for each sample (minus offset only)                                                           \n"
+    "        for (int s = 0; s < FragFilterKernelSamples; ++s)                                                                                  \n"
+    "        {                                                                                                                                  \n"
     "			float offset = FragFilterKernelOffsets[s];                                                                                      \n"
-    "		 	weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate.xy - offset*FragFilterSplitPassDirectionVector) +	\n"
-    "						     weight * texture2D(FragTextureData, FragTextureCoordinate.xy + offset*FragFilterSplitPassDirectionVector);		\n"
+    "		 	FragComputedTextureCoordinates[s] = VertTextureCoordinate.xy - offset*FragFilterSplitPassDirectionVector                        \n"
+    "        }                                                                                                                                  \n"
+    "        gl_FragColor = weightedColor;																										\n"
+    "    }                                                                                                                                      \n"
+    
+    "    FragTextureCoordinate = VertTextureCoordinate.xy;                                                                                      \n"
+    "    gl_Position = VertPosition;                                                                                                            \n"
+    "}                                                                                                                                          \n"
+};
+
+/*!
+ Fragment Shader
+ 
+ Implementation:
+ - Bilinear Texture Sampling
+ - Pre-computed texture coordinates
+ */
+static const char * FragmentShaderSourceBtsCtc =
+{
+    "#ifdef GL_ES                                                           								\n"
+    "precision lowp float;                                                                                  \n"
+    "#endif                                                                 								\n"
+    
+    "// (In) Pre-computed texture coordinates for the fragment                								\n"
+    "varying vec2 FragComputedTextureCoordinates[15];                        								\n"
+    
+    "// Uniforms (VideoFrame)                                               								\n"
+    "uniform sampler2D FragTextureData;                                     								\n"
+    
+    "// Uniforms (Filter)                                                   								\n"
+    "uniform bool FragFilterEnabled; // Skip filter if enabled is false     								\n"
+    "uniform vec4 FragFilterBounds; // Bounds = { xMin, yMin, xMax, yMax }  								\n"
+    "uniform int FragFilterKernelSamples; // Samples per pixel              								\n"
+    "uniform float FragFilterKernelWeights[25]; // Weights                                                  \n"
+    
+    "void main()                                                           									\n"
+    "{                                                                      								\n"
+    "    if (FragFilterEnabled == false ||              													\n"
+    "		 (FragTextureCoordinate.x < FragFilterBounds.x ||                                               \n"
+    "		  FragTextureCoordinate.y < FragFilterBounds.y ||                                               \n"
+    "		  FragTextureCoordinate.x > FragFilterBounds.z ||                                               \n"
+    "		  FragTextureCoordinate.y > FragFilterBounds.w))                                                \n"
+    "    {                                                                                                  \n"
+    "        gl_FragColor = texture2D(FragTextureData, FragComputedTextureCoordinates[0]);                  \n"
+    "    }																									\n"
+    "    else																							    \n"
+    "    {                                                                                                  \n"
+    "        // Weighted color sum of all the neighbour pixel												\n"
+    "        vec4 weightedColor = vec4(0.0);																\n"
+    
+    "        // Sample with the provided weights and offsets in one direction                                                                   \n"
+    "        for (int s = 0; s < FragFilterKernelSamples; ++s)                                                                                  \n"
+    "        {                                                                                                                                  \n"
+    "           float weight = FragFilterKernelWeights[s];                                                                                      \n"
+    "			vec2 coordinates = FragComputedTextureCoordinates[s];                                                                           \n"
+    "		 	weightedColor += weight * texture2D(FragTextureData, coordinates) +                                                             \n"
+    "						     weight * texture2D(FragTextureData, coordinates);                                                              \n"
     "        }                                                                                                                                  \n"
     "        gl_FragColor = weightedColor;																										\n"
     "    }                                                                                                                                      \n"
