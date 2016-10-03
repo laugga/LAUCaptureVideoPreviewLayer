@@ -99,7 +99,7 @@
 @implementation LMTCaptureVideoPreviewLayer
 
 #define FilterBoundsEnabled 0
-#define FilterBilinearTextureSamplingEnabled 0
+#define FilterBilinearTextureSamplingEnabled 1
 
 #pragma mark -
 #pragma mark Initialization
