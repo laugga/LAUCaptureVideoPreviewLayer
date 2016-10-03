@@ -86,12 +86,20 @@
     
     // Filter (Intensity)
     float _filterIntensity; // [0,1], 0 means no filter is applied
+    BOOL _filterIntensityNeedsUpdate; // YES if filter intensity changed between draw calls
     dispatch_source_t _filterIntensityTransitionTimer; // Use for animated transition between different indices
     float _filterIntensityTransitionTarget;
+    
+    // Filter (Bounds)
+    GLfloat _filterBounds[4];
+    BOOL _filterBoundsNeedsUpdate;
 }
 @end
 
 @implementation LMTCaptureVideoPreviewLayer
+
+#define FilterBoundsEnabled 0
+#define FilterBilinearTextureSamplingEnabled 1
 
 #pragma mark -
 #pragma mark Initialization
@@ -168,6 +176,9 @@
     
     // Set filter intensity from blur value
     [self setFilterIntensity:_blur];
+#if FilterBoundsEnabled
+    [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
+#endif
     
     // Create and setup displayLink
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
@@ -205,7 +216,7 @@
     }
     
     // Load blur filter program
-//#if BilinearTextureSamplingEnabled
+//#if FilterBilinearTextureSamplingEnabled
 //#if FilterBoundsEnabled
 //    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
 //#else
@@ -224,7 +235,7 @@
     // Bind blur filter uniforms
     _blurFilterUniforms.FragTextureData = glGetUniformLocation(_blurFilterProgram, "FragTextureData");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
-#if BilinearTextureSamplingEnabled
+#if FilterBilinearTextureSamplingEnabled
     _blurFilterUniforms.FilterKernelSamples = glGetUniformLocation(_blurFilterProgram, "FilterKernelSamples");
     _blurFilterUniforms.VertFilterKernelOffsets = glGetUniformLocation(_blurFilterProgram, "VertFilterKernelOffsets");
     _blurFilterUniforms.FragFilterKernelWeights = glGetUniformLocation(_blurFilterProgram, "FragFilterKernelWeights");
@@ -847,14 +858,11 @@
         // Use the blur filter program
         glUseProgram(_blurFilterProgram);
         
-        // Update filter parameters
-#if FilterBoundsEnabled
-        [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
-#endif
+        // Update any uniform value that changed since last frame
+        [self updateBlurFilterProgramUniforms];
+        
         // Set the filter split-pass direction vector
         [self switchFilterSplitPassDirectionVector];
-        
-        [self updateBlurFilterProgramUniforms];
         
         // Set the pixelBuffer to a texture instance
         // We'll use two texture instances and ping-pong between them
@@ -900,32 +908,37 @@
     }
 }
 
-#pragma mark -
-#pragma mark Filtering (Parameters)
-
 - (void)updateBlurFilterProgramUniforms
 {
-    static size_t lastUpdatedFilterKernelIndex = -1;
-    
-    if (_filterKernelIndex != lastUpdatedFilterKernelIndex)
+    if (_filterIntensityNeedsUpdate)
     {
         FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
         
-    #if BilinearTextureSamplingEnabled
+#if FilterBilinearTextureSamplingEnabled
         glUniform1i(_blurFilterUniforms.FilterKernelSamples, filterKernel.samples);
         glUniform1fv(_blurFilterUniforms.VertFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
         glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
-    #else
+#else
         glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
         glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
         glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.size, filterKernel.weights);
-    #endif
+#endif
         
-        lastUpdatedFilterKernelIndex = _filterKernelIndex;
+        _filterIntensityNeedsUpdate = NO;
     }
     
+#if FilterBoundsEnabled
+    if (_filterBoundsNeedsUpdate)
+    {
+        glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
+        _filterBoundsNeedsUpdate = NO;
+    }
     
+#endif
 }
+
+#pragma mark -
+#pragma mark Filtering (Intensity)
 
 - (void)setFilterIntensity:(float)intensity
 {
@@ -949,6 +962,8 @@
     
     // Assign the mapped index
     _filterKernelIndex =  MAX(0, MIN(_filterKernelCount-1, mappedIndex));
+    
+    _filterIntensityNeedsUpdate = YES;
 }
 
 - (void)setFilterIntensity:(float)intensity animated:(BOOL)animated
@@ -1005,9 +1020,7 @@
 }
 
 #pragma mark -
-#pragma mark Filtering (Parameters)
-
-#define FilterBoundsEnabled 0
+#pragma mark Filtering (Bounds)
 
 #if FilterBoundsEnabled
 - (void)setFilterBoundsRect:(CGRect)filterBoundsRect
@@ -1021,31 +1034,17 @@
     // The textureCoordinates mapping rotate the texture 90 degrees clockwise
     // We need to flip x/y in textureFilterBounds to work with the rotation
     GLfloat filterBounds[4] = { yMin, 1.0 - xMax, yMax, 1.0 - xMin };
-    
-    glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
+    memcpy(_filterBounds, filterBounds, 4*sizeof(GLfloat));
+    _filterBoundsNeedsUpdate = YES;
 }
 #endif
-
-- (void)switchFilterSplitPassDirectionVector
-{
-    if (_filterSplitPassDirectionVector[0] == 0)
-    {
-        _filterSplitPassDirectionVector[0] = 1;
-        _filterSplitPassDirectionVector[1] = 0;
-    }
-    else
-    {
-        _filterSplitPassDirectionVector[0] = 0;
-        _filterSplitPassDirectionVector[1] = 1;
-    }
-}
 
 #pragma mark -
 #pragma mark Filtering (Kernel)
 
 void createFilterKernel(int kernelIndex, FilterKernel_t * filterKernel)
 {
-#if BilinearTextureSamplingEnabled
+#if FilterBilinearTextureSamplingEnabled
     GLuint filterSamples = btsGaussianFilterSamplesForKernelIndex(kernelIndex);
     GLuint filterRadius = btsGaussianFilterRadiusForKernelIndex(kernelIndex);
     GLfloat filterSigma = btsGaussianFilterSigmaForKernelIndex(kernelIndex);
@@ -1107,7 +1106,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     filterKernel->radius = 0;
     free(filterKernel->weights);
 
-#if BilinearTextureSamplingEnabled
+#if FilterBilinearTextureSamplingEnabled
     free(filterKernel->offsets);
 #endif
 }
@@ -1136,7 +1135,21 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     
     // Filter parameters
     _filterDownsamplingFactor = 4.0f;
-    _filterMultiplePassCount = 1;
+    _filterMultiplePassCount = 2;
+}
+
+- (void)switchFilterSplitPassDirectionVector
+{
+    if (_filterSplitPassDirectionVector[0] == 0)
+    {
+        _filterSplitPassDirectionVector[0] = 1;
+        _filterSplitPassDirectionVector[1] = 0;
+    }
+    else
+    {
+        _filterSplitPassDirectionVector[0] = 0;
+        _filterSplitPassDirectionVector[1] = 1;
+    }
 }
 
 @end

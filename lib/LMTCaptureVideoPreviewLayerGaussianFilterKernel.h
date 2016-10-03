@@ -106,8 +106,6 @@ float dtsGaussianFilterWeightForIndexes(int kernelIndex, int weightIndex)
 #pragma mark -
 #pragma mark Bilinear texture sampling weights and offsets
 
-#define BilinearTextureSamplingEnabled 1
-
 // For each step [0,1] there's a different kernel.
 // These kernels are used to animate between filter intensity values
 static float const kBtsGaussianFilterKernel[11][25] = {
