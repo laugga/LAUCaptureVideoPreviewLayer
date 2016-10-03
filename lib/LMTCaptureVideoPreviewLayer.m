@@ -98,8 +98,8 @@
 
 @implementation LMTCaptureVideoPreviewLayer
 
-#define FilterBoundsEnabled 1
-#define FilterBilinearTextureSamplingEnabled 1
+#define FilterBoundsEnabled 0
+#define FilterBilinearTextureSamplingEnabled 0
 
 #pragma mark -
 #pragma mark Initialization
@@ -223,7 +223,7 @@
     _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
 #endif
 #else
-    _blurFilterProgram = loadProgram(VertexShaderSourceDts, FragmentShaderSourceDts);
+    _blurFilterProgram = loadProgram(VertexShaderSourceDefault, FragmentShaderSourceDts);
 #endif
     
     validateProgram(_blurFilterProgram);
