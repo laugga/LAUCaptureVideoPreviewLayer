@@ -180,7 +180,11 @@
     
     // Load blur filter program
 #if BilinearTextureSamplingEnabled
-    _blurFilterProgram = loadProgram(VertexShaderSourceBilinearTextureSampling, FragmentShaderSourceBilinearTextureSampling);
+#if FilterBoundsEnabled
+    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
+#else
+    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBtsO1);
+#endif
 #else
     _blurFilterProgram = loadProgram(VertexShaderSourceDiscreteTextureSampling, FragmentShaderSourceDiscreteTextureSampling);
 #endif
@@ -819,8 +823,9 @@
     {
         // Update filter parameters
         [self setFilterEnabled:YES];
+#if FilterBoundsEnabled
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
-        
+#endif
         // Set the filter split-pass direction vector
         [self switchFilterSplitPassDirectionVector];
         
@@ -971,6 +976,9 @@
     glUniform1i(_blurFilterUniforms.FilterEnabled, (filterEnabled ? 1 : 0));
 }
 
+#define FilterBoundsEnabled 0
+
+#if FilterBoundsEnabled
 - (void)setFilterBoundsRect:(CGRect)filterBoundsRect
 {
     GLfloat xMin = filterBoundsRect.origin.x;
@@ -985,6 +993,7 @@
     
     glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
 }
+#endif
 
 - (void)switchFilterSplitPassDirectionVector
 {
