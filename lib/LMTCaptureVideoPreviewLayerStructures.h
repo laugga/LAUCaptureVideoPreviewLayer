@@ -35,7 +35,6 @@ struct UniformHandles {
     
     GLuint FragTextureData;
     
-    GLuint FilterEnabled; // bool
     GLuint FilterSplitPassDirectionVector; // vec2 (x or y step direction)
     
     GLuint FragFilterBounds; // vec4

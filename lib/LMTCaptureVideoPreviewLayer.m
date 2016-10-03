@@ -53,10 +53,13 @@
     // Waiting to be rendered or last one rendered
     CVPixelBufferRef _pixelBuffer;
     
-    // Shader program
-    GLuint _blurFilterProgram;
+    // Shader programs
+    GLuint _defaultProgram; // On-screen
+    GLuint _blurFilterProgram; // Off-screen
     
-    // Shader binding
+    // Shader bindings
+    struct UniformHandles _defaultUniforms;
+    struct AttributeHandles _defaultAttributes;
     struct UniformHandles _blurFilterUniforms;
     struct AttributeHandles _blurFilterAttributes;
     
@@ -147,8 +150,9 @@
     // Create the onscreen framebuffer
     [self createOnscreenFramebufferForLayer:self];
 
-    // Load glsl program, uniforms and attributes
-    [self loadProgram];
+    // Load glsl programs, uniforms and attributes
+    [self loadBlurFilterProgram];
+    [self loadDefaultProgram];
     
     // Disable depth testing
     glDisable(GL_DEPTH_TEST);
@@ -171,7 +175,29 @@
     _displayLink.frameInterval = 2;
 }
 
-- (void)loadProgram
+- (void)loadDefaultProgram
+{
+    if (_defaultProgram)
+    {
+        return;
+    }
+    
+    // Load default program
+    _defaultProgram = loadProgram(VertexShaderSourceDefault, FragmentShaderSourceDefault);
+    validateProgram(_defaultProgram);
+    
+    // Bind default attributes
+    _defaultAttributes.VertPosition = glGetAttribLocation(_defaultProgram, "VertPosition");
+    _defaultAttributes.VertTextureCoordinate = glGetAttribLocation(_defaultProgram, "VertTextureCoordinate");
+    
+    // Bind default uniforms
+    _defaultUniforms.FragTextureData = glGetUniformLocation(_defaultProgram, "FragTextureData");
+    
+    // Use the blur filter glsl program
+    glUseProgram(_defaultProgram);
+}
+
+- (void)loadBlurFilterProgram
 {
     if (_blurFilterProgram)
     {
@@ -179,15 +205,16 @@
     }
     
     // Load blur filter program
-#if BilinearTextureSamplingEnabled
-#if FilterBoundsEnabled
+//#if BilinearTextureSamplingEnabled
+//#if FilterBoundsEnabled
+//    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
+//#else
+//    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
+//#endif
+//#else
+//    _blurFilterProgram = loadProgram(VertexShaderSourceDiscreteTextureSampling, FragmentShaderSourceDiscreteTextureSampling);
+//#endif
     _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
-#else
-    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBtsO1);
-#endif
-#else
-    _blurFilterProgram = loadProgram(VertexShaderSourceDiscreteTextureSampling, FragmentShaderSourceDiscreteTextureSampling);
-#endif
     validateProgram(_blurFilterProgram);
     
     // Bind blur filter attributes
@@ -195,7 +222,6 @@
     _blurFilterAttributes.VertTextureCoordinate = glGetAttribLocation(_blurFilterProgram, "VertTextureCoordinate");
     
     // Bind blur filter uniforms
-    _blurFilterUniforms.FilterEnabled = glGetUniformLocation(_blurFilterProgram, "FilterEnabled");
     _blurFilterUniforms.FragTextureData = glGetUniformLocation(_blurFilterProgram, "FragTextureData");
     _blurFilterUniforms.FragFilterBounds = glGetUniformLocation(_blurFilterProgram, "FragFilterBounds");
 #if BilinearTextureSamplingEnabled
@@ -209,9 +235,6 @@
 #endif
     
     _blurFilterUniforms.FilterSplitPassDirectionVector = glGetUniformLocation(_blurFilterProgram, "FilterSplitPassDirectionVector");
-    
-    // Use the blur filter glsl program
-    glUseProgram(_blurFilterProgram);
 }
 
 - (void)unloadProgram
@@ -657,14 +680,14 @@
     // VBO 1, Position
     glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffers[0]);
     glBufferData(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexCount * stride, vertexArray, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(_blurFilterAttributes.VertPosition);
-    glVertexAttribPointer(_blurFilterAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, 0);
+    glEnableVertexAttribArray(_defaultAttributes.VertPosition);
+    glVertexAttribPointer(_defaultAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, 0);
     
     // VBO 2, TextureCoordinate
     glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffers[1]);
     glBufferData(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexCount * stride, _onscreenTextureInstance.textureCoordinates, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(_blurFilterAttributes.VertTextureCoordinate);
-    glVertexAttribPointer(_blurFilterAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, 0);
+    glEnableVertexAttribArray(_defaultAttributes.VertTextureCoordinate);
+    glVertexAttribPointer(_defaultAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, 0);
     
     // Unbind VAO
     glBindVertexArrayOES(0);
@@ -704,7 +727,7 @@
         [self loadOnscreenTextureInstanceFor:offscreenTextureInstance];
         
         // Set Frame uniform
-        glUniform1i(_blurFilterUniforms.FragTextureData, 0);
+        glUniform1i(_defaultUniforms.FragTextureData, 0);
     }
     
     // Bind VAO
@@ -821,13 +844,17 @@
     // Only filter if filter intensity is greater than 0
     if (_filterIntensity > 0)
     {
+        // Use the blur filter program
+        glUseProgram(_blurFilterProgram);
+        
         // Update filter parameters
-        [self setFilterEnabled:YES];
 #if FilterBoundsEnabled
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
 #endif
         // Set the filter split-pass direction vector
         [self switchFilterSplitPassDirectionVector];
+        
+        [self updateBlurFilterProgramUniforms];
         
         // Set the pixelBuffer to a texture instance
         // We'll use two texture instances and ping-pong between them
@@ -848,16 +875,13 @@
         }
         
         // Disabled filtering for final onscreen rendering
-        [self setFilterEnabled:NO];
+        glUseProgram(_defaultProgram);
         
         // Draw (onscreen)
         [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
     }
     else
     {
-        // Disable filtering for final onscreen rendering
-        [self setFilterEnabled:NO];
-        
         // Draw (onscreen)
         pixelBufferTexture = [self drawOnscreenPixelBuffer:pixelBuffer];
     }
@@ -877,7 +901,31 @@
 }
 
 #pragma mark -
-#pragma mark Filtering (Intensity)
+#pragma mark Filtering (Parameters)
+
+- (void)updateBlurFilterProgramUniforms
+{
+    static size_t lastUpdatedFilterKernelIndex = -1;
+    
+    if (_filterKernelIndex != lastUpdatedFilterKernelIndex)
+    {
+        FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
+        
+    #if BilinearTextureSamplingEnabled
+        glUniform1i(_blurFilterUniforms.FilterKernelSamples, filterKernel.samples);
+        glUniform1fv(_blurFilterUniforms.VertFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
+        glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
+    #else
+        glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
+        glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
+        glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.size, filterKernel.weights);
+    #endif
+        
+        lastUpdatedFilterKernelIndex = _filterKernelIndex;
+    }
+    
+    
+}
 
 - (void)setFilterIntensity:(float)intensity
 {
@@ -901,18 +949,6 @@
     
     // Assign the mapped index
     _filterKernelIndex =  MAX(0, MIN(_filterKernelCount-1, mappedIndex));
-    
-    FilterKernel_t filterKernel = _filterKernelArray[_filterKernelIndex];
-    
-#if BilinearTextureSamplingEnabled
-    glUniform1i(_blurFilterUniforms.FilterKernelSamples, filterKernel.samples);
-    glUniform1fv(_blurFilterUniforms.VertFilterKernelOffsets, filterKernel.samples, filterKernel.offsets);
-    glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.samples, filterKernel.weights);
-#else
-    glUniform1i(_blurFilterUniforms.FragFilterKernelRadius, filterKernel.radius);
-    glUniform1i(_blurFilterUniforms.FragFilterKernelSize, filterKernel.size);
-    glUniform1fv(_blurFilterUniforms.FragFilterKernelWeights, filterKernel.size, filterKernel.weights);
-#endif
 }
 
 - (void)setFilterIntensity:(float)intensity animated:(BOOL)animated
@@ -970,11 +1006,6 @@
 
 #pragma mark -
 #pragma mark Filtering (Parameters)
-
-- (void)setFilterEnabled:(BOOL)filterEnabled
-{
-    glUniform1i(_blurFilterUniforms.FilterEnabled, (filterEnabled ? 1 : 0));
-}
 
 #define FilterBoundsEnabled 0
 
@@ -1105,7 +1136,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     
     // Filter parameters
     _filterDownsamplingFactor = 4.0f;
-    _filterMultiplePassCount = 2;
+    _filterMultiplePassCount = 1;
 }
 
 @end
