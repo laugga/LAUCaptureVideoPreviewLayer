@@ -98,7 +98,7 @@
 
 @implementation LMTCaptureVideoPreviewLayer
 
-#define FilterBoundsEnabled 0
+#define FilterBoundsEnabled 1
 #define FilterBilinearTextureSamplingEnabled 1
 
 #pragma mark -
@@ -177,7 +177,7 @@
     // Set filter intensity from blur value
     [self setFilterIntensity:_blur];
 #if FilterBoundsEnabled
-    [self setFilterBoundsRect:CGRectMake(0, 0, 1, 1)];
+    [self setFilterBoundsRect:CGRectMake(0, 0, 1, 0.5)];
 #endif
     
     // Create and setup displayLink
@@ -216,16 +216,16 @@
     }
     
     // Load blur filter program
-//#if FilterBilinearTextureSamplingEnabled
-//#if FilterBoundsEnabled
-//    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
-//#else
-//    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
-//#endif
-//#else
-//    _blurFilterProgram = loadProgram(VertexShaderSourceDiscreteTextureSampling, FragmentShaderSourceDiscreteTextureSampling);
-//#endif
+#if FilterBilinearTextureSamplingEnabled
+#if FilterBoundsEnabled
+    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBtsBounds);
+#else
     _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
+#endif
+#else
+    _blurFilterProgram = loadProgram(VertexShaderSourceDts, FragmentShaderSourceDts);
+#endif
+    
     validateProgram(_blurFilterProgram);
     
     // Bind blur filter attributes
@@ -930,7 +930,7 @@
 #if FilterBoundsEnabled
     if (_filterBoundsNeedsUpdate)
     {
-        glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, filterBounds);
+        glUniform4fv(_blurFilterUniforms.FragFilterBounds, 1, _filterBounds);
         _filterBoundsNeedsUpdate = NO;
     }
     
