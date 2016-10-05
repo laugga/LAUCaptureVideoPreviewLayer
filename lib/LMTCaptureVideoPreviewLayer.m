@@ -218,12 +218,12 @@
     // Load blur filter program
 #if FilterBilinearTextureSamplingEnabled
 #if FilterBoundsEnabled
-    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBtsBounds);
+    _blurFilterProgram = loadProgram(VertexShaderSourceBlurFilterBts, FragmentShaderSourceBlurFilterBtsBounds);
 #else
-    _blurFilterProgram = loadProgram(VertexShaderSourceBts, FragmentShaderSourceBts);
+    _blurFilterProgram = loadProgram(VertexShaderSourceBlurFilterBts, FragmentShaderSourceBlurFilterBts);
 #endif
 #else
-    _blurFilterProgram = loadProgram(VertexShaderSourceDefault, FragmentShaderSourceDts);
+    _blurFilterProgram = loadProgram(VertexShaderSourceDefault, FragmentShaderSourceBlurFilterDts);
 #endif
     
     validateProgram(_blurFilterProgram);

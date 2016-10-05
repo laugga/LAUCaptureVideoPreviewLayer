@@ -82,7 +82,7 @@ static const char * FragmentShaderSourceDefault =
  - Bilinear texture sampling enabled
  - Filter bounds disabled
  */
-static const char * VertexShaderSourceBts =
+static const char * VertexShaderSourceBlurFilterBts =
 {
     "// (In) Vertex attributes\n"
     "attribute vec4 VertPosition;\n"
@@ -97,8 +97,8 @@ static const char * VertexShaderSourceBts =
     "\n"
     "// (Out) Fragment variables\n"
     "varying vec2 FragTextureCoordinate;\n"
-    "varying vec2 FragFilterTextureCoordinates[4];\n"
-    "varying vec2 FragFilterSplitPassKernelOffsets[10];\n"
+    "varying vec2 FragFilterTextureCoordinates[8];\n"
+    "varying vec2 FragFilterSplitPassKernelOffsets[6];\n"
     "\n"
     "void main()\n"
     "{\n"
@@ -110,17 +110,19 @@ static const char * VertexShaderSourceBts =
     "  FragFilterTextureCoordinates[1] = VertTextureCoordinate + (VertFilterKernelOffsets[0]*FilterSplitPassDirectionVector);\n"
     "  FragFilterTextureCoordinates[2] = VertTextureCoordinate - (VertFilterKernelOffsets[1]*FilterSplitPassDirectionVector);\n"
     "  FragFilterTextureCoordinates[3] = VertTextureCoordinate + (VertFilterKernelOffsets[1]*FilterSplitPassDirectionVector);\n"
+    "  FragFilterTextureCoordinates[4] = VertTextureCoordinate - (VertFilterKernelOffsets[2]*FilterSplitPassDirectionVector);\n"
+    "  FragFilterTextureCoordinates[5] = VertTextureCoordinate + (VertFilterKernelOffsets[2]*FilterSplitPassDirectionVector);\n"
+    "  FragFilterTextureCoordinates[6] = VertTextureCoordinate - (VertFilterKernelOffsets[3]*FilterSplitPassDirectionVector);\n"
+    "  FragFilterTextureCoordinates[7] = VertTextureCoordinate + (VertFilterKernelOffsets[3]*FilterSplitPassDirectionVector);\n"
     "\n"
     "  // Pre-calculated offsets\n"
     "  // Limit is 32 varying floats, it's no possible to pre-calculate all texture coordinates\n"
-    "  FragFilterSplitPassKernelOffsets[2] = VertFilterKernelOffsets[2]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[3] = VertFilterKernelOffsets[3]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[4] = VertFilterKernelOffsets[4]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[5] = VertFilterKernelOffsets[5]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[6] = VertFilterKernelOffsets[6]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[7] = VertFilterKernelOffsets[7]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[8] = VertFilterKernelOffsets[8]*FilterSplitPassDirectionVector;\n"
-    "  FragFilterSplitPassKernelOffsets[9] = VertFilterKernelOffsets[9]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[0] = VertFilterKernelOffsets[4]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[1] = VertFilterKernelOffsets[5]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[2] = VertFilterKernelOffsets[6]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[3] = VertFilterKernelOffsets[7]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[4] = VertFilterKernelOffsets[8]*FilterSplitPassDirectionVector;\n"
+    "  FragFilterSplitPassKernelOffsets[5] = VertFilterKernelOffsets[9]*FilterSplitPassDirectionVector;\n"
     "\n"
     "  FragTextureCoordinate = VertTextureCoordinate;\n"
     "  gl_Position = VertPosition;\n"
@@ -135,7 +137,7 @@ static const char * VertexShaderSourceBts =
  - Bilinear texture sampling enabled
  - Filter bounds disabled
  */
-static const char * FragmentShaderSourceBts =
+static const char * FragmentShaderSourceBlurFilterBts =
 {
     "#ifdef GL_ES\n"
     "precision highp float;\n"
@@ -143,8 +145,8 @@ static const char * FragmentShaderSourceBts =
     "\n"
     "// Texture coordinate for the fragment\n"
     "varying vec2 FragTextureCoordinate;\n"
-    "varying vec2 FragFilterTextureCoordinates[4];\n"
-    "varying vec2 FragFilterSplitPassKernelOffsets[10];\n"
+    "varying vec2 FragFilterTextureCoordinates[8];\n"
+    "varying vec2 FragFilterSplitPassKernelOffsets[6];\n"
     "\n"
     "// Uniforms (VideoFrame)\n"
     "uniform sampler2D FragTextureData;\n"
@@ -168,37 +170,35 @@ static const char * FragmentShaderSourceBts =
     "  weight = FragFilterKernelWeights[1];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[2]);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[3]);\n"
-    "\n"
     "  weight = FragFilterKernelWeights[2];\n"
-    "  vec2 offset = FragFilterSplitPassKernelOffsets[2];\n"
-    "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
-    "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
+    "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[4]);\n"
+    "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[5]);\n"
     "  weight = FragFilterKernelWeights[3];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[3];\n"
-    "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
-    "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
+    "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[6]);\n"
+    "  weightedColor += weight * texture2D(FragTextureData, FragFilterTextureCoordinates[7]);\n"
+    "\n"
     "  weight = FragFilterKernelWeights[4];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[4];\n"
+    "  vec2 offset = FragFilterSplitPassKernelOffsets[0];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "  weight = FragFilterKernelWeights[5];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[5];\n"
+    "  offset = FragFilterSplitPassKernelOffsets[1];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "  weight = FragFilterKernelWeights[6];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[6];\n"
+    "  offset = FragFilterSplitPassKernelOffsets[2];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "  weight = FragFilterKernelWeights[7];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[7];\n"
+    "  offset = FragFilterSplitPassKernelOffsets[3];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "  weight = FragFilterKernelWeights[8];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[8];\n"
+    "  offset = FragFilterSplitPassKernelOffsets[4];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "  weight = FragFilterKernelWeights[9];\n"
-    "  offset = FragFilterSplitPassKernelOffsets[9];\n"
+    "  offset = FragFilterSplitPassKernelOffsets[5];\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate - offset);\n"
     "  weightedColor += weight * texture2D(FragTextureData, FragTextureCoordinate + offset);\n"
     "\n"
@@ -214,7 +214,7 @@ static const char * FragmentShaderSourceBts =
  - Bilinear texture sampling enabled
  - Filter bounds enabled
  */
-static const char * FragmentShaderSourceBtsBounds =
+static const char * FragmentShaderSourceBlurFilterBtsBounds =
 {
     "#ifdef GL_ES\n"
     "precision highp float;\n"
@@ -267,7 +267,7 @@ static const char * FragmentShaderSourceBtsBounds =
  - Discrete Texture Sampling
  - Bounds disabled
  */
-static const char * FragmentShaderSourceDts =
+static const char * FragmentShaderSourceBlurFilterDts =
 {
     "#ifdef GL_ES\n"
     "precision highp float;\n"
