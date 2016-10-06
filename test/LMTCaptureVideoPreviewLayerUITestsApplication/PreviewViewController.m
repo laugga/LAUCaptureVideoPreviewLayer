@@ -143,7 +143,7 @@
     _session = [AVCaptureSession new];
 
     // Pick Framerate and Session Preset
-    NSString * sessionPreset = AVCaptureSessionPresetPhoto; // Use high preset
+    NSString * sessionPreset = AVCaptureSessionPresetHigh; // Use high preset
     
     // For single core systems like iPhone 4 and iPod Touch 4th Generation we use a lower resolution and framerate to maintain real-time performance.
     if ([NSProcessInfo processInfo].processorCount == 1)
