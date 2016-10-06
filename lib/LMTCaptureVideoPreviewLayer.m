@@ -508,9 +508,33 @@
 
 - (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(OffscreenTextureInstance_t *)textureInstance
 {
+    // Default downsampling factor
+    GLfloat textureDownsamplingFactor = _filterDownsamplingFactor;
+    
+    // Pixel buffer dimensions and ratio
+    GLfloat pixelBufferWidth = ((GLfloat)CVPixelBufferGetWidth(pixelBuffer));
+    GLfloat pixelBufferHeight = ((GLfloat)CVPixelBufferGetHeight(pixelBuffer));
+    GLfloat pixelBufferRatio = pixelBufferWidth / pixelBufferHeight; // Usually the pixelBuffer w > h
+    
+    // Screen dimensions and ratio
+    GLfloat onscreenWidth = ((GLfloat)_onscreenColorRenderbufferWidth);
+    GLfloat onscreenHeight = ((GLfloat)_onscreenColorRenderbufferHeight);
+    GLfloat onscreenRatio = onscreenHeight / onscreenWidth;
+    
+    if (onscreenRatio > pixelBufferRatio)
+    {
+        // Use height to calculate downsampling effective factor on pixelBuffer
+        textureDownsamplingFactor = pixelBufferWidth / (onscreenHeight / _filterDownsamplingFactor);
+    }
+    else
+    {
+        // Use width to calculate downsampling effective factor on pixelBuffer
+        textureDownsamplingFactor = pixelBufferHeight / (onscreenWidth / _filterDownsamplingFactor);
+    }
+    
     // Downsample input pixelBuffer by a specific factor
-    GLfloat width = ((GLfloat)CVPixelBufferGetWidth(pixelBuffer))/_filterDownsamplingFactor;
-    GLfloat height = ((GLfloat)CVPixelBufferGetHeight(pixelBuffer))/_filterDownsamplingFactor;
+    GLfloat width = pixelBufferWidth / textureDownsamplingFactor;
+    GLfloat height = pixelBufferHeight / textureDownsamplingFactor;
     
     // Get the OpenGL texture
     CVOpenGLESTextureRef oglTexture = [self oglTextureFromPixelBuffer:pixelBuffer];
