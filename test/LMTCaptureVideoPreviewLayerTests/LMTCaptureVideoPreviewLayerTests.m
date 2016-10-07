@@ -64,12 +64,10 @@
     UIImage * targetImage3 = [UIImage imageNamed:@"target-image-48px-radius.png" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     
     UIImage * renderedImage1 = [UIImage imageFromLayer:videoPreviewLayer];
-    UIImage * renderedImage2 = [UIImage imageFromLayer:videoPreviewLayer];
     
     CGFloat similarity1 = [renderedImage1 similarityWithImage:targetImage1];
     CGFloat similarity2 = [renderedImage1 similarityWithImage:targetImage2];
     CGFloat similarity3 = [renderedImage1 similarityWithImage:targetImage3];
-    CGFloat similarity4 = [renderedImage1 similarityWithImage:renderedImage2];
     
     NSLog(@"*** Similarity between rendered image and reference image 1 is %f ***", similarity1);
     NSLog(@"*** Similarity between rendered image and reference image 2 is %f ***", similarity2);
@@ -77,8 +75,16 @@
     
     XCTAssertTrue(similarity2 < 0.1f, @"For Radius = 36px the images must be the similar within 0.1 tolerance");
     XCTAssertTrue(similarity3 < 0.08f, @"For Radius = 48px the images must be the similar within 0.08 tolerance");
+}
+
+- (void)testRenderedImageSimilarityWithAnotherRenderedImage {
     
-    XCTAssertEqual(similarity4, 0.0);
+    UIImage * renderedImage1 = [UIImage imageFromLayer:videoPreviewLayer];
+    UIImage * renderedImage2 = [UIImage imageFromLayer:videoPreviewLayer];
+    
+    CGFloat similarity = [renderedImage1 similarityWithImage:renderedImage2];
+  
+    XCTAssertEqual(similarity, 0.0);
 }
 
 - (void)testRenderPerformance {
