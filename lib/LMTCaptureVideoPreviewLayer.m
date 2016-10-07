@@ -843,7 +843,7 @@
     }
 }
 
-- (void)drawPixelBuffer:(CADisplayLink*)aDisplayLink
+- (void)drawPixelBuffer:(CADisplayLink *)aDisplayLink
 {
     CMSampleBufferRef sampleBuffer = self.internal.sampleBuffer;
     
@@ -920,16 +920,16 @@
     
     [_oglContext presentRenderbuffer:GL_RENDERBUFFER];
     
-    glBindTexture(_pixelBufferTextureInstance.textureTarget, _pixelBufferTextureInstance.textureName);
+    glBindTexture(_pixelBufferTextureInstance.textureTarget, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     CFRelease(pixelBufferTexture);
-    
-    CFRelease(pixelBuffer);
     
     if (oglContext != _oglContext)
     {
         [EAGLContext setCurrentContext:oglContext];
     }
+    
+    CFRelease(pixelBuffer);
 }
 
 - (void)updateBlurFilterProgramUniforms
