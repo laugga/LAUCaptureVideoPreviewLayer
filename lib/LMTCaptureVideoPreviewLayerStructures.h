@@ -80,6 +80,7 @@ struct TextureInstance {
     
     // Geometry, VAO for drawing quad (optional)
     // Vertex Positions and Texture coordinates (aspect-fit) (optional)
+    GLuint vertexArray;
     GLuint vertexBuffer;
     GLuint vertexCount;
     

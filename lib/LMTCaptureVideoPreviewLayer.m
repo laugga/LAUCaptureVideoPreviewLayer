@@ -489,6 +489,10 @@
     static const GLsizei stride = sizeof(VertexData_t);
     offscreenTextureInstance->vertexCount = 4;
     
+    // Vertex Array Object
+    glGenVertexArraysOES(1, &offscreenTextureInstance->vertexArray);
+    glBindVertexArrayOES(offscreenTextureInstance->vertexArray);
+    
     // VBO
     glGenBuffers(1, &(offscreenTextureInstance->vertexBuffer));
     glBindBuffer(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexBuffer);
@@ -501,6 +505,10 @@
     // TextureCoordinate
     glEnableVertexAttribArray(_blurFilterAttributes.VertTextureCoordinate);
     glVertexAttribPointer(_blurFilterAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, textureCoordinate));
+    
+    // Unbind VBO + VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArrayOES(0);
 }
 
 - (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(TextureInstance_t *)textureInstance
@@ -585,8 +593,11 @@
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
+    // Set the filter split-pass direction vector
+    [self setFilterSplitPassDirectionVectorForTextureInstance:destTextureInstance];
+    
     // Bind VAO
-    glBindBuffer(GL_ARRAY_BUFFER, destTextureInstance->vertexBuffer);
+    glBindVertexArrayOES(destTextureInstance->vertexArray);
     
     // Draw the instance
     glDrawArrays(destTextureInstance->primitiveType, 0, destTextureInstance->vertexCount);
@@ -702,6 +713,10 @@
     static const GLsizei stride = sizeof(VertexData_t);
     _onscreenTextureInstance.vertexCount = 4;
     
+    // Vertex Array Object
+    glGenVertexArraysOES(1, &_onscreenTextureInstance.vertexArray);
+    glBindVertexArrayOES(_onscreenTextureInstance.vertexArray);
+    
     // VBO
     glGenBuffers(1, &_onscreenTextureInstance.vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffer);
@@ -714,6 +729,10 @@
     // TextureCoordinate
     glEnableVertexAttribArray(_defaultAttributes.VertTextureCoordinate);
     glVertexAttribPointer(_defaultAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, textureCoordinate));
+    
+    // Unbind VBO + VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArrayOES(0);
 }
 
 - (void)drawOnscreenOffscreenTextureInstance:(TextureInstance_t *)offscreenTextureInstance
@@ -754,7 +773,7 @@
     }
     
     // Bind VAO
-    glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffer);
+    glBindVertexArrayOES(_onscreenTextureInstance.vertexArray);
     
     // Draw the instance
     glDrawArrays(_onscreenTextureInstance.primitiveType, 0, _onscreenTextureInstance.vertexCount);
@@ -867,18 +886,15 @@
     // Only filter if filter intensity is greater than 0
     if (_filterIntensity > 0)
     {
-        // Set the pixelBuffer to a texture instance
-        // We'll use two texture instances and ping-pong between them
-        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
-        
         // Use the blur filter program
         glUseProgram(_blurFilterProgram);
         
         // Update any uniform value that changed since last frame
         [self updateBlurFilterProgramUniforms];
         
-        // Set the filter split-pass direction vector
-        [self setFilterSplitPassDirectionVectorForTextureInstance:&_offscreenTextureInstances[0]];
+        // Set the pixelBuffer to a texture instance
+        // We'll use two texture instances and ping-pong between them
+        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
         
         // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
         [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
@@ -887,9 +903,6 @@
         // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
         for (int p=1; p<(2*_filterMultiplePassCount); ++p)
         {
-            // Separable filtering, switch split-direction (vertical or horizontal)
-            [self setFilterSplitPassDirectionVectorForTextureInstance:&_offscreenTextureInstances[p%2]];
-            
             // Draw split-pass (offscreen)
             [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
         }
@@ -1163,7 +1176,7 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
         _filterSplitPassDirectionVector[0] = 0;
         _filterSplitPassDirectionVector[1] = 1;
     }
-    
+
     // Set the filter step uniform
     glUniform2f(_blurFilterUniforms.FilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/textureInstance->textureWidth, _filterSplitPassDirectionVector[1]/textureInstance->textureHeight);
 }
