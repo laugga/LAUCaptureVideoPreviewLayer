@@ -63,33 +63,6 @@ struct FilterKernel {
 
 typedef struct FilterKernel FilterKernel_t;
 
-struct OffscreenTextureInstance {
-    
-    // Texture dimensions
-    GLfloat textureWidth;
-    GLfloat textureHeight;
-    
-    // Texture binding
-    GLuint textureName;
-    GLuint textureTarget; // ie. GL_TEXTURE_2D
-    
-    // Geometry, VAO for drawing quad (optional)
-    GLuint vertexArray;
-    GLuint vertexBuffers[2];
-    GLuint vertexCount;
-    
-    // Geometry, primitive type such as GL_TRIANGLE_STRIP (optional)
-    GLuint primitiveType;
-    
-    // Drawing framebuffer
-    GLuint framebuffer;
-    
-    // Filter parameters
-    GLfloat filterKernelStep[2]; // The direction of the filter FragFilterKernelStep
-};
-
-typedef struct OffscreenTextureInstance OffscreenTextureInstance_t;
-
 struct TextureInstance {
 
     // Texture dimensions
@@ -113,6 +86,9 @@ struct TextureInstance {
     
     // Drawing framebuffer
     GLuint framebuffer;
+    
+    // Program
+    GLuint program;
 };
 
 typedef struct TextureInstance TextureInstance_t;

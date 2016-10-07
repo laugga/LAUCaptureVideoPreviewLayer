@@ -64,8 +64,8 @@
     struct AttributeHandles _blurFilterAttributes;
     
     // Offscreen Framebuffer
-    OffscreenTextureInstance_t _pixelBufferTextureInstance;
-    OffscreenTextureInstance_t _offscreenTextureInstances[2];
+    TextureInstance_t _pixelBufferTextureInstance;
+    TextureInstance_t _offscreenTextureInstances[2];
     
     // Onscreen Framebuffer
     GLuint _onscreenFramebuffer;
@@ -420,7 +420,7 @@
 #pragma mark -
 #pragma mark Offscreen rendering
 
-- (GLuint)createFramebufferForOffscreenTextureInstance:(OffscreenTextureInstance_t *)offscreenTextureInstance
+- (GLuint)createFramebufferForOffscreenTextureInstance:(TextureInstance_t *)offscreenTextureInstance
 {
     // Delete potential previously created framebuffer
     if(offscreenTextureInstance->framebuffer)
@@ -458,7 +458,7 @@
     return offscreenTextureInstance->framebuffer;
 }
 
-- (void)loadOffscreenTextureInstance:(OffscreenTextureInstance_t *)offscreenTextureInstance
+- (void)loadOffscreenTextureInstance:(TextureInstance_t *)offscreenTextureInstance
 {
     // Create a new offscreen framebuffer
     [self createFramebufferForOffscreenTextureInstance:offscreenTextureInstance];
@@ -506,7 +506,7 @@
     glBindVertexArrayOES(0);
 }
 
-- (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(OffscreenTextureInstance_t *)textureInstance
+- (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(TextureInstance_t *)textureInstance
 {
     // Default downsampling factor
     GLfloat textureDownsamplingFactor = _filterDownsamplingFactor;
@@ -548,7 +548,7 @@
     return oglTexture;
 }
 
-- (void)drawOffscreenTextureInstance:(OffscreenTextureInstance_t *)srcTextureInstance onOffscreenTextureInstance:(OffscreenTextureInstance_t *)destTextureInstance
+- (void)drawOffscreenTextureInstance:(TextureInstance_t *)srcTextureInstance onOffscreenTextureInstance:(TextureInstance_t *)destTextureInstance
 {
     // Check dimensions of the source texture instance
     GLfloat width = srcTextureInstance->textureWidth;
@@ -587,9 +587,6 @@
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-    // Set the filter step
-    glUniform2f(_blurFilterUniforms.FilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/srcTextureInstance->textureWidth, _filterSplitPassDirectionVector[1]/srcTextureInstance->textureHeight);
     
     // Bind VAO
     glBindVertexArrayOES(destTextureInstance->vertexArray);
@@ -632,7 +629,7 @@
     return _onscreenFramebuffer;
 }
 
-- (void)setOnscreenTextureInstanceTextureCoordinatesFor:(OffscreenTextureInstance_t *)textureInstance
+- (void)setOnscreenTextureInstanceTextureCoordinatesFor:(TextureInstance_t *)textureInstance
 {
     // We assume the pixelBuffer is landscape, rotated 90 degrees anti-clockwise
     // So:
@@ -685,7 +682,7 @@
     memcpy(_onscreenTextureInstance.textureCoordinates, textureCoordinates, 8*sizeof(GLfloat));
 }
 
-- (void)loadOnscreenTextureInstanceFor:(OffscreenTextureInstance_t *)textureInstance
+- (void)loadOnscreenTextureInstanceFor:(TextureInstance_t *)textureInstance
 {
     Log(@"loadTextureInstanceForPixelBuffer");
     
@@ -728,7 +725,7 @@
     glBindVertexArrayOES(0);
 }
 
-- (void)drawOnscreenOffscreenTextureInstance:(OffscreenTextureInstance_t *)offscreenTextureInstance
+- (void)drawOnscreenOffscreenTextureInstance:(TextureInstance_t *)offscreenTextureInstance
 {
     if (!_onscreenFramebuffer)
     {
@@ -879,6 +876,13 @@
     // Only filter if filter intensity is greater than 0
     if (_filterIntensity > 0)
     {
+        // Set the pixelBuffer to a texture instance
+        // We'll use two texture instances and ping-pong between them
+        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
+        
+        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
+        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
+        
         // Use the blur filter program
         glUseProgram(_blurFilterProgram);
         
@@ -886,11 +890,7 @@
         [self updateBlurFilterProgramUniforms];
         
         // Set the filter split-pass direction vector
-        [self switchFilterSplitPassDirectionVector];
-        
-        // Set the pixelBuffer to a texture instance
-        // We'll use two texture instances and ping-pong between them
-        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
+        [self setFilterSplitPassDirectionVectorForTextureInstance:&_offscreenTextureInstances[0]];
         
         // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
         [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
@@ -900,7 +900,7 @@
         for (int p=1; p<(2*_filterMultiplePassCount); ++p)
         {
             // Separable filtering, switch split-direction (vertical or horizontal)
-            [self switchFilterSplitPassDirectionVector];
+            [self setFilterSplitPassDirectionVectorForTextureInstance:&_offscreenTextureInstances[p%2]];
             
             // Draw split-pass (offscreen)
             [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
@@ -1162,8 +1162,9 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
     _filterMultiplePassCount = 2;
 }
 
-- (void)switchFilterSplitPassDirectionVector
+- (void)setFilterSplitPassDirectionVectorForTextureInstance:(TextureInstance_t *)textureInstance
 {
+    // Switch the previous vector
     if (_filterSplitPassDirectionVector[0] == 0)
     {
         _filterSplitPassDirectionVector[0] = 1;
@@ -1174,6 +1175,9 @@ void releaseFilterKernel(FilterKernel_t * filterKernel)
         _filterSplitPassDirectionVector[0] = 0;
         _filterSplitPassDirectionVector[1] = 1;
     }
+    
+    // Set the filter step uniform
+    glUniform2f(_blurFilterUniforms.FilterSplitPassDirectionVector, _filterSplitPassDirectionVector[0]/textureInstance->textureWidth, _filterSplitPassDirectionVector[1]/textureInstance->textureHeight);
 }
 
 @end
