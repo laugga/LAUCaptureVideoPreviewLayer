@@ -63,6 +63,11 @@ struct FilterKernel {
 
 typedef struct FilterKernel FilterKernel_t;
 
+typedef struct {
+    GLfloat position[2];
+    GLfloat textureCoordinate[2];
+} VertexData_t;
+
 struct TextureInstance {
 
     // Texture dimensions
@@ -73,12 +78,9 @@ struct TextureInstance {
     GLuint textureName;
     GLuint textureTarget; // ie. GL_TEXTURE_2D
     
-    // Texture coordinates (aspect-fit) (optional)
-    GLfloat textureCoordinates[8];
-    
     // Geometry, VAO for drawing quad (optional)
-    GLuint vertexArray;
-    GLuint vertexBuffers[2];
+    // Vertex Positions and Texture coordinates (aspect-fit) (optional)
+    GLuint vertexBuffer;
     GLuint vertexCount;
     
     // Geometry, primitive type such as GL_TRIANGLE_STRIP (optional)
@@ -86,9 +88,6 @@ struct TextureInstance {
     
     // Drawing framebuffer
     GLuint framebuffer;
-    
-    // Program
-    GLuint program;
 };
 
 typedef struct TextureInstance TextureInstance_t;

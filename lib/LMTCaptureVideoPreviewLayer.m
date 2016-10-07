@@ -466,44 +466,41 @@
     // Use triangle strip
     offscreenTextureInstance->primitiveType = GL_TRIANGLE_STRIP;
     
-    static const float texelArray[] = {
-        0.0f, 0.0f, // bottom left
-        1.0f, 0.0f, // bottom right
-        0.0f,  1.0f, // top left
-        1.0f,  1.0f, // top right
+    // Vertex data
+    static const VertexData_t vertexData[] = {
+        {
+            {-1.0f, -1.0f}, // Position, bottom left
+            {0.0f, 0.0f} // Texture Coordinate
+        },
+        {
+            {1.0f, -1.0f}, // bottom right
+            {1.0f, 0.0f}
+        },
+        {
+            {-1.0f,  1.0f}, // top left
+            {0.0f,  1.0f}
+        },
+        {
+            {1.0f,  1.0f}, // top right
+            {1.0f,  1.0f}
+        }
     };
     
-    static const GLfloat vertexArray[] = {
-        -1.0f, -1.0f, // bottom left
-        1.0f, -1.0f, // bottom right
-        -1.0f,  1.0f, // top left
-        1.0f,  1.0f, // top right
-    };
-    
-    GLsizei stride = sizeof(GLfloat) * 2;
+    static const GLsizei stride = sizeof(VertexData_t);
     offscreenTextureInstance->vertexCount = 4;
     
-    // Vertex Array Object
-    glGenVertexArraysOES(1, &offscreenTextureInstance->vertexArray);
-    glBindVertexArrayOES(offscreenTextureInstance->vertexArray);
+    // VBO
+    glGenBuffers(1, &(offscreenTextureInstance->vertexBuffer));
+    glBindBuffer(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexCount * stride, vertexData, GL_STATIC_DRAW);
     
-    // VBOs
-    glGenBuffers(2, offscreenTextureInstance->vertexBuffers);
-    
-    // VBO 1, Position
-    glBindBuffer(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexBuffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexCount * stride, vertexArray, GL_STATIC_DRAW);
+    // Position
     glEnableVertexAttribArray(_blurFilterAttributes.VertPosition);
-    glVertexAttribPointer(_blurFilterAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, 0);
+    glVertexAttribPointer(_blurFilterAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, position));
     
-    // VBO 2, TextureCoordinate
-    glBindBuffer(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexBuffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, offscreenTextureInstance->vertexCount * stride, texelArray, GL_STATIC_DRAW);
+    // TextureCoordinate
     glEnableVertexAttribArray(_blurFilterAttributes.VertTextureCoordinate);
-    glVertexAttribPointer(_blurFilterAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, 0);
-    
-    // Unbind VAO
-    glBindVertexArrayOES(0);
+    glVertexAttribPointer(_blurFilterAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, textureCoordinate));
 }
 
 - (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(TextureInstance_t *)textureInstance
@@ -589,7 +586,7 @@
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Bind VAO
-    glBindVertexArrayOES(destTextureInstance->vertexArray);
+    glBindBuffer(GL_ARRAY_BUFFER, destTextureInstance->vertexBuffer);
     
     // Draw the instance
     glDrawArrays(destTextureInstance->primitiveType, 0, destTextureInstance->vertexCount);
@@ -629,7 +626,7 @@
     return _onscreenFramebuffer;
 }
 
-- (void)setOnscreenTextureInstanceTextureCoordinatesFor:(TextureInstance_t *)textureInstance
+- (CGPoint)onscreenTextureCoordinatesOffsetsForTextureInstance:(TextureInstance_t *)textureInstance
 {
     // We assume the pixelBuffer is landscape, rotated 90 degrees anti-clockwise
     // So:
@@ -670,59 +667,53 @@
     GLfloat _deltaTextureCoordinateS = (_scaledTextureWidth-((GLfloat)_onscreenColorRenderbufferHeight)) / _scaledTextureWidth / 2.0;
     GLfloat _deltaTextureCoordinateT = (_scaledTextureHeight-((GLfloat)_onscreenColorRenderbufferWidth)) / _scaledTextureHeight / 2.0;
     
-    // Texture coordiantes + deltas
-    const GLfloat textureCoordinates[] = {
-        1.0 - _deltaTextureCoordinateS, 1.0 - _deltaTextureCoordinateT,
-        1.0 - _deltaTextureCoordinateS, 0.0 + _deltaTextureCoordinateT,
-        0.0 + _deltaTextureCoordinateS, 1.0 - _deltaTextureCoordinateT,
-        0.0 + _deltaTextureCoordinateS, 0.0 + _deltaTextureCoordinateT
-    };
-    
     // Update the texture coordinates
-    memcpy(_onscreenTextureInstance.textureCoordinates, textureCoordinates, 8*sizeof(GLfloat));
+    return CGPointMake(_deltaTextureCoordinateS, _deltaTextureCoordinateT);
 }
 
 - (void)loadOnscreenTextureInstanceFor:(TextureInstance_t *)textureInstance
 {
-    Log(@"loadTextureInstanceForPixelBuffer");
-    
     // Use triangle strip
     _onscreenTextureInstance.primitiveType = GL_TRIANGLE_STRIP;
     
-    // Set dimensions and calculate the texture coordinates
-    [self setOnscreenTextureInstanceTextureCoordinatesFor:textureInstance];
+    // Calculate the texture coordinates offsets for the input textureInstance
+    CGPoint textureCoordinatesOffsets = [self onscreenTextureCoordinatesOffsetsForTextureInstance:textureInstance];
     
-    static const GLfloat vertexArray[] = {
-        -1.0f, -1.0f, // bottom left
-        1.0f, -1.0f, // bottom right
-        -1.0f,  1.0f, // top left
-        1.0f,  1.0f, // top right
+    // Vertex data
+    VertexData_t vertexData[] = {
+        {
+            {-1.0f, -1.0f}, // Position, bottom left
+            {1.0f - textureCoordinatesOffsets.x, 1.0f - textureCoordinatesOffsets.y} // Texture Coordinate
+        },
+        {
+            {1.0f, -1.0f}, // bottom right
+            {1.0f - textureCoordinatesOffsets.x, 0.0f + textureCoordinatesOffsets.y}
+        },
+        {
+            {-1.0f,  1.0f}, // top left
+            {0.0f + textureCoordinatesOffsets.x,  1.0f - textureCoordinatesOffsets.y}
+        },
+        {
+            {1.0f,  1.0f}, // top right
+            {0.0f + textureCoordinatesOffsets.x,  0.0f + textureCoordinatesOffsets.y}
+        }
     };
     
-    GLsizei stride = sizeof(GLfloat) * 2;
+    static const GLsizei stride = sizeof(VertexData_t);
     _onscreenTextureInstance.vertexCount = 4;
     
-    // Vertex Array Object
-    glGenVertexArraysOES(1, &_onscreenTextureInstance.vertexArray);
-    glBindVertexArrayOES(_onscreenTextureInstance.vertexArray);
+    // VBO
+    glGenBuffers(1, &_onscreenTextureInstance.vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexCount * stride, vertexData, GL_STATIC_DRAW);
     
-    // VBOs
-    glGenBuffers(2, _onscreenTextureInstance.vertexBuffers);
-    
-    // VBO 1, Position
-    glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexCount * stride, vertexArray, GL_STATIC_DRAW);
+    // Position
     glEnableVertexAttribArray(_defaultAttributes.VertPosition);
-    glVertexAttribPointer(_defaultAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, 0);
+    glVertexAttribPointer(_defaultAttributes.VertPosition, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, position));
     
-    // VBO 2, TextureCoordinate
-    glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexCount * stride, _onscreenTextureInstance.textureCoordinates, GL_STATIC_DRAW);
+    // TextureCoordinate
     glEnableVertexAttribArray(_defaultAttributes.VertTextureCoordinate);
-    glVertexAttribPointer(_defaultAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, 0);
-    
-    // Unbind VAO
-    glBindVertexArrayOES(0);
+    glVertexAttribPointer(_defaultAttributes.VertTextureCoordinate, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)offsetof(VertexData_t, textureCoordinate));
 }
 
 - (void)drawOnscreenOffscreenTextureInstance:(TextureInstance_t *)offscreenTextureInstance
@@ -763,7 +754,7 @@
     }
     
     // Bind VAO
-    glBindVertexArrayOES(_onscreenTextureInstance.vertexArray);
+    glBindBuffer(GL_ARRAY_BUFFER, _onscreenTextureInstance.vertexBuffer);
     
     // Draw the instance
     glDrawArrays(_onscreenTextureInstance.primitiveType, 0, _onscreenTextureInstance.vertexCount);
@@ -879,9 +870,6 @@
         // Set the pixelBuffer to a texture instance
         // We'll use two texture instances and ping-pong between them
         pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
-        
-        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
-        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
         
         // Use the blur filter program
         glUseProgram(_blurFilterProgram);
