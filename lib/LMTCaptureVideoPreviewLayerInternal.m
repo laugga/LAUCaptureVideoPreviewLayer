@@ -27,12 +27,18 @@
 
 #import "LMTCaptureVideoPreviewLayerInternal.h"
 
+#define kVideoDataOutputSampleBuffersSize 3
+
 @interface LMTCaptureVideoPreviewLayerInternal () <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
     AVCaptureSession * _session;
     AVCaptureVideoDataOutput * _videoDataOutput;
     dispatch_queue_t _videoDataOutputSampleBufferDelegateQueue;
-    CMSampleBufferRef _videoDataOutputSampleBuffer;
+    
+    // Circular array used to keep the sample buffers
+    NSUInteger _videoDataOutputSampleBuffersHeadIndex;
+    NSUInteger _videoDataOutputSampleBuffersTailIndex;
+    CMSampleBufferRef _videoDataOutputSampleBuffers[kVideoDataOutputSampleBuffersSize];
     
     // Hijacked AVCaptureVideoDataOutput (check
     dispatch_queue_t _hijackedVideoDataOutputSampleBufferDelegateQueue;
@@ -44,6 +50,17 @@
 
 #pragma mark -
 #pragma mark AVCaptureSession
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        _videoDataOutputSampleBuffersHeadIndex = _videoDataOutputSampleBuffersTailIndex = 0;
+        memset(_videoDataOutputSampleBuffers, NULL, kVideoDataOutputSampleBuffersSize);
+    }
+    return self;
+}
 
 - (void)setSession:(AVCaptureSession *)session
 {
@@ -158,19 +175,8 @@
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    @synchronized (self)
-    {
-        // Release the buffer if it exists
-        if(_videoDataOutputSampleBuffer)
-        {
-            CFRelease(_videoDataOutputSampleBuffer);
-            _videoDataOutputSampleBuffer = NULL;
-        }
-        
-        // Retain
-        _videoDataOutputSampleBuffer = sampleBuffer;
-        CFRetain(_videoDataOutputSampleBuffer);
-    }
+    // Add the sample buffer to the _videoDataOutputSampleBuffers circular array
+    [self addVideoDataOutputSampleBuffer:sampleBuffer];
     
     // Was the AVCaptureVideoDataOutput's hijacked?
     if (_hijackedVideoDataOutputSampleBufferDelegate && _hijackedVideoDataOutputSampleBufferDelegateQueue)
@@ -186,11 +192,57 @@
     }
 }
 
+#pragma mark -
+#pragma mark Ping-pong buffering for videoDataOutputSampleBuffers
+
 - (CMSampleBufferRef)sampleBuffer
 {
     @synchronized (self)
     {
-        return _videoDataOutputSampleBuffer;
+        CMSampleBufferRef videoDataOutputSampleBuffer = NULL;
+        
+        // Check if the circular array is not empty
+        if (_videoDataOutputSampleBuffersHeadIndex != _videoDataOutputSampleBuffersTailIndex)
+        {
+            // Remove an existing sample buffer from the head
+            CMSampleBufferRef oldVideoDataOutputSampleBuffer = _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersHeadIndex];
+            
+            // Release the buffer if it exists
+            if(oldVideoDataOutputSampleBuffer != NULL)
+            {
+                videoDataOutputSampleBuffer = oldVideoDataOutputSampleBuffer;
+            }
+            
+            // Move head +1
+            _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersHeadIndex+1)%kVideoDataOutputSampleBuffersSize;
+        }
+        
+        return videoDataOutputSampleBuffer;
+    }
+}
+
+- (void)addVideoDataOutputSampleBuffer:(CMSampleBufferRef)newVideoDataOutputSampleBuffer
+{
+    @synchronized (self)
+    {
+        if (newVideoDataOutputSampleBuffer != NULL)
+        {
+            // Add the new sample buffer to the tail
+            CMSampleBufferRef oldVideoDataOutputSampleBuffer = _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersTailIndex];
+            
+            // Release the buffer if it exists
+            if(oldVideoDataOutputSampleBuffer != NULL)
+            {
+                CFRelease(oldVideoDataOutputSampleBuffer);
+            }
+            
+            // Retain
+            _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersTailIndex] = newVideoDataOutputSampleBuffer;
+            CFRetain(newVideoDataOutputSampleBuffer);
+            
+            // Move tail +1
+            _videoDataOutputSampleBuffersTailIndex = (_videoDataOutputSampleBuffersTailIndex+1)%kVideoDataOutputSampleBuffersSize;
+        }
     }
 }
 

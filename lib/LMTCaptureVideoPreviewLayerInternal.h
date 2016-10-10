@@ -37,7 +37,7 @@
  @discussion
  The session is retained by the preview layer.
  */
-@property (nonatomic, retain) AVCaptureSession * session;
+@property (nonatomic, strong) AVCaptureSession * session;
 
 /*!
  @property sampleBuffer
