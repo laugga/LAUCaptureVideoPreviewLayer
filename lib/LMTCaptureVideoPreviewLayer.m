@@ -43,6 +43,9 @@
     // OpenGL context
     EAGLContext * _oglContext;
     
+    // Image layer used to display static scene
+    CALayer * _staticLayer;
+    
     // Display link (works only on IOS 3.1 or greater)
     CADisplayLink * _displayLink;
     
@@ -182,8 +185,9 @@
     
     // Create and setup displayLink
     _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     _displayLink.frameInterval = 2;
+    _displayLink.preferredFramesPerSecond = 30;
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)loadDefaultProgram
@@ -297,6 +301,83 @@
     CFRelease(dataProvider);
     CFRelease(colorspace);
     CGImageRelease(image);
+}
+
+#pragma mark -
+#pragma mark Static sublayer
+
+- (void)setBlurAndStopAnimated:(CGFloat)blur
+{
+    [self setBlur:blur animated:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self addStaticSublayer];
+    });
+}
+
+- (void)setBlurAndStartAnimated:(CGFloat)blur
+{
+    [self setBlur:blur animated:YES];
+    [self removeStaticSublayer];
+}
+
+
+- (UIImage *)imageFromSelf
+{
+    CGRect bounds = self.bounds;
+    
+    NSAssert(CGRectGetWidth(bounds) > 0, @"Layer %@ width is zero", self);
+    NSAssert(CGRectGetHeight(bounds) > 0, @"Layer %@ height is zero", self);
+    
+    UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    NSAssert(context != NULL, @"Invalid context for layer %@", self);
+    
+    CGContextSaveGState(context);
+    
+    [self layoutIfNeeded];
+    [self renderInContext:context];
+    
+    CGContextRestoreGState(context);
+    
+    UIImage * imageFromLayer = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return imageFromLayer;
+}
+
+- (void)addStaticSublayer
+{
+    if (_staticLayer == nil)
+    {
+        _staticLayer = [CALayer new];
+        _staticLayer.bounds = self.bounds;
+        _staticLayer.contentsScale = 2;
+        _staticLayer.anchorPoint = CGPointMake(0, 0);
+    }
+    
+    UIImage * image = [self imageFromSelf];
+    _staticLayer.contents = (__bridge id)image.CGImage;
+    
+    [_staticLayer removeAllAnimations];
+    [self addSublayer:_staticLayer];
+}
+
+- (void)removeStaticSublayer
+{
+    if (_staticLayer != nil)
+    {
+        CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        animation.duration = 0.3;
+        animation.fillMode = kCAFillModeForwards;
+        animation.fromValue = @(1);
+        animation.toValue = @(0);
+        animation.removedOnCompletion = NO;
+        animation.delegate = self;
+        [_staticLayer addAnimation:animation forKey:@"opacityAnimation"];
+    }
 }
 
 #pragma mark -
@@ -856,8 +937,11 @@
     
     if (!sampleBuffer)
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is NULL");
+        Log(@"CameraOGLPreviewView: sampleBuffer is NULL (duration %f)", aDisplayLink.duration);
         return;
+    } else
+    {
+        Log(@"CameraOGLPreviewView: sampleBuffer is OK (duration %f)", aDisplayLink.duration);
     }
     
     CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));

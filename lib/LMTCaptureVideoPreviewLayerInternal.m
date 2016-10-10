@@ -27,7 +27,7 @@
 
 #import "LMTCaptureVideoPreviewLayerInternal.h"
 
-#define kVideoDataOutputSampleBuffersSize 3
+#define kVideoDataOutputSampleBuffersSize 2
 
 @interface LMTCaptureVideoPreviewLayerInternal () <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
