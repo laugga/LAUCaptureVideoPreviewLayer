@@ -173,7 +173,8 @@ end
 %% Kernel generation for 2) bilinear texture sampling implementation
 
 function outputStr = bilinearTextureSamplingGaussianFilterWeightsAndOffsets(t, minSigma, maxSigma)
-sigma = lerp(t, minSigma, maxSigma);
+sigma = smoothStep(t, minSigma, maxSigma);
+maxFilterSize = filterSize(maxSigma);
 gaussianFilterKernel = Gaussian2dMatrix(sigma);
 [m,n] = size(gaussianFilterKernel);
 weights = zeros(1,m);
@@ -187,9 +188,10 @@ weights = (weights.^0.5);
 % Using the bilinear texture filtering available in the GPU we reduce 
 % the total number of texture reads from m to ceil(m/2)
 btsSamples = floor(floor(m/2)/2)+1;
-btsWeights = zeros(1,btsSamples);
+maxBtsSamples = floor(floor(maxFilterSize/2)/2)+1;
+btsWeights = zeros(1,maxBtsSamples);
 btsWeightsSum = 0;
-btsOffsets = zeros(1,btsSamples);
+btsOffsets = zeros(1,maxBtsSamples);
 
 % Start with the edge of the normal gaussian filter kernel towards the center
 % The edge weight of the kernel + neighbor 
@@ -260,5 +262,10 @@ end
 function easeOutQuadValue = easeOutQuad(t, min, max) 
 tSin = sin(t * pi * 0.5);
 easeOutQuadValue = (1-tSin)*min + tSin*max;
+end
+
+function smoothStepValue = smoothStep(t, min, max)
+tst =  t*t * (3 - 2*t)
+smoothStepValue = (1 - tst)*min + tst*max;
 end
 
