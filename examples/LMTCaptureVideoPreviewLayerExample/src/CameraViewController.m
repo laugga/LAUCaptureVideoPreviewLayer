@@ -29,6 +29,9 @@
 
 @interface CameraViewController ()
 
+@property (nonatomic, readonly) CameraPreviewView * previewView;
+@property (nonatomic, weak) IBOutlet UIButton * pauseButton;
+
 @end
 
 @implementation CameraViewController
@@ -48,11 +51,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [super dealloc];
-}
-
 #pragma mark -
 #pragma mark View
 
@@ -61,7 +59,7 @@
     [super viewDidLoad];
     
     // Camera Preview View
-    [self.view addSubview:[self previewView]];
+    [self.view insertSubview:self.previewView belowSubview:self.pauseButton];
 }
 
 - (void)viewWillLayoutSubviews
@@ -270,6 +268,23 @@
 
 #pragma mark -
 #pragma mark Actions
+
+- (IBAction)pauseSession:(id)sender
+{
+    // Start or stop running session
+    if ([_session isRunning]) {
+        [_previewView pausePreview];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [_session stopRunning];
+            [self.pauseButton setTitle:@"Resume" forState:UIControlStateNormal];
+        });
+    } else {
+        [_session startRunning];
+        [self.pauseButton setTitle:@"Pause" forState:UIControlStateNormal];
+        [_previewView resumePreview];
+    }
+}
 
 #pragma mark -
 #pragma mark AVCaptureSession Notifications

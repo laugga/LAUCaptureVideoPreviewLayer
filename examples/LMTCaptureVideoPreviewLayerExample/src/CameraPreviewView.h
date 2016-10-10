@@ -36,5 +36,8 @@
 
 - (void)setCaptureSession:(AVCaptureSession *)captureSession;
 
+- (void)pausePreview;
+- (void)resumePreview;
+
 @end
 

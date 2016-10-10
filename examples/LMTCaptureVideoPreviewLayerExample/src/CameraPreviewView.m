@@ -103,4 +103,14 @@
     }
 }
 
+- (void)pausePreview
+{
+    [_videoPreviewLayer setBlurAndStopAnimated:1.0];
+}
+
+- (void)resumePreview
+{
+    [_videoPreviewLayer setBlurAndStartAnimated:0.0];
+}
+
 @end
