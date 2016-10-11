@@ -223,23 +223,6 @@
     {
         if ([captureDevice position] == desiredPosition)
         {
-//            NSError * error = nil;
-//            
-//            // Calculate frame duration
-//            CMTime frameDuration = kCMTimeInvalid;
-//            frameDuration = CMTimeMake(1, _frameRate);
-//            
-//            if ([captureDevice lockForConfiguration:&error])
-//            {
-//                captureDevice.activeVideoMaxFrameDuration = frameDuration;
-//                captureDevice.activeVideoMinFrameDuration = frameDuration;
-//                [captureDevice unlockForConfiguration];
-//            }
-//            else
-//            {
-//                Log(@"Camera: videoDevice lockForConfiguration returned error %@", error);
-//            }
-            
             return captureDevice;
         }
     }
@@ -249,20 +232,6 @@
 
 - (void)setCaptureDevice:(AVCaptureDevice *)captureDevice
 {
-//    if (_device) {
-//        
-//        // Remove observer from capture device
-//        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus];
-//        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure];
-//    }
-//    
-//    if (captureDevice) {
-//        
-//        // Add Observer to capture device for focus and exposure events
-//        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-//        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-//    }
-    
     _device = captureDevice;
 }
 
@@ -272,17 +241,15 @@
 - (IBAction)pauseSession:(id)sender
 {
     // Start or stop running session
-    if ([_session isRunning]) {
-        [_previewView pausePreview];
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [_session stopRunning];
-            [self.pauseButton setTitle:@"Resume" forState:UIControlStateNormal];
-        });
-    } else {
+    if ([_session isRunning])
+    {
+        [_session stopRunning];
+        [self.pauseButton setTitle:@"Resume" forState:UIControlStateNormal];
+    }
+    else
+    {
         [_session startRunning];
         [self.pauseButton setTitle:@"Pause" forState:UIControlStateNormal];
-        [_previewView resumePreview];
     }
 }
 
