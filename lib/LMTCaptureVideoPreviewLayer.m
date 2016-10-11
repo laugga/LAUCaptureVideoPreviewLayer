@@ -358,15 +358,28 @@
 - (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStopRunning:(AVCaptureSession *)session
 {
     [self setBlur:1.0 animated:YES];
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self addOnscreenSnapshotImageSublayer];
+        _displayLink.paused = YES; // TODO pause when blur-in animation finishes
     });
 }
 
 - (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStartRunning:(AVCaptureSession *)session
 {
-    [self removeOnscreenSnapshotImageSublayer];
-    [self setBlur:0.0 animated:YES];
+    // Delay the fade out transition because first frames after session starts running are darker
+    CFTimeInterval fadeOutDelay = 0.7f;
+    
+    // This will show the snapshot image layer to hide the dark frames
+    [self addOnscreenSnapshotImageSublayer];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        _displayLink.paused = NO; // TODO investigate why first frames after session starts running are darker...
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(fadeOutDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self removeOnscreenSnapshotImageSublayer];
+        [self setBlur:0.0 animated:YES];
+    });
 }
 
 #pragma mark -
@@ -833,46 +846,45 @@
 
 - (void)addOnscreenSnapshotImageSublayer
 {
-    _displayLink.paused = YES;
-    
-    if (_onscreenSnapshotImageSublayer == nil)
+    if (_pixelBufferTexture != nil)
     {
         _onscreenSnapshotImageSublayer = [CALayer new];
         _onscreenSnapshotImageSublayer.bounds = self.bounds;
         _onscreenSnapshotImageSublayer.contentsScale = 2;
         _onscreenSnapshotImageSublayer.anchorPoint = CGPointMake(0, 0);
-        _onscreenSnapshotImageSublayer.opacity = 0.0;
+        _onscreenSnapshotImageSublayer.backgroundColor = self.backgroundColor;
+        
+        _onscreenSnapshotImageSublayer.contents = (__bridge id)[self imageFromOnscreenFramebuffer].CGImage;
+        _onscreenSnapshotImageSublayer.opacity = 1.0;
         
         [self addSublayer:_onscreenSnapshotImageSublayer];
     }
-    
-    _onscreenSnapshotImageSublayer.contents = (__bridge id)[self imageFromOnscreenFramebuffer].CGImage;
-    
-    CABasicAnimation * fadeTransition = [CABasicAnimation animation];
-    fadeTransition.duration = 0.3f;
-    fadeTransition.fromValue = @(0.0f);
-    fadeTransition.toValue = @(1.0f);
-    fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"opacity"];
-    
-    _onscreenSnapshotImageSublayer.opacity = 1.0f;
 }
 
 - (void)removeOnscreenSnapshotImageSublayer
 {
-    [_onscreenSnapshotImageSublayer removeAllAnimations];
-    
-    CABasicAnimation * fadeTransition = [CABasicAnimation animation];
-    fadeTransition.duration = 0.3f;
-    fadeTransition.fromValue = @(1.0f);
-    fadeTransition.toValue = @(0.0f);
-    fadeTransition.beginTime = CACurrentMediaTime() + 0.15;
-    fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"opacity"];
-    
-    _onscreenSnapshotImageSublayer.opacity = 0.0f;
-    
-    //[_onscreenSnapshotImageSublayer removeFromSuperlayer]; // TODO removeFromLayer
+    if (_onscreenSnapshotImageSublayer)
+    {
+        [CATransaction begin];
+        
+        CABasicAnimation * fadeOutAnimation = [CABasicAnimation animation];
+        fadeOutAnimation.duration = 0.25f;
+        fadeOutAnimation.fromValue = @(1.0f);
+        fadeOutAnimation.toValue = @(0.0f);
+        fadeOutAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        fadeOutAnimation.removedOnCompletion = YES;
+        fadeOutAnimation.fillMode = kCAFillModeBoth;
+        [_onscreenSnapshotImageSublayer addAnimation:fadeOutAnimation forKey:@"opacity"];
+        
+        _onscreenSnapshotImageSublayer.opacity = 0.0f;
+        
+        [CATransaction setCompletionBlock:^{
+            [_onscreenSnapshotImageSublayer removeFromSuperlayer];
+            _onscreenSnapshotImageSublayer = nil;
+        }];
+        
+        [CATransaction commit];
+    }
 }
 
 #pragma mark -
