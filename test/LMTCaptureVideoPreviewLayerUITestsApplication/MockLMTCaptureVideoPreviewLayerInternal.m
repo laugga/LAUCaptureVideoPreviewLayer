@@ -85,4 +85,18 @@
     return pixelBuffer;
 }
 
+- (void)simulateCaptureSessionDidStartRunningNotification
+{
+    if ([self.delegate respondsToSelector:@selector(captureVideoPreviewLayerInternal:sessionDidStartRunning:)]) {
+        [self.delegate captureVideoPreviewLayerInternal:self sessionDidStartRunning:nil];
+    }
+}
+
+- (void)simulateCaptureSessionDidStopRunningNotification
+{
+    if ([self.delegate respondsToSelector:@selector(captureVideoPreviewLayerInternal:sessionDidStopRunning:)]) {
+        [self.delegate captureVideoPreviewLayerInternal:self sessionDidStopRunning:nil];
+    }
+}
+
 @end

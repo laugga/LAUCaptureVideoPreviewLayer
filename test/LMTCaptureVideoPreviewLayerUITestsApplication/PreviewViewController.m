@@ -138,7 +138,6 @@
     }
 
 #if !TARGET_OS_SIMULATOR
-    
     // Create Session
     _session = [AVCaptureSession new];
 
@@ -194,7 +193,6 @@
     
     // Observe for specific notifications related with the session
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureSessionNotification:) name:nil object:_session];
-    
 #endif
     
     // Setup camera preview
@@ -217,29 +215,13 @@
     }
 }
 
-- (AVCaptureDevice *)captureDeviceForPosition:(AVCaptureDevicePosition)desiredPosition {
+- (AVCaptureDevice *)captureDeviceForPosition:(AVCaptureDevicePosition)desiredPosition
+{
     
     for (AVCaptureDevice * captureDevice in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo])
     {
         if ([captureDevice position] == desiredPosition)
         {
-            //            NSError * error = nil;
-            //
-            //            // Calculate frame duration
-            //            CMTime frameDuration = kCMTimeInvalid;
-            //            frameDuration = CMTimeMake(1, _frameRate);
-            //
-            //            if ([captureDevice lockForConfiguration:&error])
-            //            {
-            //                captureDevice.activeVideoMaxFrameDuration = frameDuration;
-            //                captureDevice.activeVideoMinFrameDuration = frameDuration;
-            //                [captureDevice unlockForConfiguration];
-            //            }
-            //            else
-            //            {
-            //                Log(@"Camera: videoDevice lockForConfiguration returned error %@", error);
-            //            }
-            
             return captureDevice;
         }
     }
@@ -249,20 +231,6 @@
 
 - (void)setCaptureDevice:(AVCaptureDevice *)captureDevice
 {
-    //    if (_device) {
-    //
-    //        // Remove observer from capture device
-    //        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus];
-    //        [_device removeObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure];
-    //    }
-    //
-    //    if (captureDevice) {
-    //
-    //        // Add Observer to capture device for focus and exposure events
-    //        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingFocus options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-    //        [captureDevice addObserver:self forKeyPath:kCameraCaptureDeviceAdjustingExposure options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld) context:NULL];
-    //    }
-    
     _device = captureDevice;
 }
 

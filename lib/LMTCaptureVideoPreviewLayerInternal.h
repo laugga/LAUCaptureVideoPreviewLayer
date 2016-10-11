@@ -27,6 +27,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+@protocol LMTCaptureVideoPreviewLayerInternalDelegate;
+
 @interface LMTCaptureVideoPreviewLayerInternal : NSObject
 
 /*!
@@ -45,5 +47,27 @@
  The CMSampleBufferRef sample buffer being currently displayed
  */
 @property (nonatomic, readonly) CMSampleBufferRef sampleBuffer;
+
+/*!
+ @property sessionIsRunning
+ @abstract
+ YES if the session is running. NO for all other possible states:
+ RuntimeError, Interrupted, Stopped.
+ */
+@property (nonatomic, readonly) BOOL sessionIsRunning;
+
+/*!
+ @property delegate
+ @abstract
+ Informs the delegate object about state changes in the capture pipeline.
+ */
+@property (nonatomic, weak) id<LMTCaptureVideoPreviewLayerInternalDelegate> delegate;
+
+@end
+
+@protocol LMTCaptureVideoPreviewLayerInternalDelegate <NSObject>
+
+- (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStopRunning:(AVCaptureSession *)session;
+- (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStartRunning:(AVCaptureSession *)session;
 
 @end

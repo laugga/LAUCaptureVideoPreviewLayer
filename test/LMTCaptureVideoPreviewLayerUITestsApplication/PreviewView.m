@@ -57,19 +57,21 @@
     
 #if TARGET_OS_SIMULATOR
         // Inject the mock object for LMTCaptureVideoPreviewLayerInternal
-        [videoPreviewLayer setInternal:[MockLMTCaptureVideoPreviewLayerInternal new]];
+        MockLMTCaptureVideoPreviewLayerInternal * mockInternal = [MockLMTCaptureVideoPreviewLayerInternal new];
+        mockInternal.delegate = videoPreviewLayer;
+        [videoPreviewLayer setInternal:mockInternal];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [mockInternal simulateCaptureSessionDidStopRunningNotification];
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [mockInternal simulateCaptureSessionDidStartRunningNotification];
+        });
 #endif
         
         [self setVideoPreviewLayer:videoPreviewLayer];
-        [videoPreviewLayer setBlur:1.0];
-        
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [videoPreviewLayer setBlur:0 animated:YES];
-//        });
-//        
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [videoPreviewLayer setBlur:1 animated:YES];
-//        });
+        [videoPreviewLayer setBlur:0.0];
     }
 }
 

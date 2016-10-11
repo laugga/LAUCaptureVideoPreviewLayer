@@ -31,4 +31,7 @@
 
 @property (nonatomic, copy) UIImage * sampleBufferImage;
 
+- (void)simulateCaptureSessionDidStartRunningNotification;
+- (void)simulateCaptureSessionDidStopRunningNotification;
+
 @end

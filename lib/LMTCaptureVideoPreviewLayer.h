@@ -92,8 +92,6 @@ NS_CLASS_AVAILABLE(10_7, 7_0) __TVOS_PROHIBITED
  YES to enable the animated transition.
  */
 - (void)setBlur:(CGFloat)blur animated:(BOOL)animated;
-- (void)setBlurAndStopAnimated:(CGFloat)blur;
-- (void)setBlurAndStartAnimated:(CGFloat)blur;
 
 /*!
  @method layerWithSession:

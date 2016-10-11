@@ -57,7 +57,7 @@
     if (self)
     {
         _videoDataOutputSampleBuffersHeadIndex = _videoDataOutputSampleBuffersTailIndex = 0;
-        memset(_videoDataOutputSampleBuffers, NULL, kVideoDataOutputSampleBuffersSize);
+        memset(_videoDataOutputSampleBuffers, 0, kVideoDataOutputSampleBuffersSize);
     }
     return self;
 }
@@ -66,7 +66,8 @@
 {
     if (_session)
     {
-        // TODO
+        // Stop observing the old session
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:_session];
     }
     
     _session = session;
@@ -82,6 +83,9 @@
         Log(@"LMTCaptureVideoPreviewLayerInternal: Can NOT add AVCaptureVideoDataOutput to AVCaptureSession");
         [self hijackSessionVideoDataOutput];
     }
+    
+    // Observe for specific notifications related with the session
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sessionDidPostNotification:) name:nil object:_session];
 }
 
 - (void)hijackSessionVideoDataOutput
@@ -120,6 +124,27 @@
             [[currentVideoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
         }
         
+    }
+}
+
+#pragma mark -
+#pragma mark AVCaptureSession Notifications
+
+- (void)sessionDidPostNotification:(NSNotification *)notification
+{
+    if ([notification.name isEqualToString:AVCaptureSessionWasInterruptedNotification] ||
+        [notification.name isEqualToString:AVCaptureSessionRuntimeErrorNotification] ||
+        [notification.name isEqualToString:AVCaptureSessionDidStopRunningNotification])
+    {
+        if ([_delegate respondsToSelector:@selector(captureVideoPreviewLayerInternal:sessionDidStopRunning:)]) {
+            [_delegate captureVideoPreviewLayerInternal:self sessionDidStopRunning:_session];
+        }
+    }
+    else
+    {
+        if ([_delegate respondsToSelector:@selector(captureVideoPreviewLayerInternal:sessionDidStartRunning:)]) {
+            [_delegate captureVideoPreviewLayerInternal:self sessionDidStartRunning:_session];
+        }
     }
 }
 

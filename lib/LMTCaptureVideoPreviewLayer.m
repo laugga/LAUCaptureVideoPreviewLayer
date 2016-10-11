@@ -38,13 +38,13 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-@interface LMTCaptureVideoPreviewLayer () <AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface LMTCaptureVideoPreviewLayer () <LMTCaptureVideoPreviewLayerInternalDelegate>
 {
     // OpenGL context
     EAGLContext * _oglContext;
     
-    // Image layer used to display static scene
-    CALayer * _staticLayer;
+    // Layer used to display a snapshot image of the current framebuffer
+    CALayer * _onscreenSnapshotImageSublayer;
     
     // Display link (works only on IOS 3.1 or greater)
     CADisplayLink * _displayLink;
@@ -156,38 +156,41 @@
 
 - (void)layoutSublayers
 {
+    PrettyLog;
+    
     [super layoutSublayers];
     
-    // Create the onscreen framebuffer
-    [self createOnscreenFramebufferForLayer:self];
-
-    // Load glsl programs, uniforms and attributes
-    [self loadBlurFilterProgram];
-    [self loadDefaultProgram];
-    
-    // Disable depth testing
-    glDisable(GL_DEPTH_TEST);
-    
-    // Use texture 0
-    glActiveTexture(GL_TEXTURE0);
-    
-    // OpenGL pre-warm
-    if (!_internal.sampleBuffer)
+    if (!_onscreenFramebuffer)
     {
-        [self drawColor:self.backgroundColor];
+        // Create the onscreen framebuffer
+        [self createOnscreenFramebufferForLayer:self];
+
+        // Load glsl programs, uniforms and attributes
+        [self loadBlurFilterProgram];
+        [self loadDefaultProgram];
+        
+        // Disable depth testing
+        glDisable(GL_DEPTH_TEST);
+        
+        // Use texture 0
+        glActiveTexture(GL_TEXTURE0);
+        
+        // OpenGL pre-warm
+        if (!_internal.sampleBuffer)
+        {
+            [self drawColor:self.backgroundColor];
+        }
+        
+        // Set filter intensity from blur value
+        [self setFilterIntensity:_blur];
+    #if FilterBoundsEnabled
+        [self setFilterBoundsRect:CGRectMake(0, 0, 1, 0.5)];
+    #endif
+        
+        // Create and setup displayLink
+        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
+        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     }
-    
-    // Set filter intensity from blur value
-    [self setFilterIntensity:_blur];
-#if FilterBoundsEnabled
-    [self setFilterBoundsRect:CGRectMake(0, 0, 1, 0.5)];
-#endif
-    
-    // Create and setup displayLink
-    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-    _displayLink.frameInterval = 2;
-    _displayLink.preferredFramesPerSecond = 30;
-    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)loadDefaultProgram
@@ -264,11 +267,19 @@
 
 - (void)renderInContext:(CGContextRef)context
 {
+    [self renderInContext:context andRedrawPixelBuffer:YES];
+}
+
+- (void)renderInContext:(CGContextRef)context andRedrawPixelBuffer:(BOOL)redrawPixelBuffer
+{
     // Assuming kEAGLColorFormatRGBA8 format is used
     NSInteger pixelsDataSize = _onscreenColorRenderbufferWidth * _onscreenColorRenderbufferHeight * 4;
     GLubyte * pixelsData = (GLubyte * )calloc(pixelsDataSize, sizeof(GLubyte));
     
-    [self drawPixelBuffer:nil];
+    // Redraw pixelBuffer or read the current contents of the onscreen framebuffer
+    if (redrawPixelBuffer) {
+        [self drawPixelBuffer:nil];
+    }
     
     // Bind the offscreen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, _onscreenFramebuffer);
@@ -301,83 +312,6 @@
     CFRelease(dataProvider);
     CFRelease(colorspace);
     CGImageRelease(image);
-}
-
-#pragma mark -
-#pragma mark Static sublayer
-
-- (void)setBlurAndStopAnimated:(CGFloat)blur
-{
-    [self setBlur:blur animated:YES];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self addStaticSublayer];
-    });
-}
-
-- (void)setBlurAndStartAnimated:(CGFloat)blur
-{
-    [self setBlur:blur animated:YES];
-    [self removeStaticSublayer];
-}
-
-
-- (UIImage *)imageFromSelf
-{
-    CGRect bounds = self.bounds;
-    
-    NSAssert(CGRectGetWidth(bounds) > 0, @"Layer %@ width is zero", self);
-    NSAssert(CGRectGetHeight(bounds) > 0, @"Layer %@ height is zero", self);
-    
-    UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0);
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    NSAssert(context != NULL, @"Invalid context for layer %@", self);
-    
-    CGContextSaveGState(context);
-    
-    [self layoutIfNeeded];
-    [self renderInContext:context];
-    
-    CGContextRestoreGState(context);
-    
-    UIImage * imageFromLayer = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return imageFromLayer;
-}
-
-- (void)addStaticSublayer
-{
-    if (_staticLayer == nil)
-    {
-        _staticLayer = [CALayer new];
-        _staticLayer.bounds = self.bounds;
-        _staticLayer.contentsScale = 2;
-        _staticLayer.anchorPoint = CGPointMake(0, 0);
-    }
-    
-    UIImage * image = [self imageFromSelf];
-    _staticLayer.contents = (__bridge id)image.CGImage;
-    
-    [_staticLayer removeAllAnimations];
-    [self addSublayer:_staticLayer];
-}
-
-- (void)removeStaticSublayer
-{
-    if (_staticLayer != nil)
-    {
-        CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-        animation.duration = 0.3;
-        animation.fillMode = kCAFillModeForwards;
-        animation.fromValue = @(1);
-        animation.toValue = @(0);
-        animation.removedOnCompletion = NO;
-        animation.delegate = self;
-        [_staticLayer addAnimation:animation forKey:@"opacityAnimation"];
-    }
 }
 
 #pragma mark -
@@ -415,9 +349,24 @@
     if (!_internal)
     {
         _internal = [LMTCaptureVideoPreviewLayerInternal new];
+        _internal.delegate = self;
     }
     
     return _internal;
+}
+
+- (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStopRunning:(AVCaptureSession *)session
+{
+    [self setBlur:1.0 animated:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self addOnscreenSnapshotImageSublayer];
+    });
+}
+
+- (void)captureVideoPreviewLayerInternal:(LMTCaptureVideoPreviewLayerInternal *)internal sessionDidStartRunning:(AVCaptureSession *)session
+{
+    [self removeOnscreenSnapshotImageSublayer];
+    [self setBlur:0.0 animated:YES];
 }
 
 #pragma mark -
@@ -881,6 +830,69 @@
 }
 
 #pragma mark -
+#pragma mark Onscreen framebuffer snapshot
+
+- (UIImage *)imageFromOnscreenFramebuffer
+{
+    CGRect bounds = self.bounds;
+    
+    NSAssert(CGRectGetWidth(bounds) > 0, @"Layer %@ width is zero", self);
+    NSAssert(CGRectGetHeight(bounds) > 0, @"Layer %@ height is zero", self);
+    
+    UIGraphicsBeginImageContextWithOptions(bounds.size, YES, 0);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    NSAssert(context != NULL, @"Invalid context for layer %@", self);
+    
+    CGContextSaveGState(context);
+    
+    [self renderInContext:context andRedrawPixelBuffer:NO];
+    
+    CGContextRestoreGState(context);
+    
+    UIImage * imageFromOnscreenFramebuffer = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return imageFromOnscreenFramebuffer;
+}
+
+- (void)addOnscreenSnapshotImageSublayer
+{
+    _displayLink.paused = YES;
+    
+    if (_onscreenSnapshotImageSublayer == nil)
+    {
+        _onscreenSnapshotImageSublayer = [CALayer new];
+        _onscreenSnapshotImageSublayer.bounds = self.bounds;
+        _onscreenSnapshotImageSublayer.contentsScale = 2;
+        _onscreenSnapshotImageSublayer.anchorPoint = CGPointMake(0, 0);
+    }
+    
+    _onscreenSnapshotImageSublayer.contents = (__bridge id)[self imageFromOnscreenFramebuffer].CGImage;
+    
+    [_onscreenSnapshotImageSublayer removeAllAnimations];
+    [self addSublayer:_onscreenSnapshotImageSublayer];
+}
+
+- (void)removeOnscreenSnapshotImageSublayer
+{
+    _displayLink.paused = NO;
+    
+//    if (_onscreenSnapshotImageSublayer != nil)
+//    {
+//        CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+//        animation.duration = 0.3;
+//        animation.fillMode = kCAFillModeForwards;
+//        animation.fromValue = @(1);
+//        animation.toValue = @(0);
+//        animation.removedOnCompletion = NO;
+//        [_onscreenSnapshotImageSublayer addAnimation:animation forKey:@"opacityAnimation"];
+//    }
+}
+
+#pragma mark -
 #pragma mark Drawing
 
 - (void)getCGColor:(CGColorRef)color componentsRed:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha
@@ -937,11 +949,12 @@
     
     if (!sampleBuffer)
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is NULL (duration %f)", aDisplayLink.duration);
+        Log(@"CameraOGLPreviewView: sampleBuffer is NULL (frame duration %fs)", aDisplayLink.duration);
         return;
-    } else
+    }
+    else
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is OK (duration %f)", aDisplayLink.duration);
+        Log(@"CameraOGLPreviewView: sampleBuffer is OK (frame duration %fs)", aDisplayLink.duration);
     }
     
     CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
