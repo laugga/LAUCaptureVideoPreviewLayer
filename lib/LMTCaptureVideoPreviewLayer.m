@@ -54,7 +54,7 @@
     
     // Last Pixel buffer set
     // Waiting to be rendered or last one rendered
-    CVPixelBufferRef _pixelBuffer;
+    CVOpenGLESTextureRef _pixelBufferTexture;
     
     // Shader programs
     GLuint _defaultProgram; // On-screen
@@ -541,14 +541,14 @@
     glBindVertexArrayOES(0);
 }
 
-- (CVOpenGLESTextureRef)setPixelBuffer:(CVPixelBufferRef)pixelBuffer toTextureInstance:(TextureInstance_t *)textureInstance
+- (void)scaleDownPixelBufferTextureInstanceDimensions
 {
     // Default downsampling factor
     GLfloat textureDownsamplingFactor = _filterDownsamplingFactor;
     
     // Pixel buffer dimensions and ratio
-    GLfloat pixelBufferWidth = ((GLfloat)CVPixelBufferGetWidth(pixelBuffer));
-    GLfloat pixelBufferHeight = ((GLfloat)CVPixelBufferGetHeight(pixelBuffer));
+    GLfloat pixelBufferWidth = _pixelBufferTextureInstance.textureWidth;
+    GLfloat pixelBufferHeight = _pixelBufferTextureInstance.textureHeight;
     GLfloat pixelBufferRatio = pixelBufferWidth / pixelBufferHeight; // Usually the pixelBuffer w > h
     
     // Screen dimensions and ratio
@@ -568,19 +568,12 @@
     }
     
     // Downsample input pixelBuffer by a specific factor
-    GLfloat width = pixelBufferWidth / textureDownsamplingFactor;
-    GLfloat height = pixelBufferHeight / textureDownsamplingFactor;
-    
-    // Get the OpenGL texture
-    CVOpenGLESTextureRef oglTexture = [self oglTextureFromPixelBuffer:pixelBuffer];
+    GLfloat scaledWidth = pixelBufferWidth / textureDownsamplingFactor;
+    GLfloat scaledHeight = pixelBufferHeight / textureDownsamplingFactor;
     
     // Create a temporary offscreen texture instance wrapping the pixelBuffer
-    textureInstance->textureWidth = width;
-    textureInstance->textureHeight = height;
-    textureInstance->textureTarget = CVOpenGLESTextureGetTarget(oglTexture);
-    textureInstance->textureName = CVOpenGLESTextureGetName(oglTexture);
-    
-    return oglTexture;
+    _pixelBufferTextureInstance.textureWidth = scaledWidth;
+    _pixelBufferTextureInstance.textureHeight = scaledHeight;
 }
 
 - (void)drawOffscreenTextureInstance:(TextureInstance_t *)srcTextureInstance onOffscreenTextureInstance:(TextureInstance_t *)destTextureInstance
@@ -809,26 +802,6 @@
     glDrawArrays(_onscreenTextureInstance.primitiveType, 0, _onscreenTextureInstance.vertexCount);
 }
 
-- (CVOpenGLESTextureRef)drawOnscreenPixelBuffer:(CVPixelBufferRef)pixelBuffer
-{
-    // Check dimensions of the pixelBuffer
-    GLfloat width = (GLfloat)CVPixelBufferGetWidth(pixelBuffer);
-    GLfloat height = (GLfloat)CVPixelBufferGetHeight(pixelBuffer);
-    
-    // Get the OpenGL texture
-    CVOpenGLESTextureRef oglTexture = [self oglTextureFromPixelBuffer:pixelBuffer];
-    
-    // Create a temporary offscreen texture instance wrapping the pixelBuffer
-    _pixelBufferTextureInstance.textureWidth = width;
-    _pixelBufferTextureInstance.textureHeight = height;
-    _pixelBufferTextureInstance.textureTarget = CVOpenGLESTextureGetTarget(oglTexture);
-    _pixelBufferTextureInstance.textureName = CVOpenGLESTextureGetName(oglTexture);
-    
-    [self drawOnscreenOffscreenTextureInstance:&_pixelBufferTextureInstance];
-    
-    return oglTexture;
-}
-
 #pragma mark -
 #pragma mark Onscreen framebuffer snapshot
 
@@ -868,25 +841,38 @@
         _onscreenSnapshotImageSublayer.bounds = self.bounds;
         _onscreenSnapshotImageSublayer.contentsScale = 2;
         _onscreenSnapshotImageSublayer.anchorPoint = CGPointMake(0, 0);
-        _onscreenSnapshotImageSublayer.hidden = YES;
-        
-        CATransition * fadeTransition = [CATransition animation];
-        fadeTransition.type = kCATransitionFade;
-        fadeTransition.duration = 0.3f;
-        fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"fadeTransition"];
+        _onscreenSnapshotImageSublayer.opacity = 0.0;
         
         [self addSublayer:_onscreenSnapshotImageSublayer];
     }
     
     _onscreenSnapshotImageSublayer.contents = (__bridge id)[self imageFromOnscreenFramebuffer].CGImage;
-    _onscreenSnapshotImageSublayer.hidden = NO;
+    
+    CABasicAnimation * fadeTransition = [CABasicAnimation animation];
+    fadeTransition.duration = 0.3f;
+    fadeTransition.fromValue = @(0.0f);
+    fadeTransition.toValue = @(1.0f);
+    fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"opacity"];
+    
+    _onscreenSnapshotImageSublayer.opacity = 1.0f;
 }
 
 - (void)removeOnscreenSnapshotImageSublayer
 {
-    _displayLink.paused = NO;
-    _onscreenSnapshotImageSublayer.hidden = YES;
+    [_onscreenSnapshotImageSublayer removeAllAnimations];
+    
+    CABasicAnimation * fadeTransition = [CABasicAnimation animation];
+    fadeTransition.duration = 0.3f;
+    fadeTransition.fromValue = @(1.0f);
+    fadeTransition.toValue = @(0.0f);
+    fadeTransition.beginTime = CACurrentMediaTime() + 0.15;
+    fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"opacity"];
+    
+    _onscreenSnapshotImageSublayer.opacity = 0.0f;
+    
+    //[_onscreenSnapshotImageSublayer removeFromSuperlayer]; // TODO removeFromLayer
 }
 
 #pragma mark -
@@ -944,21 +930,48 @@
 {
     CMSampleBufferRef sampleBuffer = self.internal.sampleBuffer;
     
-    if (!sampleBuffer)
+    if (sampleBuffer)
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is NULL (frame duration %fs)", aDisplayLink.duration);
-        return;
+        Log(@"CameraOGLPreviewView: sampleBuffer is OK (frame duration %fs)", aDisplayLink.duration);
+        
+        // New pixelBuffer available to be rendered ?
+        CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
+        
+        if (!pixelBuffer)
+        {
+            Log(@"CameraOGLPreviewView: pixelBuffer is nil");
+            return;
+        }
+        
+        // Release old pixelBuffer texture if it exists
+        if (_pixelBufferTexture)
+        {
+            CFRelease(_pixelBufferTexture);
+            _pixelBufferTexture = NULL;
+        }
+        
+        // Check dimensions of the pixelBuffer
+        GLfloat width = (GLfloat)CVPixelBufferGetWidth(pixelBuffer);
+        GLfloat height = (GLfloat)CVPixelBufferGetHeight(pixelBuffer);
+        
+        // Get the OpenGL texture
+        _pixelBufferTexture = [self oglTextureFromPixelBuffer:pixelBuffer];
+        
+        // Create a temporary offscreen texture instance wrapping the pixelBuffer
+        _pixelBufferTextureInstance.textureWidth = width;
+        _pixelBufferTextureInstance.textureHeight = height;
+        _pixelBufferTextureInstance.textureTarget = CVOpenGLESTextureGetTarget(_pixelBufferTexture);
+        _pixelBufferTextureInstance.textureName = CVOpenGLESTextureGetName(_pixelBufferTexture);
+        
+        CFRelease(pixelBuffer);
+    }
+    else if (_pixelBufferTexture)
+    {
+        Log(@"CameraOGLPreviewView: re-using last pixelBuffer texture (frame duration %fs)", aDisplayLink.duration);
     }
     else
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is OK (frame duration %fs)", aDisplayLink.duration);
-    }
-    
-    CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
-    
-    if (!pixelBuffer)
-    {
-        Log(@"CameraOGLPreviewView: pixelBuffer is nil");
+        Log(@"CameraOGLPreviewView: sampleBuffer and pixelBufferTexture are NULL. NOT going to render. (frame duration %fs)", aDisplayLink.duration);
         return;
     }
     
@@ -975,8 +988,6 @@
     // Avoid loading previous buffer contents
     glClear(GL_COLOR_BUFFER_BIT);
     
-    CVOpenGLESTextureRef pixelBufferTexture = NULL;
-    
     // Only filter if filter intensity is greater than 0
     if (_filterIntensity > 0)
     {
@@ -986,9 +997,8 @@
         // Update any uniform value that changed since last frame
         [self updateBlurFilterProgramUniforms];
         
-        // Set the pixelBuffer to a texture instance
-        // We'll use two texture instances and ping-pong between them
-        pixelBufferTexture = [self setPixelBuffer:pixelBuffer toTextureInstance:&_pixelBufferTextureInstance];
+        // Downsample pixel buffer texture dimensions
+        [self scaleDownPixelBufferTextureInstanceDimensions];
         
         // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
         [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
@@ -1010,21 +1020,18 @@
     else
     {
         // Draw (onscreen)
-        pixelBufferTexture = [self drawOnscreenPixelBuffer:pixelBuffer];
+        [self drawOnscreenOffscreenTextureInstance:&_pixelBufferTextureInstance];
     }
     
     [_oglContext presentRenderbuffer:GL_RENDERBUFFER];
     
     glBindTexture(_pixelBufferTextureInstance.textureTarget, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    CFRelease(pixelBufferTexture);
-    
+
     if (oglContext != _oglContext)
     {
         [EAGLContext setCurrentContext:oglContext];
     }
-    
-    CFRelease(pixelBuffer);
 }
 
 - (void)updateBlurFilterProgramUniforms

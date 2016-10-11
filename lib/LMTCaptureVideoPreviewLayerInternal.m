@@ -258,10 +258,11 @@
             // Release the buffer if it exists
             if(oldVideoDataOutputSampleBuffer != NULL)
             {
+                // Release old
                 CFRelease(oldVideoDataOutputSampleBuffer);
             }
             
-            // Retain
+            // Retain new
             _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersTailIndex] = newVideoDataOutputSampleBuffer;
             CFRetain(newVideoDataOutputSampleBuffer);
             
