@@ -868,28 +868,25 @@
         _onscreenSnapshotImageSublayer.bounds = self.bounds;
         _onscreenSnapshotImageSublayer.contentsScale = 2;
         _onscreenSnapshotImageSublayer.anchorPoint = CGPointMake(0, 0);
+        _onscreenSnapshotImageSublayer.hidden = YES;
+        
+        CATransition * fadeTransition = [CATransition animation];
+        fadeTransition.type = kCATransitionFade;
+        fadeTransition.duration = 0.3f;
+        fadeTransition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [_onscreenSnapshotImageSublayer addAnimation:fadeTransition forKey:@"fadeTransition"];
+        
+        [self addSublayer:_onscreenSnapshotImageSublayer];
     }
     
     _onscreenSnapshotImageSublayer.contents = (__bridge id)[self imageFromOnscreenFramebuffer].CGImage;
-    
-    [_onscreenSnapshotImageSublayer removeAllAnimations];
-    [self addSublayer:_onscreenSnapshotImageSublayer];
+    _onscreenSnapshotImageSublayer.hidden = NO;
 }
 
 - (void)removeOnscreenSnapshotImageSublayer
 {
     _displayLink.paused = NO;
-    
-//    if (_onscreenSnapshotImageSublayer != nil)
-//    {
-//        CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-//        animation.duration = 0.3;
-//        animation.fillMode = kCAFillModeForwards;
-//        animation.fromValue = @(1);
-//        animation.toValue = @(0);
-//        animation.removedOnCompletion = NO;
-//        [_onscreenSnapshotImageSublayer addAnimation:animation forKey:@"opacityAnimation"];
-//    }
+    _onscreenSnapshotImageSublayer.hidden = YES;
 }
 
 #pragma mark -
