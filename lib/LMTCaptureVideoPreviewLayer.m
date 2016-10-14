@@ -190,10 +190,6 @@
     #if FilterBoundsEnabled
         [self setFilterBoundsRect:CGRectMake(0, 0, 1, 0.5)];
     #endif
-        
-        // Create and setup displayLink
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     }
 }
 
@@ -357,13 +353,15 @@
             // Create the session video preview layer from AVFoundation
             _videoPreviewSublayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.internal.session];
             
-            [_videoPreviewSublayer setBackgroundColor:self.backgroundColor];
-            [_videoPreviewSublayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // TODO self.videoGravity
-            [_videoPreviewSublayer setBounds:self.bounds];
+            _videoPreviewSublayer.backgroundColor = self.backgroundColor;
+            _videoPreviewSublayer.videoGravity = AVLayerVideoGravityResizeAspectFill;  // TODO self.videoGravity
+            _videoPreviewSublayer.bounds = self.bounds;
+            _videoPreviewSublayer.anchorPoint = CGPointMake(0,0);
             
             [self addSublayer:_videoPreviewSublayer];
-            _displayLink.paused = YES;
         }
+        
+        _videoPreviewSublayer.hidden = NO;
     }
 }
 
@@ -371,8 +369,11 @@
 {
     if (_videoPreviewSublayer)
     {
-        _displayLink.paused = NO;
-        [_videoPreviewSublayer removeFromSuperlayer];
+        _videoPreviewSublayer.hidden = YES;
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [_videoPreviewSublayer removeFromSuperlayer];
+//            _videoPreviewSublayer = nil;
+//        });
     }
 }
 
@@ -1126,6 +1127,8 @@
 
 - (void)setFilterIntensity:(float)intensity
 {
+    float oldIntensity = _filterIntensity;
+    
     // Bail out if the program hasn't been loaded yet
     if (!_blurFilterProgram)
     {
@@ -1136,18 +1139,38 @@
     [self loadFilter];
     
     // Clamp intensity between [0,1] range
-    float clampedIntensity =  MAX(0, MIN(1, intensity));
+    float newIntensity =  MAX(0, MIN(1, intensity));
     
     // Assign the intensity value
-    _filterIntensity = clampedIntensity;
+    _filterIntensity = newIntensity;
     
     // Map intensity to a integer kernel index
-    size_t mappedIndex = (size_t)roundf(clampedIntensity * ((float)(_filterKernelCount-1)));
+    size_t mappedIndex = (size_t)roundf(newIntensity * ((float)(_filterKernelCount-1)));
     
     // Assign the mapped index
     _filterKernelIndex =  MAX(0, MIN(_filterKernelCount-1, mappedIndex));
     
     _filterIntensityNeedsUpdate = YES;
+    
+    if (newIntensity > 0.0 && oldIntensity == 0.0)
+    {
+        if (!_displayLink)
+        {
+            // Create and setup displayLink
+            _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
+            [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        }
+        
+        _displayLink.paused = NO;
+        
+        [self removeAVCaptureVideoPreviewSublayer];
+    }
+    else if (newIntensity == 0.0)
+    {
+        [self addAVCaptureVideoPreviewSublayer];
+        
+        _displayLink.paused = YES;
+    }
 }
 
 - (void)setFilterIntensity:(float)intensity animated:(BOOL)animated
