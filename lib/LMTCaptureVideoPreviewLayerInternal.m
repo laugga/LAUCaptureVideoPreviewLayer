@@ -31,7 +31,10 @@
 
 @interface LMTCaptureVideoPreviewLayerInternal () <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
+    // Session
     AVCaptureSession * _session;
+    
+    // AVCaptureVideoDataOutput and delegate queue
     AVCaptureVideoDataOutput * _videoDataOutput;
     dispatch_queue_t _videoDataOutputSampleBufferDelegateQueue;
     
@@ -80,6 +83,8 @@
     }
     else
     {
+        // TODO improve this. After setSession the hijackedSession with prevent canAddOutput...
+        
         Log(@"LMTCaptureVideoPreviewLayerInternal: Can NOT add AVCaptureVideoDataOutput to AVCaptureSession");
         [self hijackSessionVideoDataOutput];
     }

@@ -46,6 +46,10 @@
     // Layer used to display a snapshot image of the current framebuffer
     CALayer * _onscreenSnapshotImageSublayer;
     
+    // CoreAnimation layer for previewing the visual output of an AVCaptureSession
+    // Used for normal rendering. More efficient (CPU and GPU) than our own...
+    AVCaptureVideoPreviewLayer * _videoPreviewSublayer;
+    
     // Display link (works only on IOS 3.1 or greater)
     CADisplayLink * _displayLink;
     
@@ -339,6 +343,37 @@
 - (void)setSession:(AVCaptureSession *)session
 {
     self.internal.session = session;
+}
+
+#pragma mark -
+#pragma mark AVCaptureVideoPreviewLayer
+
+- (void)addAVCaptureVideoPreviewSublayer
+{
+    if (self.internal.session)
+    {
+        if (!_videoPreviewSublayer)
+        {
+            // Create the session video preview layer from AVFoundation
+            _videoPreviewSublayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.internal.session];
+            
+            [_videoPreviewSublayer setBackgroundColor:self.backgroundColor];
+            [_videoPreviewSublayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // TODO self.videoGravity
+            [_videoPreviewSublayer setBounds:self.bounds];
+            
+            [self addSublayer:_videoPreviewSublayer];
+            _displayLink.paused = YES;
+        }
+    }
+}
+
+- (void)removeAVCaptureVideoPreviewSublayer
+{
+    if (_videoPreviewSublayer)
+    {
+        _displayLink.paused = NO;
+        [_videoPreviewSublayer removeFromSuperlayer];
+    }
 }
 
 #pragma mark -
