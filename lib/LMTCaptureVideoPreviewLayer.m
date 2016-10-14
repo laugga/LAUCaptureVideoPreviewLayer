@@ -419,7 +419,9 @@
     // Create a new CVOpenGLESTexture cache
     if (!_oglTextureCache)
     {
-        CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, _oglContext, NULL, &_oglTextureCache);
+        NSDictionary * cacheAttributes = @{ (NSString *)kCVOpenGLESTextureCacheMaximumTextureAgeKey: @(0.1) };
+        
+        CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, (__bridge CFDictionaryRef _Nullable)(cacheAttributes), _oglContext, NULL, &_oglTextureCache);
         if (result != kCVReturnSuccess)
         {
             Log(@"CameraOGLPreviewView: Error at CVOpenGLESTextureCacheCreate %d", result);
