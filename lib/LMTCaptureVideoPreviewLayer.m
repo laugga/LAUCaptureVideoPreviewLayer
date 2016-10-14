@@ -450,6 +450,15 @@
         return NULL;
     }
     
+//    GLfloat lowerLeft[2];
+//    GLfloat lowerRight[2];
+//    GLfloat upperRight[2];
+//    GLfloat upperLeft[2];
+//    
+//    CVOpenGLESTextureGetCleanTexCoords(oglTexture, lowerLeft, lowerRight, upperRight, upperLeft);
+//    
+//    NSLog(@"CVOpenGLESTextureGetCleanTexCoords (%f, %f), (%f, %f), (%f, %f), (%f, %f)", lowerLeft[0], lowerLeft[1], lowerRight[0], lowerRight[1], upperRight[0], upperRight[1], upperLeft[0], upperLeft[1]);
+    
     return oglTexture;
 }
 
