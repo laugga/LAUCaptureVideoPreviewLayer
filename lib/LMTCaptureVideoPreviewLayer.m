@@ -962,23 +962,16 @@
     if (_onscreenSnapshotImageSublayer)
     {
         [CATransaction begin];
-        
-        CABasicAnimation * fadeOutAnimation = [CABasicAnimation animation];
-        fadeOutAnimation.duration = 0.25f;
-        fadeOutAnimation.fromValue = @(1.0f);
-        fadeOutAnimation.toValue = @(0.0f);
-        fadeOutAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        fadeOutAnimation.removedOnCompletion = YES;
-        fadeOutAnimation.fillMode = kCAFillModeBoth;
-        [_onscreenSnapshotImageSublayer addAnimation:fadeOutAnimation forKey:@"opacity"];
-        
-        _onscreenSnapshotImageSublayer.opacity = 0.0f;
-        
         [CATransaction setCompletionBlock:^{
             [_onscreenSnapshotImageSublayer removeFromSuperlayer];
             _onscreenSnapshotImageSublayer = nil;
         }];
         
+        [CATransaction setAnimationDuration:0.25f];
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+
+        _onscreenSnapshotImageSublayer.opacity = 0.0f;
+
         [CATransaction commit];
     }
 }
