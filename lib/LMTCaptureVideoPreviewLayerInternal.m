@@ -205,8 +205,10 @@
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    PrettyLog;
+    
     // Add the sample buffer to the _videoDataOutputSampleBuffers circular array
-    [self addVideoDataOutputSampleBuffer:sampleBuffer];
+    [self addSampleBuffer:sampleBuffer];
     
     // Was the AVCaptureVideoDataOutput's hijacked?
     if (_hijackedVideoDataOutputSampleBufferDelegate && _hijackedVideoDataOutputSampleBufferDelegateQueue)
@@ -229,6 +231,8 @@
 {
     @synchronized (self)
     {
+        PrettyLog;
+        
         CMSampleBufferRef videoDataOutputSampleBuffer = NULL;
         
         // Check if the circular array is not empty
@@ -243,6 +247,8 @@
                 videoDataOutputSampleBuffer = oldVideoDataOutputSampleBuffer;
             }
             
+            Log(@"\nsampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, videoDataOutputSampleBuffer);
+            
             // Move head +1
             _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersHeadIndex+1)%kVideoDataOutputSampleBuffersSize;
         }
@@ -251,16 +257,18 @@
     }
 }
 
-- (void)addVideoDataOutputSampleBuffer:(CMSampleBufferRef)newVideoDataOutputSampleBuffer
+- (void)addSampleBuffer:(CMSampleBufferRef)newVideoDataOutputSampleBuffer
 {
     @synchronized (self)
     {
+        PrettyLog;
+        
         if (newVideoDataOutputSampleBuffer != NULL)
         {
             // Add the new sample buffer to the tail
             CMSampleBufferRef oldVideoDataOutputSampleBuffer = _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersTailIndex];
             
-            // Release the buffer if it exists
+            // Release an old buffer if it exists
             if(oldVideoDataOutputSampleBuffer != NULL)
             {
                 // Release old
@@ -273,6 +281,37 @@
             
             // Move tail +1
             _videoDataOutputSampleBuffersTailIndex = (_videoDataOutputSampleBuffersTailIndex+1)%kVideoDataOutputSampleBuffersSize;
+            
+            // As a circular array we make sure old unused sample buffers are discarded by moving head forwards +1
+            if (_videoDataOutputSampleBuffersTailIndex == _videoDataOutputSampleBuffersHeadIndex)
+            {
+                // Move head +1
+                _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersTailIndex+1)%kVideoDataOutputSampleBuffersSize;
+            }
+            
+            Log(@"\naddSampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, newVideoDataOutputSampleBuffer);
+        }
+    }
+}
+
+- (void)flushSampleBuffer
+{
+    @synchronized (self)
+    {
+        while(_videoDataOutputSampleBuffersHeadIndex != _videoDataOutputSampleBuffersTailIndex)
+        {
+            // Remove an existing sample buffer from the head
+            CMSampleBufferRef videoDataOutputSampleBuffer = _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersHeadIndex];
+            
+            // Release the buffer if it exists
+            if(videoDataOutputSampleBuffer != NULL)
+            {
+                CFRelease(videoDataOutputSampleBuffer);
+                _videoDataOutputSampleBuffers[_videoDataOutputSampleBuffersHeadIndex] = NULL;
+            }
+            
+            // Move head +1
+            _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersHeadIndex+1)%kVideoDataOutputSampleBuffersSize;
         }
     }
 }

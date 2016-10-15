@@ -185,6 +185,11 @@
             [self drawColor:self.backgroundColor];
         }
         
+        // Create and setup displayLink
+        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
+        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        _displayLink.paused = YES;
+        
         // Set filter intensity from blur value
         [self setFilterIntensity:_blur];
     #if FilterBoundsEnabled
@@ -346,6 +351,8 @@
 
 - (void)addAVCaptureVideoPreviewSublayer
 {
+    PrettyLog;
+    
     if (self.internal.session)
     {
         if (!_videoPreviewSublayer)
@@ -357,23 +364,28 @@
             _videoPreviewSublayer.videoGravity = AVLayerVideoGravityResizeAspectFill;  // TODO self.videoGravity
             _videoPreviewSublayer.bounds = self.bounds;
             _videoPreviewSublayer.anchorPoint = CGPointMake(0,0);
+            _videoPreviewSublayer.hidden = YES;
             
             [self addSublayer:_videoPreviewSublayer];
         }
         
+        [CATransaction begin];
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
         _videoPreviewSublayer.hidden = NO;
+        [CATransaction commit];
     }
 }
 
 - (void)removeAVCaptureVideoPreviewSublayer
 {
+    PrettyLog;
+    
     if (_videoPreviewSublayer)
     {
+        [CATransaction begin];
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
         _videoPreviewSublayer.hidden = YES;
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [_videoPreviewSublayer removeFromSuperlayer];
-//            _videoPreviewSublayer = nil;
-//        });
+        [CATransaction commit];
     }
 }
 
@@ -502,7 +514,15 @@
 
 - (void)flushPixelBufferCache
 {
-    if ( _oglTextureCache ) {
+    // Release old pixelBuffer texture if it exists
+    if (_pixelBufferTexture)
+    {
+        CFRelease(_pixelBufferTexture);
+        _pixelBufferTexture = NULL;
+    }
+    
+    if (_oglTextureCache)
+    {
         CVOpenGLESTextureCacheFlush(_oglTextureCache, 0);
     }
 }
@@ -987,18 +1007,20 @@
 
 - (void)drawPixelBuffer:(CADisplayLink *)aDisplayLink
 {
+    PrettyLog;
+    
     CMSampleBufferRef sampleBuffer = self.internal.sampleBuffer;
     
     if (sampleBuffer)
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer is OK (frame duration %fs)", aDisplayLink.duration);
+        Log(@"*** CameraOGLPreviewView: sampleBuffer is OK (frame duration %fs)", aDisplayLink.duration);
         
         // New pixelBuffer available to be rendered ?
         CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CFRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
         
         if (!pixelBuffer)
         {
-            Log(@"CameraOGLPreviewView: pixelBuffer is nil");
+            Log(@"*** CameraOGLPreviewView: pixelBuffer is nil");
             return;
         }
         
@@ -1026,11 +1048,11 @@
     }
     else if (_pixelBufferTexture)
     {
-        Log(@"CameraOGLPreviewView: re-using last pixelBuffer texture (frame duration %fs)", aDisplayLink.duration);
+        Log(@"*** CameraOGLPreviewView: re-using last pixelBuffer texture (frame duration %fs)", aDisplayLink.duration);
     }
     else
     {
-        Log(@"CameraOGLPreviewView: sampleBuffer and pixelBufferTexture are NULL. NOT going to render. (frame duration %fs)", aDisplayLink.duration);
+        Log(@"*** CameraOGLPreviewView: sampleBuffer and pixelBufferTexture are NULL. NOT going to render. (frame duration %fs)", aDisplayLink.duration);
         return;
     }
     
@@ -1048,35 +1070,35 @@
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Only filter if filter intensity is greater than 0
-    if (_filterIntensity > 0)
-    {
-        // Use the blur filter program
-        glUseProgram(_blurFilterProgram);
-        
-        // Update any uniform value that changed since last frame
-        [self updateBlurFilterProgramUniforms];
-        
-        // Downsample pixel buffer texture dimensions
-        [self scaleDownPixelBufferTextureInstanceDimensions];
-        
-        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
-        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
-        
-        // Draw the offscreen texture instances and keep applying the filter (ping, pong, ping, pong)
-        // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
-        for (int p=1; p<(2*_filterMultiplePassCount); ++p)
-        {
-            // Draw split-pass (offscreen)
-            [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
-        }
-        
-        // Disabled filtering for final onscreen rendering
-        glUseProgram(_defaultProgram);
-        
-        // Draw (onscreen)
-        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
-    }
-    else
+//    if (_filterIntensity > 0)
+//    {
+//        // Use the blur filter program
+//        glUseProgram(_blurFilterProgram);
+//        
+//        // Update any uniform value that changed since last frame
+//        [self updateBlurFilterProgramUniforms];
+//        
+//        // Downsample pixel buffer texture dimensions
+//        [self scaleDownPixelBufferTextureInstanceDimensions];
+//        
+//        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
+//        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
+//        
+//        // Draw the offscreen texture instances and keep applying the filter (ping, pong, ping, pong)
+//        // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
+//        for (int p=1; p<(2*_filterMultiplePassCount); ++p)
+//        {
+//            // Draw split-pass (offscreen)
+//            [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
+//        }
+//        
+//        // Disabled filtering for final onscreen rendering
+//        glUseProgram(_defaultProgram);
+//        
+//        // Draw (onscreen)
+//        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
+//    }
+//    else
     {
         // Draw (onscreen)
         [self drawOnscreenOffscreenTextureInstance:&_pixelBufferTextureInstance];
@@ -1154,22 +1176,15 @@
     
     if (newIntensity > 0.0 && oldIntensity == 0.0)
     {
-        if (!_displayLink)
-        {
-            // Create and setup displayLink
-            _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-            [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        }
-        
+        [self drawPixelBuffer:nil];
         _displayLink.paused = NO;
-        
         [self removeAVCaptureVideoPreviewSublayer];
     }
     else if (newIntensity == 0.0)
     {
         [self addAVCaptureVideoPreviewSublayer];
-        
         _displayLink.paused = YES;
+        [self flushPixelBufferCache];
     }
 }
 
