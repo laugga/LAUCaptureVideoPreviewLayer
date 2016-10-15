@@ -32,6 +32,9 @@
 {
     // Preview (live)
     LMTCaptureVideoPreviewLayer * _videoPreviewLayer;
+    
+    // Debug view
+    CALayer * _longPressDebugLayer;
 }
 
 - (void)setCaptureSession:(AVCaptureSession *)captureSession;

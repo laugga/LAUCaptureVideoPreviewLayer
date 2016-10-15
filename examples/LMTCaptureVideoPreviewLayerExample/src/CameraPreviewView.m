@@ -37,6 +37,16 @@
         UILongPressGestureRecognizer * longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(userDidLongPress:)];
         longPressGestureRecognizer.minimumPressDuration = 0.01;
         [self addGestureRecognizer:longPressGestureRecognizer];
+        
+        _longPressDebugLayer = [[CALayer alloc] init];
+        _longPressDebugLayer.bounds = CGRectMake(0, 0, 50, 50);
+        _longPressDebugLayer.cornerRadius = 25;
+        _longPressDebugLayer.anchorPoint = CGPointMake(0.5, 0.5);
+        _longPressDebugLayer.backgroundColor = [[UIColor whiteColor] CGColor];
+        _longPressDebugLayer.opacity = 0.75;
+        _longPressDebugLayer.position = CGPointMake(CGRectGetWidth(frame)/2.0f, CGRectGetHeight(frame)/2.0f);
+        _longPressDebugLayer.hidden = YES;
+        [self.layer addSublayer:_longPressDebugLayer];
     }
     
     return self;
@@ -78,7 +88,7 @@
         _videoPreviewLayer = videoPreviewLayer;
         
         [self.layer setMasksToBounds:YES];
-        [self.layer addSublayer:_videoPreviewLayer];
+        [self.layer insertSublayer:_videoPreviewLayer below:_longPressDebugLayer];
     }
     else
     {
@@ -94,12 +104,22 @@
         // Switch to blur = 1.0 when user presses
         //_videoPreviewLayer.blur = 1.0;
         [_videoPreviewLayer setBlur:1.0 animated:YES];
+        
+        // Show debug view
+        [CATransaction begin];
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+        _longPressDebugLayer.position = [sender locationInView:self];
+        _longPressDebugLayer.hidden = NO;
+        [CATransaction commit];
     }
     else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateFailed)
     {
         // Turn blur off when user stops pressing
         //_videoPreviewLayer.blur = 0.0f;
         [_videoPreviewLayer setBlur:0.0 animated:YES];
+        
+        // Hide debug view
+        _longPressDebugLayer.hidden = YES;
     }
 }
 

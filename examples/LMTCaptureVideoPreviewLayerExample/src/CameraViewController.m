@@ -116,6 +116,11 @@
     PrettyLog;
 }
 
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
 #pragma mark -
 #pragma mark Preview View
 
