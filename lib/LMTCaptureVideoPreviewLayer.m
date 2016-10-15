@@ -101,6 +101,10 @@
     GLfloat _filterBounds[4];
     BOOL _filterBoundsNeedsUpdate;
 }
+
+// Property used to control access to display link
+@property (nonatomic, readonly) CADisplayLink * displayLink;
+
 @end
 
 @implementation LMTCaptureVideoPreviewLayer
@@ -184,11 +188,6 @@
         {
             [self drawColor:self.backgroundColor];
         }
-        
-        // Create and setup displayLink
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        _displayLink.paused = YES;
         
         // Set filter intensity from blur value
         [self setFilterIntensity:_blur];
@@ -320,6 +319,30 @@
 }
 
 #pragma mark -
+#pragma mark CADisplayLink
+
+- (CADisplayLink *)displayLink
+{
+    if (!_displayLink)
+    {
+        // Create and setup displayLink
+        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawPixelBuffer:)];
+        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+        _displayLink.paused = YES;
+    }
+    
+    return _displayLink;
+}
+
+- (void)setDisplayLinkPaused:(BOOL)displayLinkPaused
+{
+    if (_videoPreviewSublayer.hidden)
+    {
+        self.displayLink.paused = displayLinkPaused;
+    }
+}
+
+#pragma mark -
 #pragma mark Blur property
 
 - (void)setBlur:(CGFloat)blur
@@ -373,6 +396,9 @@
         [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
         _videoPreviewSublayer.hidden = NO;
         [CATransaction commit];
+        
+        self.displayLink.paused = YES;
+        [self flushPixelBufferCache];
     }
 }
 
@@ -382,6 +408,9 @@
     
     if (_videoPreviewSublayer)
     {
+        [self drawPixelBuffer:nil];
+        self.displayLink.paused = NO;
+        
         [CATransaction begin];
         [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
         _videoPreviewSublayer.hidden = YES;
@@ -408,7 +437,7 @@
     [self setBlur:1.0 animated:YES];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        _displayLink.paused = YES; // TODO pause when blur-in animation finishes
+        [self setDisplayLinkPaused:YES]; // TODO pause when blur-in animation finishes
     });
 }
 
@@ -421,7 +450,7 @@
     [self addOnscreenSnapshotImageSublayer];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        _displayLink.paused = NO; // TODO investigate why first frames after session starts running are darker...
+        [self setDisplayLinkPaused:NO]; // TODO investigate why first frames after session starts running are darker...
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(fadeOutDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1176,15 +1205,11 @@
     
     if (newIntensity > 0.0 && oldIntensity == 0.0)
     {
-        [self drawPixelBuffer:nil];
-        _displayLink.paused = NO;
         [self removeAVCaptureVideoPreviewSublayer];
     }
     else if (newIntensity == 0.0)
     {
         [self addAVCaptureVideoPreviewSublayer];
-        _displayLink.paused = YES;
-        [self flushPixelBufferCache];
     }
 }
 

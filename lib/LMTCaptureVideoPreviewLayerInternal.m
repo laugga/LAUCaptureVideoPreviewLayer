@@ -247,7 +247,7 @@
                 videoDataOutputSampleBuffer = oldVideoDataOutputSampleBuffer;
             }
             
-            Log(@"\nsampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, videoDataOutputSampleBuffer);
+            //Log(@"\nsampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, videoDataOutputSampleBuffer);
             
             // Move head +1
             _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersHeadIndex+1)%kVideoDataOutputSampleBuffersSize;
@@ -289,7 +289,7 @@
                 _videoDataOutputSampleBuffersHeadIndex = (_videoDataOutputSampleBuffersTailIndex+1)%kVideoDataOutputSampleBuffersSize;
             }
             
-            Log(@"\naddSampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, newVideoDataOutputSampleBuffer);
+            //Log(@"\naddSampleBuffer head %d tail %d info %@\n\n\n", _videoDataOutputSampleBuffersHeadIndex, _videoDataOutputSampleBuffersTailIndex, newVideoDataOutputSampleBuffer);
         }
     }
 }
