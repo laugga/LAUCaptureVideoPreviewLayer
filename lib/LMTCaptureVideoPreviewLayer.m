@@ -1092,35 +1092,35 @@
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Only filter if filter intensity is greater than 0
-//    if (_filterIntensity > 0)
-//    {
-//        // Use the blur filter program
-//        glUseProgram(_blurFilterProgram);
-//        
-//        // Update any uniform value that changed since last frame
-//        [self updateBlurFilterProgramUniforms];
-//        
-//        // Downsample pixel buffer texture dimensions
-//        [self scaleDownPixelBufferTextureInstanceDimensions];
-//        
-//        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
-//        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
-//        
-//        // Draw the offscreen texture instances and keep applying the filter (ping, pong, ping, pong)
-//        // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
-//        for (int p=1; p<(2*_filterMultiplePassCount); ++p)
-//        {
-//            // Draw split-pass (offscreen)
-//            [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
-//        }
-//        
-//        // Disabled filtering for final onscreen rendering
-//        glUseProgram(_defaultProgram);
-//        
-//        // Draw (onscreen)
-//        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
-//    }
-//    else
+    if (_filterIntensity > 0)
+    {
+        // Use the blur filter program
+        glUseProgram(_blurFilterProgram);
+        
+        // Update any uniform value that changed since last frame
+        [self updateBlurFilterProgramUniforms];
+        
+        // Downsample pixel buffer texture dimensions
+        [self scaleDownPixelBufferTextureInstanceDimensions];
+        
+        // First Draw the pixel buffer in an offscreen texture instance (this is a special step)
+        [self drawOffscreenTextureInstance:&_pixelBufferTextureInstance onOffscreenTextureInstance:&_offscreenTextureInstances[0]];
+        
+        // Draw the offscreen texture instances and keep applying the filter (ping, pong, ping, pong)
+        // Because we did already drew once, the number of draw calls left = 2 * multiple-pass-count - 1
+        for (int p=1; p<(2*_filterMultiplePassCount); ++p)
+        {
+            // Draw split-pass (offscreen)
+            [self drawOffscreenTextureInstance:&_offscreenTextureInstances[(p+1)%2] onOffscreenTextureInstance:&_offscreenTextureInstances[p%2]];
+        }
+        
+        // Disabled filtering for final onscreen rendering
+        glUseProgram(_defaultProgram);
+        
+        // Draw (onscreen)
+        [self drawOnscreenOffscreenTextureInstance:&_offscreenTextureInstances[1]];
+    }
+    else
     {
         // Draw (onscreen)
         [self drawOnscreenOffscreenTextureInstance:&_pixelBufferTextureInstance];
