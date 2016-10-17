@@ -51,6 +51,16 @@ LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer 
 videoPreviewLayer.blur = 1.0f;
 ```
 
+## Example
+
+The example is a single view application with a AVCaptureSession and a AVCaptureDeviceInput (AVCaptureDevicePositionBack).
+
+__Interactions:__
+
+* Tap to blur-in (animated)
+* Pull-down to gradually decrease blur value
+* Pause/Resume the capture session (animated)
+
 ## Development Notes
 
 __LMTCaptureVideoPreviewLayer vs. AVCaptureVideoPreviewLayer__
