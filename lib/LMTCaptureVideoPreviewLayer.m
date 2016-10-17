@@ -352,7 +352,7 @@
 
 - (void)setBlur:(CGFloat)blur animated:(BOOL)animated
 {
-    _blur = blur;
+    _blur = MIN(1.0f, MAX(0.0f, blur));
     [self setFilterIntensity:_blur animated:animated];
 }
 

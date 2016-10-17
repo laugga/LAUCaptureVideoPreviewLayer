@@ -205,7 +205,7 @@
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    PrettyLog;
+    //PrettyLog;
     
     // Add the sample buffer to the _videoDataOutputSampleBuffers circular array
     [self addSampleBuffer:sampleBuffer];
@@ -231,7 +231,7 @@
 {
     @synchronized (self)
     {
-        PrettyLog;
+        //PrettyLog;
         
         CMSampleBufferRef videoDataOutputSampleBuffer = NULL;
         
@@ -261,7 +261,7 @@
 {
     @synchronized (self)
     {
-        PrettyLog;
+        //PrettyLog;
         
         if (newVideoDataOutputSampleBuffer != NULL)
         {
