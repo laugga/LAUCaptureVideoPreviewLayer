@@ -26,6 +26,8 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera is required for the purposes of this example</string>
+	<key>UILaunchStoryboardName</key>
+	<string>Launch Screen</string>
 	<key>UIPrerenderedIcon</key>
 	<true/>
 	<key>UIRequiresFullScreen</key>

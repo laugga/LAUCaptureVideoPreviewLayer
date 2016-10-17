@@ -33,8 +33,8 @@
     // Preview (live)
     LMTCaptureVideoPreviewLayer * _videoPreviewLayer;
     
-    // Debug view
-    CALayer * _longPressDebugLayer;
+    // Layer used to show long press gesture initial location
+    CALayer * _longPressBeganLocationLayer;
 }
 
 - (void)setCaptureSession:(AVCaptureSession *)captureSession;

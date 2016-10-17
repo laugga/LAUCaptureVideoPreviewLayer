@@ -66,7 +66,8 @@
 {
     [super viewWillLayoutSubviews];
     
-    [self previewView].frame = self.view.bounds;
+    self.previewView.frame = self.view.bounds;
+    self.previewView.backgroundColor = self.view.backgroundColor;
 }
 
 - (void)viewWillAppear:(BOOL)animated

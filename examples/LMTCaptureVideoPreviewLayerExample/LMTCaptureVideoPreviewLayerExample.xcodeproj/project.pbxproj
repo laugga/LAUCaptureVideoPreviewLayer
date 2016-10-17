@@ -8,16 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		380ED6B21D9037AA009BEB7A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 380ED6B11D9037AA009BEB7A /* Images.xcassets */; };
+		389735071DB50D4700A4154B /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 389735061DB50D4700A4154B /* Launch Screen.storyboard */; };
 		38E212A91D32680D00AAE5F6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E212A81D32680D00AAE5F6 /* AVFoundation.framework */; };
-		38E212AD1D32692200AAE5F6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 38E212AC1D32692200AAE5F6 /* Default-568h@2x.png */; };
 		38E212B01D326B4100AAE5F6 /* CameraPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212AF1D326B4100AAE5F6 /* CameraPreviewView.m */; };
 		857BC1FA0AEE6C838C8C359A /* libPods-LMTCaptureVideoPreviewLayerExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D7415B685F7012807E9CC699 /* libPods-LMTCaptureVideoPreviewLayerExample.a */; };
 		A06ACB2A1608B2C300E20441 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB291608B2C300E20441 /* UIKit.framework */; };
 		A06ACB2C1608B2C300E20441 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2B1608B2C300E20441 /* Foundation.framework */; };
 		A06ACB2E1608B2C300E20441 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */; };
 		A0C519601880585600FE03D2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0C519501880585600FE03D2 /* InfoPlist.strings */; };
-		A0C519611880585600FE03D2 /* CameraViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0C519521880585600FE03D2 /* CameraViewController_iPad.xib */; };
-		A0C519621880585600FE03D2 /* CameraViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0C519541880585600FE03D2 /* CameraViewController_iPhone.xib */; };
+		A0C519621880585600FE03D2 /* CameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0C519541880585600FE03D2 /* CameraViewController.xib */; };
 		A0C519701880589F00FE03D2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C5196B1880589F00FE03D2 /* AppDelegate.m */; };
 		A0C519711880589F00FE03D2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C5196D1880589F00FE03D2 /* main.m */; };
 		A0C519721880589F00FE03D2 /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C5196F1880589F00FE03D2 /* CameraViewController.m */; };
@@ -25,8 +24,8 @@
 
 /* Begin PBXFileReference section */
 		380ED6B11D9037AA009BEB7A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LMTCaptureVideoPreviewLayerExample/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		389735061DB50D4700A4154B /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "resources/Launch Screen.storyboard"; sourceTree = SOURCE_ROOT; };
 		38E212A81D32680D00AAE5F6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		38E212AC1D32692200AAE5F6 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "resources/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
 		38E212AE1D326B4100AAE5F6 /* CameraPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraPreviewView.h; path = src/CameraPreviewView.h; sourceTree = SOURCE_ROOT; };
 		38E212AF1D326B4100AAE5F6 /* CameraPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraPreviewView.m; path = src/CameraPreviewView.m; sourceTree = SOURCE_ROOT; };
 		44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LMTCaptureVideoPreviewLayerExample/Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -37,8 +36,7 @@
 		A06ACB2B1608B2C300E20441 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		A0C519511880585600FE03D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
-		A0C519531880585600FE03D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = CameraViewController_iPad.xib; sourceTree = "<group>"; };
-		A0C519551880585600FE03D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = CameraViewController_iPhone.xib; sourceTree = "<group>"; };
+		A0C519551880585600FE03D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = CameraViewController.xib; sourceTree = "<group>"; };
 		A0C5196A1880589F00FE03D2 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = src/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		A0C5196B1880589F00FE03D2 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = src/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		A0C5196D1880589F00FE03D2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = SOURCE_ROOT; };
@@ -121,8 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				A0C519501880585600FE03D2 /* InfoPlist.strings */,
-				A0C519521880585600FE03D2 /* CameraViewController_iPad.xib */,
-				A0C519541880585600FE03D2 /* CameraViewController_iPhone.xib */,
+				A0C519541880585600FE03D2 /* CameraViewController.xib */,
 			);
 			name = en.lproj;
 			path = resources/en.lproj;
@@ -156,8 +153,8 @@
 			isa = PBXGroup;
 			children = (
 				380ED6B11D9037AA009BEB7A /* Images.xcassets */,
-				38E212AC1D32692200AAE5F6 /* Default-568h@2x.png */,
 				A0C5194F1880585600FE03D2 /* en.lproj */,
+				389735061DB50D4700A4154B /* Launch Screen.storyboard */,
 			);
 			name = Resources;
 			path = LAPickerView;
@@ -222,10 +219,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0C519621880585600FE03D2 /* CameraViewController_iPhone.xib in Resources */,
+				A0C519621880585600FE03D2 /* CameraViewController.xib in Resources */,
 				380ED6B21D9037AA009BEB7A /* Images.xcassets in Resources */,
-				A0C519611880585600FE03D2 /* CameraViewController_iPad.xib in Resources */,
-				38E212AD1D32692200AAE5F6 /* Default-568h@2x.png in Resources */,
+				389735071DB50D4700A4154B /* Launch Screen.storyboard in Resources */,
 				A0C519601880585600FE03D2 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -303,20 +299,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		A0C519521880585600FE03D2 /* CameraViewController_iPad.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A0C519531880585600FE03D2 /* en */,
-			);
-			name = CameraViewController_iPad.xib;
-			sourceTree = "<group>";
-		};
-		A0C519541880585600FE03D2 /* CameraViewController_iPhone.xib */ = {
+		A0C519541880585600FE03D2 /* CameraViewController.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				A0C519551880585600FE03D2 /* en */,
 			);
-			name = CameraViewController_iPhone.xib;
+			name = CameraViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -401,7 +389,6 @@
 			baseConfigurationReference = 44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = JJC3QT2D2L;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -424,7 +411,6 @@
 			baseConfigurationReference = 4F8F2323D7872B979A6332AF /* Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = JJC3QT2D2L;

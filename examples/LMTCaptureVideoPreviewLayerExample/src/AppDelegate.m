@@ -40,12 +40,8 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     // View Controller
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.viewController = [[CameraViewController alloc] initWithNibName:@"CameraViewController_iPhone" bundle:nil];
-    } else {
-        self.viewController = [[CameraViewController alloc] initWithNibName:@"CameraViewController_iPad" bundle:nil];
-    }
-    
+    self.viewController = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
+
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     

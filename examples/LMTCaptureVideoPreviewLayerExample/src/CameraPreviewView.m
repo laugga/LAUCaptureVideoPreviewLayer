@@ -29,24 +29,27 @@
 
 @implementation CameraPreviewView
 
+static CGFloat const kLongPressBeganLocationLayerWidth = 80.0f;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self)
     {
+        // Long press gesture used to blur-in/out the preview
         UILongPressGestureRecognizer * longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(userDidLongPress:)];
-        longPressGestureRecognizer.minimumPressDuration = 0.01;
+        longPressGestureRecognizer.minimumPressDuration = 0.001;
         [self addGestureRecognizer:longPressGestureRecognizer];
         
-        _longPressDebugLayer = [[CALayer alloc] init];
-        _longPressDebugLayer.bounds = CGRectMake(0, 0, 50, 50);
-        _longPressDebugLayer.cornerRadius = 25;
-        _longPressDebugLayer.anchorPoint = CGPointMake(0.5, 0.5);
-        _longPressDebugLayer.backgroundColor = [[UIColor whiteColor] CGColor];
-        _longPressDebugLayer.opacity = 0.75;
-        _longPressDebugLayer.position = CGPointMake(CGRectGetWidth(frame)/2.0f, CGRectGetHeight(frame)/2.0f);
-        _longPressDebugLayer.hidden = YES;
-        [self.layer addSublayer:_longPressDebugLayer];
+        // Debug layer used to show the initial tap location of the long press gesture recognizer
+        _longPressBeganLocationLayer = [[CALayer alloc] init];
+        _longPressBeganLocationLayer.bounds = CGRectMake(0, 0, kLongPressBeganLocationLayerWidth, kLongPressBeganLocationLayerWidth);
+        _longPressBeganLocationLayer.cornerRadius = kLongPressBeganLocationLayerWidth/2.0f;
+        _longPressBeganLocationLayer.anchorPoint = CGPointMake(0.5, 0.5);
+        _longPressBeganLocationLayer.backgroundColor = [[UIColor whiteColor] CGColor];
+        _longPressBeganLocationLayer.opacity = 0.9;
+        _longPressBeganLocationLayer.hidden = YES;
+        [self.layer addSublayer:_longPressBeganLocationLayer];
     }
     
     return self;
@@ -69,7 +72,7 @@
     {
         // Create the session video preview layer
         LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
-        [videoPreviewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
+        [videoPreviewLayer setBackgroundColor:[self.backgroundColor CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
 
         [self setVideoPreviewLayer:videoPreviewLayer];
@@ -88,7 +91,7 @@
         _videoPreviewLayer = videoPreviewLayer;
         
         [self.layer setMasksToBounds:YES];
-        [self.layer insertSublayer:_videoPreviewLayer below:_longPressDebugLayer];
+        [self.layer insertSublayer:_videoPreviewLayer below:_longPressBeganLocationLayer];
     }
     else
     {
@@ -97,10 +100,17 @@
     }
 }
 
+#pragma mark -
+#pragma mark Interactions
+
 - (void)userDidLongPress:(UITapGestureRecognizer *)sender
 {
+    static CGPoint beganLocation;
+    
     if (sender.state == UIGestureRecognizerStateBegan)
     {
+        beganLocation = [sender locationInView:self];
+        
         // Switch to blur = 1.0 when user presses
         //_videoPreviewLayer.blur = 1.0;
         [_videoPreviewLayer setBlur:1.0 animated:YES];
@@ -108,9 +118,18 @@
         // Show debug view
         [CATransaction begin];
         [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
-        _longPressDebugLayer.position = [sender locationInView:self];
-        _longPressDebugLayer.hidden = NO;
+        _longPressBeganLocationLayer.position = [sender locationInView:self];
+        _longPressBeganLocationLayer.hidden = NO;
         [CATransaction commit];
+    }
+    else if (sender.state == UIGestureRecognizerStateChanged)
+    {
+        CGPoint changedLocation = [sender locationInView:self];
+        CGFloat offsetPercent = (beganLocation.y - changedLocation.y)/100.0f;
+        CGFloat blur = 1.0f + offsetPercent;
+        
+        // Set a new blur value
+        [_videoPreviewLayer setBlur:blur animated:YES];
     }
     else if (sender.state == UIGestureRecognizerStateEnded || sender.state == UIGestureRecognizerStateFailed)
     {
@@ -119,7 +138,7 @@
         [_videoPreviewLayer setBlur:0.0 animated:YES];
         
         // Hide debug view
-        _longPressDebugLayer.hidden = YES;
+        _longPressBeganLocationLayer.hidden = YES;
     }
 }
 
