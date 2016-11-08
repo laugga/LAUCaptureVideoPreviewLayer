@@ -1,9 +1,9 @@
 /*
  
- AppDelegate.h
- LAUCaptureVideoPreviewLayerExample
+ main.m
+ LAUCaptureVideoPreviewLayer UI Tests Application
  
- Copyright (c) 2016 Coletiv Studio.
+ Copyright (c) 2016 Luis Laugga
  Some rights reserved, all wrongs deserved.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,16 +23,13 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-*/
-
+ */
 
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 
-@class CameraViewController;
-
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow * window;
-@property (strong, nonatomic) CameraViewController * viewController;
-
-@end
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}

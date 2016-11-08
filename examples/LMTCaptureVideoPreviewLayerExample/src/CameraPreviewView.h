@@ -1,7 +1,7 @@
 /*
  
  CameraPreviewView.h
- LMTCaptureVideoPreviewLayerExample
+ LAUCaptureVideoPreviewLayerExample
  
  Copyright (c) 2016 Coletiv Studio.
  Some rights reserved, all wrongs deserved.
@@ -25,13 +25,13 @@
  
  */
 
-#import <LMTCaptureVideoPreviewLayer/LMTCaptureVideoPreviewLayer.h>
+#import <LAUCaptureVideoPreviewLayer/LAUCaptureVideoPreviewLayer.h>
 #import <AVFoundation/AVFoundation.h>
 
 @interface CameraPreviewView : UIView
 {
     // Preview (live)
-    LMTCaptureVideoPreviewLayer * _videoPreviewLayer;
+    LAUCaptureVideoPreviewLayer * _videoPreviewLayer;
     
     // Layer used to show long press gesture initial location
     CALayer * _longPressBeganLocationLayer;

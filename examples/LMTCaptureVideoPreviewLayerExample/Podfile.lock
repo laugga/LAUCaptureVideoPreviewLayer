@@ -1,15 +1,15 @@
 PODS:
-  - LMTCaptureVideoPreviewLayer (0.1.0)
+  - LAUCaptureVideoPreviewLayer (0.1.0)
 
 DEPENDENCIES:
-  - LMTCaptureVideoPreviewLayer (from `../../`)
+  - LAUCaptureVideoPreviewLayer (from `../../`)
 
 EXTERNAL SOURCES:
-  LMTCaptureVideoPreviewLayer:
+  LAUCaptureVideoPreviewLayer:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  LMTCaptureVideoPreviewLayer: a5648fd14d06a52fa29482c66e1e7955ed11b5c9
+  LAUCaptureVideoPreviewLayer: a5648fd14d06a52fa29482c66e1e7955ed11b5c9
 
 PODFILE CHECKSUM: 27b9e0bb53da8b39b784f1ef16250be227507bb9
 

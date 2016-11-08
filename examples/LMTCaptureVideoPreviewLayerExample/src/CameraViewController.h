@@ -1,7 +1,7 @@
 /*
  
  ViewController.h
- LMTCaptureVideoPreviewLayerExample
+ LAUCaptureVideoPreviewLayerExample
  
  Copyright (c) 2016 Coletiv Studio.
  Some rights reserved, all wrongs deserved.

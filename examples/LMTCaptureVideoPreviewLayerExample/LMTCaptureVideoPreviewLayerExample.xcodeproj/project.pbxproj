@@ -11,7 +11,7 @@
 		389735071DB50D4700A4154B /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 389735061DB50D4700A4154B /* Launch Screen.storyboard */; };
 		38E212A91D32680D00AAE5F6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E212A81D32680D00AAE5F6 /* AVFoundation.framework */; };
 		38E212B01D326B4100AAE5F6 /* CameraPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E212AF1D326B4100AAE5F6 /* CameraPreviewView.m */; };
-		857BC1FA0AEE6C838C8C359A /* libPods-LMTCaptureVideoPreviewLayerExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D7415B685F7012807E9CC699 /* libPods-LMTCaptureVideoPreviewLayerExample.a */; };
+		857BC1FA0AEE6C838C8C359A /* libPods-LAUCaptureVideoPreviewLayerExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D7415B685F7012807E9CC699 /* libPods-LAUCaptureVideoPreviewLayerExample.a */; };
 		A06ACB2A1608B2C300E20441 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB291608B2C300E20441 /* UIKit.framework */; };
 		A06ACB2C1608B2C300E20441 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2B1608B2C300E20441 /* Foundation.framework */; };
 		A06ACB2E1608B2C300E20441 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */; };
@@ -23,15 +23,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		380ED6B11D9037AA009BEB7A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LMTCaptureVideoPreviewLayerExample/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		380ED6B11D9037AA009BEB7A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LAUCaptureVideoPreviewLayerExample/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		389735061DB50D4700A4154B /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "resources/Launch Screen.storyboard"; sourceTree = SOURCE_ROOT; };
 		38E212A81D32680D00AAE5F6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		38E212AE1D326B4100AAE5F6 /* CameraPreviewView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraPreviewView.h; path = src/CameraPreviewView.h; sourceTree = SOURCE_ROOT; };
 		38E212AF1D326B4100AAE5F6 /* CameraPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraPreviewView.m; path = src/CameraPreviewView.m; sourceTree = SOURCE_ROOT; };
-		44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LMTCaptureVideoPreviewLayerExample/Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig"; sourceTree = "<group>"; };
-		4F8F2323D7872B979A6332AF /* Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-LMTCaptureVideoPreviewLayerExample/Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig"; sourceTree = "<group>"; };
+		44BD4EDAE32CEDB472343522 /* Pods-LAUCaptureVideoPreviewLayerExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LAUCaptureVideoPreviewLayerExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LAUCaptureVideoPreviewLayerExample/Pods-LAUCaptureVideoPreviewLayerExample.debug.xcconfig"; sourceTree = "<group>"; };
+		4F8F2323D7872B979A6332AF /* Pods-LAUCaptureVideoPreviewLayerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LAUCaptureVideoPreviewLayerExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-LAUCaptureVideoPreviewLayerExample/Pods-LAUCaptureVideoPreviewLayerExample.release.xcconfig"; sourceTree = "<group>"; };
 		A01C02411620D9BA003DA76F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		A06ACB251608B2C300E20441 /* LMTCaptureVideoPreviewLayerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LMTCaptureVideoPreviewLayerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A06ACB251608B2C300E20441 /* LAUCaptureVideoPreviewLayerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LAUCaptureVideoPreviewLayerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A06ACB291608B2C300E20441 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A06ACB2B1608B2C300E20441 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -42,9 +42,9 @@
 		A0C5196D1880589F00FE03D2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = SOURCE_ROOT; };
 		A0C5196E1880589F00FE03D2 /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = src/CameraViewController.h; sourceTree = SOURCE_ROOT; };
 		A0C5196F1880589F00FE03D2 /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraViewController.m; path = src/CameraViewController.m; sourceTree = SOURCE_ROOT; };
-		A0C51973188058B700FE03D2 /* LMTCaptureVideoPreviewLayerExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LMTCaptureVideoPreviewLayerExample-Info.plist"; path = "support/LMTCaptureVideoPreviewLayerExample-Info.plist"; sourceTree = SOURCE_ROOT; };
-		A0C51974188058B700FE03D2 /* LMTCaptureVideoPreviewLayerExample-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "LMTCaptureVideoPreviewLayerExample-Prefix.pch"; path = "support/LMTCaptureVideoPreviewLayerExample-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		D7415B685F7012807E9CC699 /* libPods-LMTCaptureVideoPreviewLayerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LMTCaptureVideoPreviewLayerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0C51973188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LAUCaptureVideoPreviewLayerExample-Info.plist"; path = "support/LAUCaptureVideoPreviewLayerExample-Info.plist"; sourceTree = SOURCE_ROOT; };
+		A0C51974188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "LAUCaptureVideoPreviewLayerExample-Prefix.pch"; path = "support/LAUCaptureVideoPreviewLayerExample-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		D7415B685F7012807E9CC699 /* libPods-LAUCaptureVideoPreviewLayerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LAUCaptureVideoPreviewLayerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +56,7 @@
 				A06ACB2A1608B2C300E20441 /* UIKit.framework in Frameworks */,
 				A06ACB2C1608B2C300E20441 /* Foundation.framework in Frameworks */,
 				A06ACB2E1608B2C300E20441 /* CoreGraphics.framework in Frameworks */,
-				857BC1FA0AEE6C838C8C359A /* libPods-LMTCaptureVideoPreviewLayerExample.a in Frameworks */,
+				857BC1FA0AEE6C838C8C359A /* libPods-LAUCaptureVideoPreviewLayerExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,8 +66,8 @@
 		7BD2789375A1B84AC1309F2B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */,
-				4F8F2323D7872B979A6332AF /* Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig */,
+				44BD4EDAE32CEDB472343522 /* Pods-LAUCaptureVideoPreviewLayerExample.debug.xcconfig */,
+				4F8F2323D7872B979A6332AF /* Pods-LAUCaptureVideoPreviewLayerExample.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -88,7 +88,7 @@
 		A06ACB261608B2C300E20441 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A06ACB251608B2C300E20441 /* LMTCaptureVideoPreviewLayerExample.app */,
+				A06ACB251608B2C300E20441 /* LAUCaptureVideoPreviewLayerExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,7 +101,7 @@
 				A06ACB2B1608B2C300E20441 /* Foundation.framework */,
 				A06ACB2D1608B2C300E20441 /* CoreGraphics.framework */,
 				A01C02411620D9BA003DA76F /* CoreFoundation.framework */,
-				D7415B685F7012807E9CC699 /* libPods-LMTCaptureVideoPreviewLayerExample.a */,
+				D7415B685F7012807E9CC699 /* libPods-LAUCaptureVideoPreviewLayerExample.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -109,7 +109,7 @@
 		A0C51945188057B700FE03D2 /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				A0C51973188058B700FE03D2 /* LMTCaptureVideoPreviewLayerExample-Info.plist */,
+				A0C51973188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Info.plist */,
 			);
 			name = Support;
 			path = LAPickerView;
@@ -143,7 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				A0C5196D1880589F00FE03D2 /* main.m */,
-				A0C51974188058B700FE03D2 /* LMTCaptureVideoPreviewLayerExample-Prefix.pch */,
+				A0C51974188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */,
 			);
 			name = "Other Sources";
 			path = LAPickerView;
@@ -163,9 +163,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A06ACB241608B2C300E20441 /* LMTCaptureVideoPreviewLayerExample */ = {
+		A06ACB241608B2C300E20441 /* LAUCaptureVideoPreviewLayerExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A06ACB461608B2C300E20441 /* Build configuration list for PBXNativeTarget "LMTCaptureVideoPreviewLayerExample" */;
+			buildConfigurationList = A06ACB461608B2C300E20441 /* Build configuration list for PBXNativeTarget "LAUCaptureVideoPreviewLayerExample" */;
 			buildPhases = (
 				C1547E61646C05785C46A957 /* [CP] Check Pods Manifest.lock */,
 				A06ACB211608B2C300E20441 /* Sources */,
@@ -178,9 +178,9 @@
 			);
 			dependencies = (
 			);
-			name = LMTCaptureVideoPreviewLayerExample;
+			name = LAUCaptureVideoPreviewLayerExample;
 			productName = LAPickerViewOverview;
-			productReference = A06ACB251608B2C300E20441 /* LMTCaptureVideoPreviewLayerExample.app */;
+			productReference = A06ACB251608B2C300E20441 /* LAUCaptureVideoPreviewLayerExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -197,7 +197,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LMTCaptureVideoPreviewLayerExample" */;
+			buildConfigurationList = A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LAUCaptureVideoPreviewLayerExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -209,7 +209,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A06ACB241608B2C300E20441 /* LMTCaptureVideoPreviewLayerExample */,
+				A06ACB241608B2C300E20441 /* LAUCaptureVideoPreviewLayerExample */,
 			);
 		};
 /* End PBXProject section */
@@ -241,7 +241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LMTCaptureVideoPreviewLayerExample/Pods-LMTCaptureVideoPreviewLayerExample-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LAUCaptureVideoPreviewLayerExample/Pods-LAUCaptureVideoPreviewLayerExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		704DD100712223FF45329322 /* [CP] Copy Pods Resources */ = {
@@ -256,7 +256,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LMTCaptureVideoPreviewLayerExample/Pods-LMTCaptureVideoPreviewLayerExample-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LAUCaptureVideoPreviewLayerExample/Pods-LAUCaptureVideoPreviewLayerExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C1547E61646C05785C46A957 /* [CP] Check Pods Manifest.lock */ = {
@@ -386,7 +386,7 @@
 		};
 		A06ACB471608B2C300E20441 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 44BD4EDAE32CEDB472343522 /* Pods-LMTCaptureVideoPreviewLayerExample.debug.xcconfig */;
+			baseConfigurationReference = 44BD4EDAE32CEDB472343522 /* Pods-LAUCaptureVideoPreviewLayerExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -396,19 +396,19 @@
 					"\"$(SRCROOT)\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "support/LMTCaptureVideoPreviewLayerExample-Prefix.pch";
+				GCC_PREFIX_HEADER = "support/LAUCaptureVideoPreviewLayerExample-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				INFOPLIST_FILE = "support/LMTCaptureVideoPreviewLayerExample-Info.plist";
+				INFOPLIST_FILE = "support/LAUCaptureVideoPreviewLayerExample-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.LMTCaptureVideoPreviewLayerExample;
-				PRODUCT_NAME = LMTCaptureVideoPreviewLayerExample;
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.LAUCaptureVideoPreviewLayerExample;
+				PRODUCT_NAME = LAUCaptureVideoPreviewLayerExample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
 		};
 		A06ACB481608B2C300E20441 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4F8F2323D7872B979A6332AF /* Pods-LMTCaptureVideoPreviewLayerExample.release.xcconfig */;
+			baseConfigurationReference = 4F8F2323D7872B979A6332AF /* Pods-LAUCaptureVideoPreviewLayerExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -419,12 +419,12 @@
 					"\"$(SRCROOT)\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "support/LMTCaptureVideoPreviewLayerExample-Prefix.pch";
+				GCC_PREFIX_HEADER = "support/LAUCaptureVideoPreviewLayerExample-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				INFOPLIST_FILE = "support/LMTCaptureVideoPreviewLayerExample-Info.plist";
+				INFOPLIST_FILE = "support/LAUCaptureVideoPreviewLayerExample-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.LMTCaptureVideoPreviewLayerExample;
-				PRODUCT_NAME = LMTCaptureVideoPreviewLayerExample;
+				PRODUCT_BUNDLE_IDENTIFIER = co.coletiv.LAUCaptureVideoPreviewLayerExample;
+				PRODUCT_NAME = LAUCaptureVideoPreviewLayerExample;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -433,7 +433,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LMTCaptureVideoPreviewLayerExample" */ = {
+		A06ACB1F1608B2C200E20441 /* Build configuration list for PBXProject "LAUCaptureVideoPreviewLayerExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A06ACB441608B2C300E20441 /* Debug */,
@@ -442,7 +442,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A06ACB461608B2C300E20441 /* Build configuration list for PBXNativeTarget "LMTCaptureVideoPreviewLayerExample" */ = {
+		A06ACB461608B2C300E20441 /* Build configuration list for PBXNativeTarget "LAUCaptureVideoPreviewLayerExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A06ACB471608B2C300E20441 /* Debug */,

@@ -1,7 +1,7 @@
 /*
  
  CameraPreviewView.m
- LMTCaptureVideoPreviewLayerExample
+ LAUCaptureVideoPreviewLayerExample
  
  Copyright (c) 2016 Coletiv Studio.
  Some rights reserved, all wrongs deserved.
@@ -71,7 +71,7 @@ static CGFloat const kLongPressBeganLocationLayerWidth = 80.0f;
     if (captureSession)
     {
         // Create the session video preview layer
-        LMTCaptureVideoPreviewLayer * videoPreviewLayer = [[LMTCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
+        LAUCaptureVideoPreviewLayer * videoPreviewLayer = [[LAUCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
         [videoPreviewLayer setBackgroundColor:[self.backgroundColor CGColor]];
         [videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill]; // fill the layer
 
@@ -84,7 +84,7 @@ static CGFloat const kLongPressBeganLocationLayerWidth = 80.0f;
     }
 }
 
-- (void)setVideoPreviewLayer:(LMTCaptureVideoPreviewLayer *)videoPreviewLayer
+- (void)setVideoPreviewLayer:(LAUCaptureVideoPreviewLayer *)videoPreviewLayer
 {
     if (videoPreviewLayer)
     {
