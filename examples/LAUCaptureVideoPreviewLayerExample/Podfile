@@ -1,6 +1,5 @@
 platform :ios, '7.0'
 
 target "LAUCaptureVideoPreviewLayerExample" do
-  # pod "LAUCaptureVideoPreviewLayer", :git => 'git@bitbucket.org:coletiv/lmtcapturevideopreviewlayer.git'
   pod "LAUCaptureVideoPreviewLayer", :path => '../../'
 end

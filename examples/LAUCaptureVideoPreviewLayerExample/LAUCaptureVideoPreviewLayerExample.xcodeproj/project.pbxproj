@@ -23,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3807FF711DD20EEC00C4FC1F /* LAUCaptureVideoPreviewLayerExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LAUCaptureVideoPreviewLayerExample-Info.plist"; path = "support/LAUCaptureVideoPreviewLayerExample-Info.plist"; sourceTree = SOURCE_ROOT; };
+		3807FF731DD20EF900C4FC1F /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "LAUCaptureVideoPreviewLayerExample-Prefix.pch"; path = "support/LAUCaptureVideoPreviewLayerExample-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		380ED6B11D9037AA009BEB7A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LAUCaptureVideoPreviewLayerExample/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		389735061DB50D4700A4154B /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "resources/Launch Screen.storyboard"; sourceTree = SOURCE_ROOT; };
 		38E212A81D32680D00AAE5F6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -42,8 +44,6 @@
 		A0C5196D1880589F00FE03D2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = SOURCE_ROOT; };
 		A0C5196E1880589F00FE03D2 /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = src/CameraViewController.h; sourceTree = SOURCE_ROOT; };
 		A0C5196F1880589F00FE03D2 /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraViewController.m; path = src/CameraViewController.m; sourceTree = SOURCE_ROOT; };
-		A0C51973188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "LAUCaptureVideoPreviewLayerExample-Info.plist"; path = "support/LAUCaptureVideoPreviewLayerExample-Info.plist"; sourceTree = SOURCE_ROOT; };
-		A0C51974188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "LAUCaptureVideoPreviewLayerExample-Prefix.pch"; path = "support/LAUCaptureVideoPreviewLayerExample-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		D7415B685F7012807E9CC699 /* libPods-LAUCaptureVideoPreviewLayerExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LAUCaptureVideoPreviewLayerExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -109,7 +109,7 @@
 		A0C51945188057B700FE03D2 /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				A0C51973188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Info.plist */,
+				3807FF711DD20EEC00C4FC1F /* LAUCaptureVideoPreviewLayerExample-Info.plist */,
 			);
 			name = Support;
 			path = LAPickerView;
@@ -142,8 +142,8 @@
 		A0F1A4F516302ECA002E6BE5 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				3807FF731DD20EF900C4FC1F /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */,
 				A0C5196D1880589F00FE03D2 /* main.m */,
-				A0C51974188058B700FE03D2 /* LAUCaptureVideoPreviewLayerExample-Prefix.pch */,
 			);
 			name = "Other Sources";
 			path = LAPickerView;
