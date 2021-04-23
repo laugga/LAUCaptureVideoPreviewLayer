@@ -2,15 +2,16 @@
 
 ## Introduction
 
-LAUCaptureVideoPreviewLayer is a preview layer for the AVCaptureSession with GPU-based blur filter. You can use it like a AVCaptureVideoPreviewLayer and then dynamically/real-time apply a blur filter to the video output frames.
+LAUCaptureVideoPreviewLayer is a preview layer for the AVCaptureSession with GPU-based blur filter. You can use it like a AVCaptureVideoPreviewLayer and then dynamically/in real-time apply a blur filter to the video output frames.
 
-We developed it for Lightmate's iOS app. This is our attempt to share some of the components used in the app.
+It was developed for [Lightmate](https://lightmate.app/ "Lightmate")'s iOS app with the goal of replacing AVFoundation's *AVCaptureVideoPreviewLayer*. This is mainly an R&D project and there are still many optimizations needed before it can be used in a "production" context. This is an attempt to share some of the learnings and components used in the app.
 
-## Requirements
+## Requirements and Dependencies
 
 * iOS 7.0 or later
 * ARC
 * Suported devices: ?
+* OpenGL 2.0 / GLSL
 
 ## Using with CocoaPods
 
@@ -55,6 +56,8 @@ videoPreviewLayer.blur = 1.0f;
 
 The example is a single view application with a AVCaptureSession and a AVCaptureDeviceInput (AVCaptureDevicePositionBack).
 
+![Blur in out example](docs/figures/blur-in-out-example.gif)
+
 __Interactions:__
 
 * Tap to blur-in (animated)
@@ -81,7 +84,11 @@ __Gaussian Blur Implementation__
 ## References
 
 [Real-Time Rendering, 3rd Edition, 10.9 Image Processing (p.468-472)](http://www.realtimerendering.com)
+
 [Intel, An investigation of fast real-time GPU-based image blur algorithms](https://software.intel.com/en-us/blogs/2014/07/15/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms)
+
 [GPU Gems 3, Chapter 40. Incremental Computation of the Gaussian](http://http.developer.nvidia.com/GPUGems3/gpugems3_ch40.html)
+
 [Rastergrid, Efficient Gaussian blur with linear sampling](http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/)
+
 [Xissburg, Faster Gaussian Blur in GLSL](http://xissburg.com/faster-gaussian-blur-in-glsl/)
